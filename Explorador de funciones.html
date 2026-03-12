@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Explorador de Funciones</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:#f4f6f8;
+}
+
+#funcion{
+font-size:22px;
+font-weight:bold;
+margin:15px;
+}
+
+#coordenadas{
+font-size:18px;
+margin:10px;
+color:#2c3e50;
+}
+
+canvas{
+background:white;
+border:1px solid #999;
+}
+
+button{
+font-size:18px;
+padding:10px 20px;
+margin:15px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Explorador de Funciones</h1>
+
+<div id="funcion"></div>
+
+<div id="coordenadas">
+Coordenadas: (x , y)
+</div>
+
+<canvas id="grafico" width="800" height="450"></canvas>
+
+<div>
+<button onclick="anterior()">⬅ Función anterior</button>
+<button onclick="siguiente()">Función siguiente ➡</button>
+</div>
+
+<script>
+
+const funciones=[
+
+{
+exp:"1) f(x)= x² - 4",
+f:(x)=>x*x-4,
+color:"#2980b9",
+raices:[-2,2]
+},
+
+{
+exp:"2) f(x)= x³ - 3x",
+f:(x)=>x*x*x-3*x,
+color:"#27ae60",
+raices:[-Math.sqrt(3),0,Math.sqrt(3)]
+},
+
+{
+exp:"3) f(x)= |x| - 2",
+f:(x)=>Math.abs(x)-2,
+color:"#8e44ad",
+raices:[-2,2]
+},
+
+{
+exp:"4) f(x)= √(x+4) - 1",
+f:(x)=>Math.sqrt(x+4)-1,
+color:"#d35400",
+asintota:-4,
+raices:[-3]
+},
+
+{
+exp:"5) f(x)= 2^x - 3",
+f:(x)=>Math.pow(2,x)-3,
+color:"#16a085",
+raices:[Math.log2(3)]
+},
+
+{
+exp:"6) f(x)= 1/(x-2)",
+f:(x)=>1/(x-2),
+color:"#c0392b",
+asintota:2
+}
+
+]
+
+let indice=0
+let chart
+
+function generarDatos(func,min,max){
+
+let datos=[]
+
+for(let x=min;x<=max;x+=0.02){
+
+let y=func(x)
+
+if(!isNaN(y) && isFinite(y)){
+datos.push({x:x,y:y})
+}
+
+}
+
+return datos
+
+}
+
+const pluginEjes={
+id:"ejes",
+
+afterDraw(chart){
+
+const ctx=chart.ctx
+const xScale=chart.scales.x
+const yScale=chart.scales.y
+
+ctx.save()
+ctx.fillStyle="black"
+ctx.font="12px Arial"
+
+for(let i=-10;i<=10;i++){
+
+let x=xScale.getPixelForValue(i)
+let y=yScale.getPixelForValue(0)
+
+ctx.fillText(i,x-6,y+15)
+
+}
+
+for(let i=-10;i<=10;i++){
+
+let x=xScale.getPixelForValue(0)
+let y=yScale.getPixelForValue(i)
+
+if(i!==0) ctx.fillText(i,x+6,y+3)
+
+}
+
+ctx.restore()
+
+}
+
+}
+
+function dibujar(){
+
+const fun=funciones[indice]
+
+document.getElementById("funcion").innerText=fun.exp
+
+let datasets=[]
+
+if(fun.asintota!==undefined){
+
+let izquierda=generarDatos(fun.f,-10,fun.asintota-0.01)
+let derecha=generarDatos(fun.f,fun.asintota+0.01,10)
+
+datasets.push({
+data:izquierda,
+borderColor:fun.color,
+borderWidth:3,
+pointRadius:0,
+showLine:true
+})
+
+datasets.push({
+data:derecha,
+borderColor:fun.color,
+borderWidth:3,
+pointRadius:0,
+showLine:true
+})
+
+datasets.push({
+data:[{x:fun.asintota,y:-10},{x:fun.asintota,y:10}],
+borderColor:"black",
+borderDash:[6,6],
+borderWidth:2,
+pointRadius:0,
+showLine:true
+})
+
+}
+
+else{
+
+let datos=generarDatos(fun.f,-10,10)
+
+datasets.push({
+data:datos,
+borderColor:fun.color,
+borderWidth:3,
+pointRadius:0,
+showLine:true
+})
+
+}
+
+if(fun.raices){
+
+let puntos=[]
+
+fun.raices.forEach(r=>{
+puntos.push({x:r,y:0})
+})
+
+datasets.push({
+data:puntos,
+backgroundColor:"red",
+borderColor:"red",
+pointRadius:6,
+showLine:false
+})
+
+}
+
+datasets.push(
+{
+data:[{x:-10,y:0},{x:10,y:0}],
+borderColor:"black",
+borderWidth:2,
+pointRadius:0,
+showLine:true
+},
+{
+data:[{x:0,y:-10},{x:0,y:10}],
+borderColor:"black",
+borderWidth:2,
+pointRadius:0,
+showLine:true
+}
+)
+
+if(chart) chart.destroy()
+
+chart=new Chart(document.getElementById("grafico"),{
+
+type:"scatter",
+
+data:{datasets:datasets},
+
+options:{
+
+plugins:{legend:{display:false}},
+
+interaction:{
+mode:"nearest",
+intersect:false
+},
+
+onClick:(evt)=>{
+
+const canvas=chart.canvas
+const rect=canvas.getBoundingClientRect()
+
+const xPixel=evt.clientX-rect.left
+
+const xValue=chart.scales.x.getValueForPixel(xPixel)
+
+const funActual=funciones[indice]
+
+if(funActual.f){
+
+let yValue=funActual.f(xValue)
+
+if(!isNaN(yValue) && isFinite(yValue)){
+
+document.getElementById("coordenadas").innerText=
+"Coordenadas: ("+
+xValue.toFixed(4)+" , "+
+yValue.toFixed(4)+")"
+
+}
+
+}
+
+},
+
+scales:{
+
+x:{
+type:"linear",
+min:-10,
+max:10,
+grid:{color:"#ddd"},
+ticks:{display:false}
+},
+
+y:{
+min:-10,
+max:10,
+grid:{color:"#ddd"},
+ticks:{display:false}
+}
+
+}
+
+},
+
+plugins:[pluginEjes]
+
+})
+
+}
+
+function siguiente(){
+
+indice++
+if(indice>=funciones.length) indice=0
+dibujar()
+
+}
+
+function anterior(){
+
+indice--
+if(indice<0) indice=funciones.length-1
+dibujar()
+
+}
+
+dibujar()
+
+</script>
+
+</body>
+</html>
