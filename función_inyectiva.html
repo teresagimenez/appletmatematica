@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Funciones Inyectivas</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  body {
+    font-family: Arial;
+    text-align: center;
+    background-color: #f4f4f4;
+  }
+
+  #contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  canvas {
+    background: white;
+    margin: 5px;
+  }
+
+  button {
+    padding: 8px;
+    margin: 5px;
+    font-size: 14px;
+  }
+
+  #pantalla {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>¿Es inyectiva?</h2>
+<p id="pantalla"></p>
+<p>Usá la recta horizontal para decidir</p>
+
+<div id="contenedor">
+  <canvas id="grafico1" width="320" height="240"></canvas>
+  <canvas id="grafico2" width="320" height="240"></canvas>
+</div>
+
+<div>
+  <button onclick="anterior()">⬅️ Anterior</button>
+  <button onclick="siguiente()">➡️ Siguiente</button>
+  <button onclick="toggleLinea()">Recta Horizontal</button>
+</div>
+
+<p id="info"></p>
+
+<script>
+let indice = 0;
+let mostrarLinea = false;
+
+const pares = [
+  {f1: x => 2*x+1, f2: x => x*x, texto:"f(x)=2x+1   |   g(x)=x²"},
+  {f1: x => x*x*x, f2: x => Math.abs(x), texto:"f(x)=x³   |   g(x)=|x|"},
+  {f1: x => 1/x, f2: x => Math.sqrt(x>=0?x:NaN), texto:"f(x)=1/x   |   g(x)=√x"},
+  {f1: x => x*x*x - x, f2: x => Math.exp(x)/10, texto:"f(x)=x³-x   |   g(x)=e^x/10"},
+  {f1: x => Math.log(x>0?x:NaN), f2: x => x*x+1, texto:"f(x)=ln(x)   |   g(x)=x²+1"}
+];
+
+let chart1, chart2;
+
+function generarDatos(func){
+  let data = [];
+  for(let x=-5; x<=5; x+=0.2){
+    let y = func(x);
+    if(!isNaN(y) && isFinite(y)){
+      data.push({x:x, y:y});
+    }
+  }
+  return data;
+}
+
+function crearGrafico(canvasId, func){
+  return new Chart(document.getElementById(canvasId), {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          data: generarDatos(func),
+          showLine: true,
+          pointRadius: 0
+        },
+        {
+          data: mostrarLinea ? [{x:-5,y:1},{x:5,y:1}] : [],
+          borderDash: [5,5],
+          showLine: true,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: false,
+      plugins: {legend: {display: false}},
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'center', // eje X en el medio
+          min:-5,
+          max:5,
+          ticks:{font:{size:10}}
+        },
+        y: {
+          position: 'center', // 🔥 eje Y en el medio
+          min:-5,
+          max:5,
+          ticks:{font:{size:10}}
+        }
+      }
+    }
+  });
+}
+
+function dibujar(){
+  if(chart1) chart1.destroy();
+  if(chart2) chart2.destroy();
+
+  let par = pares[indice];
+
+  chart1 = crearGrafico("grafico1", par.f1);
+  chart2 = crearGrafico("grafico2", par.f2);
+
+  document.getElementById("info").innerHTML = par.texto;
+
+  document.getElementById("pantalla").innerHTML =
+    "Pantalla " + (indice + 1) + " de " + pares.length;
+}
+
+function siguiente(){
+  indice = (indice+1)%pares.length;
+  dibujar();
+}
+
+function anterior(){
+  indice = (indice-1+pares.length)%pares.length;
+  dibujar();
+}
+
+function toggleLinea(){
+  mostrarLinea = !mostrarLinea;
+  dibujar();
+}
+
+dibujar();
+</script>
+
+</body>
+</html>
