@@ -63,6 +63,12 @@ canvas {
   background: white;
 }
 
+.funcion {
+  font-size: 18px;
+  margin: 10px;
+  font-weight: bold;
+}
+
 button {
   margin-top: 10px;
   padding: 10px;
@@ -111,13 +117,54 @@ button {
 </div>
 
 <!-- SALAS -->
-<div id="c1" class="screen"><h2>Sala 1</h2><canvas id="f1" width="300" height="300"></canvas><button onclick="volver()">Volver</button></div>
-<div id="c2" class="screen"><h2>Sala 2</h2><canvas id="f2" width="300" height="300"></canvas><button onclick="volver()">Volver</button></div>
-<div id="c3" class="screen"><h2>Sala 3</h2><canvas id="f3" width="300" height="300"></canvas><button onclick="volver()">Volver</button></div>
-<div id="c4" class="screen"><h2>Sala 4</h2><canvas id="f4" width="300" height="300"></canvas><button onclick="volver()">Volver</button></div>
-<div id="c5" class="screen"><h2>Sala 5</h2><canvas id="f5" width="300" height="300"></canvas><button onclick="volver()">Volver</button></div>
-<div id="c6" class="screen"><h2>Sala 6</h2><canvas id="f6" width="300" height="300"></canvas><button onclick="volver()">Volver</button></div>
-<div id="c7" class="screen"><h2>Sala 7</h2><canvas id="f7" width="300" height="300"></canvas><button onclick="volver()">Volver</button></div>
+<div id="c1" class="screen">
+  <h2>Sala 1</h2>
+  <div class="funcion">f(x) = x³ − 6x² + 8x</div>
+  <canvas id="f1" width="300" height="300"></canvas>
+  <button onclick="volver()">Volver</button>
+</div>
+
+<div id="c2" class="screen">
+  <h2>Sala 2</h2>
+  <div class="funcion">f(x) = (x² − x) / (x + 1)</div>
+  <canvas id="f2" width="300" height="300"></canvas>
+  <button onclick="volver()">Volver</button>
+</div>
+
+<div id="c3" class="screen">
+  <h2>Sala 3</h2>
+  <div class="funcion">f(x) = ln(x + 2)</div>
+  <canvas id="f3" width="300" height="300"></canvas>
+  <button onclick="volver()">Volver</button>
+</div>
+
+<div id="c4" class="screen">
+  <h2>Sala 4</h2>
+  <div class="funcion">f(x) = 2x − 5</div>
+  <canvas id="f4" width="300" height="300"></canvas>
+  <button onclick="volver()">Volver</button>
+</div>
+
+<div id="c5" class="screen">
+  <h2>Sala 5</h2>
+  <div class="funcion">f(x) = -1/10 x³ + 1/2 x² + 6/5 x - 18/5</div>  
+  <canvas id="f5" width="300" height="300"></canvas>
+  <button onclick="volver()">Volver</button>
+</div>
+
+<div id="c6" class="screen">
+  <h2>Sala 6</h2>
+  <div class="funcion">f(x) = |eˣ − 1|</div>
+  <canvas id="f6" width="300" height="300"></canvas>
+  <button onclick="volver()">Volver</button>
+</div>
+
+<div id="c7" class="screen">
+  <h2>Sala 7</h2>
+  <div class="funcion">f(x) = -1/2 x² + 2x + 2</div>
+  <canvas id="f7" width="300" height="300"></canvas>
+  <button onclick="volver()">Volver</button>
+</div>
 
 <script>
 
@@ -182,60 +229,12 @@ function dibujar(canvasId, f, escala=20){
   ctx.stroke();
 }
 
-/* =========================
-   FUNCIONES
-========================= */
-
 dibujar("f1", x => x**3 - 6*x**2 + 8*x);
-
-// 🔥 SALA 2 ACTUALIZADA
 dibujar("f2", x => (x*(x-1))/(x+1), 20);
-
-// ASÍNTOTA x = -1
-(function(){
-  const c = document.getElementById("f2");
-  const ctx = c.getContext("2d");
-
-  ctx.setLineDash([6,6]);
-  ctx.strokeStyle = "red";
-
-  let x = c.width/2 + (-1)*20;
-
-  ctx.beginPath();
-  ctx.moveTo(x, 0);
-  ctx.lineTo(x, c.height);
-  ctx.stroke();
-
-  ctx.setLineDash([]);
-  ctx.strokeStyle = "black";
-})();
-
 dibujar("f3", x => Math.log(x + 2), 20);
-
-(function(){
-  const c = document.getElementById("f3");
-  const ctx = c.getContext("2d");
-
-  ctx.setLineDash([6,6]);
-  ctx.strokeStyle = "red";
-
-  let x = c.width/2 + (-2)*20;
-
-  ctx.beginPath();
-  ctx.moveTo(x,0);
-  ctx.lineTo(x,c.height);
-  ctx.stroke();
-
-  ctx.setLineDash([]);
-  ctx.strokeStyle = "black";
-})();
-
 dibujar("f4", x => 2*x - 5);
-
 dibujar("f5", x => -0.1*(x+3)*(x-2)*(x-6), 20);
-
 dibujar("f6", x => Math.abs(Math.exp(x) - 1));
-
 dibujar("f7", x => -0.5*(x-2)**2 + 4, 20);
 
 </script>
