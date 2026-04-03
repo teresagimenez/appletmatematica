@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Funciones – Análisis</title>
+
+<style>
+body { font-family: Arial; text-align: center; }
+
+button {
+  margin: 5px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+canvas {
+  border: 1px solid black;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Análisis de funciones</h2>
+<p id="titulo">Función 1</p>
+
+<div>
+<button onclick="cargar(1, x=>x)">Función 1</button>
+<button onclick="cargar(2, x=>x*x)">Función 2</button>
+<button onclick="cargar(3, x=>x*x*x)">Función 3</button>
+<button onclick="cargar(4, x=>Math.exp(x))">Función 4</button>
+<button onclick="cargar(5, x=>Math.log(x))">Función 5</button>
+<button onclick="cargar(6, x=>1/x)">Función 6</button>
+</div>
+
+<canvas id="grafico" width="400" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("grafico");
+const ctx = canvas.getContext("2d");
+
+function dibujarEjes() {
+    const w = canvas.width;
+    const h = canvas.height;
+    const escala = 20;
+
+    ctx.beginPath();
+    ctx.moveTo(0, h/2);
+    ctx.lineTo(w, h/2);
+    ctx.moveTo(w/2, 0);
+    ctx.lineTo(w/2, h);
+    ctx.stroke();
+
+    ctx.font = "10px Arial";
+    for (let i = -8; i <= 8; i++) {
+        ctx.fillText(i, w/2 + i*escala, h/2 + 10);
+        ctx.fillText(i, w/2 + 5, h/2 - i*escala);
+    }
+
+    // Etiquetas
+    ctx.font = "12px Arial";
+    ctx.fillText("x", w - 15, h/2 - 5);
+    ctx.fillText("f(x)", w/2 + 5, 15);
+}
+
+function cargar(num, f) {
+    document.getElementById("titulo").innerText = "Función " + num;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    const escala = 20;
+
+    ctx.clearRect(0,0,w,h);
+    dibujarEjes();
+
+    ctx.beginPath();
+    let first = true;
+
+    for (let x = -10; x <= 10; x += 0.05) {
+
+        let y;
+        try {
+            y = f(x);
+            if (!isFinite(y)) continue;
+        } catch {
+            continue;
+        }
+
+        let px = w/2 + x*escala;
+        let py = h/2 - y*escala;
+
+        if (first) {
+            ctx.moveTo(px, py);
+            first = false;
+        } else {
+            ctx.lineTo(px, py);
+        }
+    }
+
+    ctx.stroke();
+}
+
+// inicial
+cargar(1, x=>x);
+</script>
+
+</body>
+</html>
