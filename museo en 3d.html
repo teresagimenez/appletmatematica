@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Museo Educativo FINAL</title>
+
+<style>
+body { margin:0; overflow:hidden; font-family:Arial; }
+
+#info {
+ position:absolute;
+ top:10px; left:10px;
+ background:white;
+ padding:8px;
+}
+
+#popup, #quiz {
+ position:absolute;
+ left:50%;
+ transform:translateX(-50%);
+ background:rgba(0,0,0,0.8);
+ color:white;
+ padding:15px;
+ border-radius:10px;
+ display:none;
+}
+
+#popup { bottom:120px; }
+#quiz { top:20%; width:300px; }
+
+button { margin:5px; }
+
+.controls {
+ position:absolute;
+ bottom:20px;
+ width:100%;
+ text-align:center;
+}
+
+.btn {
+ width:60px; height:60px;
+ margin:5px;
+ border:none;
+ border-radius:10px;
+ background:rgba(0,0,0,0.6);
+ color:white;
+ font-size:20px;
+}
+
+#map {
+ position:absolute;
+ top:10px;
+ right:10px;
+ width:150px;
+ height:90px;
+ background:white;
+ border:2px solid black;
+}
+</style>
+</head>
+<body>
+
+<div id="info">Museo interactivo</div>
+<div id="popup"></div>
+<div id="quiz"></div>
+<canvas id="map"></canvas>
+
+<div class="controls">
+<button class="btn" id="up">⬆</button><br>
+<button class="btn" id="left">⬅</button>
+<button class="btn" id="down">⬇</button>
+<button class="btn" id="right">➡</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/PointerLockControls.js"></script>
+
+<script>
+
+const SCALE=0.1;
+let score=0;
+
+let scene=new THREE.Scene();
+scene.background=new THREE.Color(0xf4f1ea);
+
+let camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,1,1000);
+camera.position.set(0,1.7,20);
+
+let renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+
+let controls=new THREE.PointerLockControls(camera,document.body);
+document.body.onclick=()=>controls.lock();
+scene.add(controls.getObject());
+
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+
+// piso
+let floor=new THREE.Mesh(
+ new THREE.PlaneGeometry(100,100),
+ new THREE.MeshStandardMaterial({color:0xc8a97e})
+);
+floor.rotation.x=-Math.PI/2;
+scene.add(floor);
+
+// paredes
+let objects=[];
+function wall(x,y,w,h){
+ let m=new THREE.Mesh(
+  new THREE.BoxGeometry(w*SCALE,4,h*SCALE),
+  new THREE.MeshStandardMaterial({color:0xf0ede6})
+ );
+ m.position.set((x+w/2-375)*SCALE,2,(y+h/2-225)*SCALE);
+ scene.add(m);
+ objects.push(m);
+}
+
+// estructura exacta
+wall(0,0,750,4); wall(0,446,750,4);
+wall(0,0,4,450); wall(746,0,4,450);
+
+wall(0,300,350,4); wall(420,300,330,4);
+wall(0,160,120,4); wall(160,160,210,4);
+wall(410,160,210,4); wall(660,160,90,4);
+
+wall(250,0,4,240); wall(250,300,4,150);
+wall(500,0,4,240); wall(500,300,4,150);
+
+// cuadros
+let cuadros=[];
+
+function cuadro(px,py,f,nombre,texto,pregunta,opciones,correcta){
+
+ let canvas=document.createElement("canvas");
+ canvas.width=512; canvas.height=512;
+ let ctx=canvas.getContext("2d");
+
+ ctx.fillStyle="white";
+ ctx.fillRect(0,0,512,512);
+
+ ctx.beginPath();
+ ctx.moveTo(0,256); ctx.lineTo(512,256);
+ ctx.moveTo(256,0); ctx.lineTo(256,512);
+ ctx.stroke();
+
+ ctx.strokeStyle="blue"; ctx.lineWidth=3;
+ ctx.beginPath();
+
+ let first=true;
+ for(let x=-10;x<=10;x+=0.1){
+  let y=f(x);
+  if(!isFinite(y)||Math.abs(y)>50) continue;
+
+  let X=256+x*20;
+  let Y=256-y*20;
+
+  if(first){ctx.moveTo(X,Y); first=false;}
+  else ctx.lineTo(X,Y);
+ }
+ ctx.stroke();
+
+ let tex=new THREE.CanvasTexture(canvas);
+
+ let x=(px-375)*SCALE;
+ let z=(py-225)*SCALE;
+
+ let mesh=new THREE.Mesh(
+  new THREE.PlaneGeometry(3,3),
+  new THREE.MeshBasicMaterial({map:tex})
+ );
+
+ mesh.position.set(x,2,z);
+ scene.add(mesh);
+
+ cuadros.push({mesh,nombre,texto,pregunta,opciones,correcta,visited:false,px,py});
+}
+
+// salas
+cuadro(320,340,x=>x**3-6*x**2+8*x,"Sala 1","Función cúbica","¿Raíces? ",["1","2","3"],"3");
+cuadro(320,220,x=>(x*(x-1))/(x+1),"Sala 2","Racional","Indefinida?",["x=1","x=-1","x=0"],"x=-1");
+cuadro(100,220,x=>Math.log(x+2),"Sala 3","Log","Dominio?",["x>-2","x>0","x<2"],"x>-2");
+cuadro(540,220,x=>2*x-5,"Sala 4","Lineal","Pendiente?",["2","-5","1"],"2");
+cuadro(100,80,x=>-0.1*(x+3)*(x-2)*(x-6),"Sala 5","Cúbica","Grado?",["2","3","1"],"3");
+cuadro(320,80,x=>Math.abs(Math.exp(x)-1),"Sala 6","Exp","Siempre?",["positiva","negativa","0"],"positiva");
+cuadro(540,80,x=>-0.5*(x-2)**2+4,"Sala 7","Cuadrática","Forma?",["Parábola","Recta","Hiperbola"],"Parábola");
+
+// UI
+let popup=document.getElementById("popup");
+let quiz=document.getElementById("quiz");
+
+// interacción
+function interact(){
+ let pos=controls.getObject().position;
+
+ for(let c of cuadros){
+  let d=pos.distanceTo(c.mesh.position);
+
+  if(d<3){
+   popup.style.display="block";
+   popup.innerHTML="<b>"+c.nombre+"</b><br>"+c.texto;
+
+   speechSynthesis.speak(new SpeechSynthesisUtterance(c.nombre));
+
+   if(!c.visited){
+    c.visited=true;
+    showQuiz(c);
+   }
+   return;
+  }
+ }
+ popup.style.display="none";
+}
+
+function showQuiz(c){
+ quiz.style.display="block";
+ let html="<b>"+c.pregunta+"</b><br>";
+
+ c.opciones.forEach(op=>{
+  html+=`<button onclick="answer('${op}','${c.correcta}')">${op}</button>`;
+ });
+
+ quiz.innerHTML=html;
+}
+
+window.answer=function(op,correcta){
+ if(op===correcta){
+  score++;
+  alert("Correcto 🎉 Puntaje: "+score);
+ }else{
+  alert("Incorrecto");
+ }
+ quiz.style.display="none";
+}
+
+// movimiento
+let mf,mb,ml,mr;
+
+["up","down","left","right"].forEach(id=>{
+ document.getElementById(id).onmousedown=()=>setMove(id,1);
+ document.getElementById(id).onmouseup=()=>setMove(id,0);
+});
+
+function setMove(id,val){
+ if(id==="up") mf=val;
+ if(id==="down") mb=val;
+ if(id==="left") ml=val;
+ if(id==="right") mr=val;
+}
+
+onkeydown=e=>{
+if(e.code==='KeyW'||e.code==='ArrowUp') mf=1;
+if(e.code==='KeyS'||e.code==='ArrowDown') mb=1;
+if(e.code==='KeyA'||e.code==='ArrowLeft') ml=1;
+if(e.code==='KeyD'||e.code==='ArrowRight') mr=1;
+};
+
+onkeyup=e=>{
+if(e.code==='KeyW'||e.code==='ArrowUp') mf=0;
+if(e.code==='KeyS'||e.code==='ArrowDown') mb=0;
+if(e.code==='KeyA'||e.code==='ArrowLeft') ml=0;
+if(e.code==='KeyD'||e.code==='ArrowRight') mr=0;
+};
+
+// minimapa PRO
+let map=document.getElementById("map");
+let ctx=map.getContext("2d");
+
+function drawMap(){
+
+ ctx.fillStyle="white";
+ ctx.fillRect(0,0,150,90);
+
+ ctx.strokeStyle="black";
+
+ function wall2D(x,y,w,h){
+  ctx.strokeRect(x/5,y/5,w/5,h/5);
+ }
+
+ // mismas paredes
+ wall2D(0,0,750,4); wall2D(0,446,750,4);
+ wall2D(0,0,4,450); wall2D(746,0,4,450);
+
+ wall2D(0,300,350,4); wall2D(420,300,330,4);
+ wall2D(0,160,120,4); wall2D(160,160,210,4);
+ wall2D(410,160,210,4); wall2D(660,160,90,4);
+
+ wall2D(250,0,4,240); wall2D(250,300,4,150);
+ wall2D(500,0,4,240); wall2D(500,300,4,150);
+
+ // salas
+ ctx.fillStyle="blue";
+ cuadros.forEach(c=>{
+  ctx.fillRect(c.px/5,c.py/5,4,4);
+ });
+
+ // jugador
+ let px=controls.getObject().position.x;
+ let pz=controls.getObject().position.z;
+
+ let mx=(px/SCALE+375)/5;
+ let my=(pz/SCALE+225)/5;
+
+ ctx.fillStyle="red";
+ ctx.fillRect(mx,my,4,4);
+
+ // orientación
+ let dir=controls.getDirection(new THREE.Vector3());
+ ctx.beginPath();
+ ctx.moveTo(mx,my);
+ ctx.lineTo(mx+dir.x*10,my+dir.z*10);
+ ctx.stroke();
+}
+
+// colisión
+function collide(pos){
+ for(let o of objects){
+  let box=new THREE.Box3().setFromObject(o);
+  let player=new THREE.Box3().setFromCenterAndSize(pos,new THREE.Vector3(1,2,1));
+  if(box.intersectsBox(player)) return true;
+ }
+}
+
+// animación
+function animate(){
+ requestAnimationFrame(animate);
+
+ let old=controls.getObject().position.clone();
+
+ if(mf) controls.moveForward(0.1);
+ if(mb) controls.moveForward(-0.1);
+ if(ml) controls.moveRight(-0.1);
+ if(mr) controls.moveRight(0.1);
+
+ if(collide(controls.getObject().position)){
+  controls.getObject().position.copy(old);
+ }
+
+ interact();
+ drawMap();
+
+ renderer.render(scene,camera);
+}
+
+animate();
+
+</script>
+</body>
+</html>
