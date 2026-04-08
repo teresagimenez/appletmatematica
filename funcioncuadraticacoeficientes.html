@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Applet Función Cuadrática</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { font-family: Arial; text-align: center; }
+.container { width: 80%; margin: auto; }
+.slider { width: 100%; }
+</style>
+</head>
+<body>
+
+<h2>Exploración de la función cuadrática</h2>
+<p>f(x) = ax² + bx + c</p>
+
+<div class="container">
+<label>a: <span id="aval">1</span></label>
+<input type="range" min="-10" max="10" value="1" step="1" id="a" class="slider">
+
+<label>b: <span id="bval">0</span></label>
+<input type="range" min="-10" max="10" value="0" step="1" id="b" class="slider">
+
+<label>c: <span id="cval">0</span></label>
+<input type="range" min="-10" max="10" value="0" step="1" id="c" class="slider">
+
+<canvas id="grafico"></canvas>
+</div>
+
+<script>
+const ctx = document.getElementById('grafico').getContext('2d');
+
+let chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [
+            {
+                label: 'f(x)',
+                data: [],
+                fill: false,
+                borderWidth: 2,
+                pointRadius: 0
+            },
+            {
+                label: 'Eje X',
+                data: [
+                    {x: -10, y: 0},
+                    {x: 10, y: 0}
+                ],
+                borderWidth: 1,
+                pointRadius: 0
+            },
+            {
+                label: 'Eje Y',
+                data: [
+                    {x: 0, y: -50},
+                    {x: 0, y: 50}
+                ],
+                borderWidth: 1,
+                pointRadius: 0
+            }
+        ]
+    },
+    options: {
+        scales: {
+            x: {
+                type: 'linear',
+                min: -10,
+                max: 10,
+                ticks: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Eje X'
+                }
+            },
+            y: {
+                min: -50,
+                max: 50,
+                ticks: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Eje Y'
+                }
+            }
+        }
+    }
+});
+
+function calcular() {
+    let a = parseFloat(document.getElementById('a').value);
+    let b = parseFloat(document.getElementById('b').value);
+    let c = parseFloat(document.getElementById('c').value);
+
+    document.getElementById('aval').innerText = a;
+    document.getElementById('bval').innerText = b;
+    document.getElementById('cval').innerText = c;
+
+    let datos = [];
+    let etiquetas = [];
+
+    for (let x = -10; x <= 10; x += 0.5) {
+        let y = a*x*x + b*x + c;
+        etiquetas.push(x);
+        datos.push({x: x, y: y});
+    }
+
+    chart.data.labels = etiquetas;
+    chart.data.datasets[0].data = datos;
+    chart.update();
+}
+
+
+document.getElementById('a').addEventListener('input', calcular);
+document.getElementById('b').addEventListener('input', calcular);
+document.getElementById('c').addEventListener('input', calcular);
+
+calcular();
+</script>
+
+</body>
+</html>
