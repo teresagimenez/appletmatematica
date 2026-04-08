@@ -2,18 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Museo Educativo FINAL</title>
+<title>Museo Interactivo FINAL Mobile</title>
 
 <style>
 body { margin:0; overflow:hidden; font-family:Arial; }
 
-#info {
- position:absolute;
- top:10px; left:10px;
- background:white;
- padding:8px;
-}
-
+/* UI */
 #popup, #quiz {
  position:absolute;
  left:50%;
@@ -28,25 +22,7 @@ body { margin:0; overflow:hidden; font-family:Arial; }
 #popup { bottom:120px; }
 #quiz { top:20%; width:300px; }
 
-button { margin:5px; }
-
-.controls {
- position:absolute;
- bottom:20px;
- width:100%;
- text-align:center;
-}
-
-.btn {
- width:60px; height:60px;
- margin:5px;
- border:none;
- border-radius:10px;
- background:rgba(0,0,0,0.6);
- color:white;
- font-size:20px;
-}
-
+/* minimapa */
 #map {
  position:absolute;
  top:10px;
@@ -56,30 +32,32 @@ button { margin:5px; }
  background:white;
  border:2px solid black;
 }
+
+/* joystick */
+#joystick {
+ position:absolute;
+ bottom:30px;
+ left:30px;
+ width:100px;
+ height:100px;
+ background:rgba(0,0,0,0.3);
+ border-radius:50%;
+ touch-action:none;
+}
 </style>
 </head>
 <body>
 
-<div id="info">Museo interactivo</div>
 <div id="popup"></div>
 <div id="quiz"></div>
 <canvas id="map"></canvas>
-
-<div class="controls">
-<button class="btn" id="up">⬆</button><br>
-<button class="btn" id="left">⬅</button>
-<button class="btn" id="down">⬇</button>
-<button class="btn" id="right">➡</button>
-</div>
+<div id="joystick"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/PointerLockControls.js"></script>
 
 <script>
 
 const SCALE=0.1;
-let score=0;
-
 let scene=new THREE.Scene();
 scene.background=new THREE.Color(0xf4f1ea);
 
@@ -90,11 +68,8 @@ let renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
 document.body.appendChild(renderer.domElement);
 
-let controls=new THREE.PointerLockControls(camera,document.body);
-document.body.onclick=()=>controls.lock();
-scene.add(controls.getObject());
-
-scene.add(new THREE.AmbientLight(0xffffff,0.6));
+// luces
+scene.add(new THREE.AmbientLight(0xffffff,0.7));
 
 // piso
 let floor=new THREE.Mesh(
@@ -116,35 +91,31 @@ function wall(x,y,w,h){
  objects.push(m);
 }
 
-// estructura exacta
+// estructura
 wall(0,0,750,4); wall(0,446,750,4);
 wall(0,0,4,450); wall(746,0,4,450);
-
 wall(0,300,350,4); wall(420,300,330,4);
 wall(0,160,120,4); wall(160,160,210,4);
 wall(410,160,210,4); wall(660,160,90,4);
-
 wall(250,0,4,240); wall(250,300,4,150);
 wall(500,0,4,240); wall(500,300,4,150);
 
 // cuadros
 let cuadros=[];
-
 function cuadro(px,py,f,nombre,texto,pregunta,opciones,correcta){
 
  let canvas=document.createElement("canvas");
  canvas.width=512; canvas.height=512;
  let ctx=canvas.getContext("2d");
 
- ctx.fillStyle="white";
- ctx.fillRect(0,0,512,512);
+ ctx.fillStyle="white"; ctx.fillRect(0,0,512,512);
 
  ctx.beginPath();
  ctx.moveTo(0,256); ctx.lineTo(512,256);
  ctx.moveTo(256,0); ctx.lineTo(256,512);
  ctx.stroke();
 
- ctx.strokeStyle="blue"; ctx.lineWidth=3;
+ ctx.strokeStyle="blue";
  ctx.beginPath();
 
  let first=true;
@@ -177,7 +148,7 @@ function cuadro(px,py,f,nombre,texto,pregunta,opciones,correcta){
 }
 
 // salas
-cuadro(320,340,x=>x**3-6*x**2+8*x,"Sala 1","Función cúbica","¿Raíces? ",["1","2","3"],"3");
+cuadro(320,340,x=>x**3-6*x**2+8*x,"Sala 1","Función cúbica","¿Raíces?",["1","2","3"],"3");
 cuadro(320,220,x=>(x*(x-1))/(x+1),"Sala 2","Racional","Indefinida?",["x=1","x=-1","x=0"],"x=-1");
 cuadro(100,220,x=>Math.log(x+2),"Sala 3","Log","Dominio?",["x>-2","x>0","x<2"],"x>-2");
 cuadro(540,220,x=>2*x-5,"Sala 4","Lineal","Pendiente?",["2","-5","1"],"2");
@@ -191,7 +162,7 @@ let quiz=document.getElementById("quiz");
 
 // interacción
 function interact(){
- let pos=controls.getObject().position;
+ let pos=camera.position;
 
  for(let c of cuadros){
   let d=pos.distanceTo(c.mesh.position);
@@ -199,8 +170,6 @@ function interact(){
   if(d<3){
    popup.style.display="block";
    popup.innerHTML="<b>"+c.nombre+"</b><br>"+c.texto;
-
-   speechSynthesis.speak(new SpeechSynthesisUtterance(c.nombre));
 
    if(!c.visited){
     c.visited=true;
@@ -224,45 +193,38 @@ function showQuiz(c){
 }
 
 window.answer=function(op,correcta){
- if(op===correcta){
-  score++;
-  alert("Correcto 🎉 Puntaje: "+score);
- }else{
-  alert("Incorrecto");
- }
+ alert(op===correcta ? "Correcto 🎉" : "Incorrecto");
  quiz.style.display="none";
 }
 
-// movimiento
-let mf,mb,ml,mr;
+// movimiento PC
+let keys={};
+onkeydown=e=>keys[e.code]=true;
+onkeyup=e=>keys[e.code]=false;
 
-["up","down","left","right"].forEach(id=>{
- document.getElementById(id).onmousedown=()=>setMove(id,1);
- document.getElementById(id).onmouseup=()=>setMove(id,0);
+// joystick móvil
+let moveX=0, moveY=0;
+let joystick=document.getElementById("joystick");
+
+joystick.addEventListener("touchmove",(e)=>{
+ let rect=joystick.getBoundingClientRect();
+ let t=e.touches[0];
+
+ moveX=(t.clientX-rect.left-50)/50;
+ moveY=(t.clientY-rect.top-50)/50;
 });
 
-function setMove(id,val){
- if(id==="up") mf=val;
- if(id==="down") mb=val;
- if(id==="left") ml=val;
- if(id==="right") mr=val;
-}
+joystick.addEventListener("touchend",()=>{
+ moveX=0; moveY=0;
+});
 
-onkeydown=e=>{
-if(e.code==='KeyW'||e.code==='ArrowUp') mf=1;
-if(e.code==='KeyS'||e.code==='ArrowDown') mb=1;
-if(e.code==='KeyA'||e.code==='ArrowLeft') ml=1;
-if(e.code==='KeyD'||e.code==='ArrowRight') mr=1;
-};
+// cámara táctil
+document.addEventListener("touchmove",(e)=>{
+ if(e.target===joystick) return;
+ camera.rotation.y -= e.touches[0].movementX*0.002;
+});
 
-onkeyup=e=>{
-if(e.code==='KeyW'||e.code==='ArrowUp') mf=0;
-if(e.code==='KeyS'||e.code==='ArrowDown') mb=0;
-if(e.code==='KeyA'||e.code==='ArrowLeft') ml=0;
-if(e.code==='KeyD'||e.code==='ArrowRight') mr=0;
-};
-
-// minimapa PRO
+// minimapa
 let map=document.getElementById("map");
 let ctx=map.getContext("2d");
 
@@ -271,45 +233,22 @@ function drawMap(){
  ctx.fillStyle="white";
  ctx.fillRect(0,0,150,90);
 
- ctx.strokeStyle="black";
-
  function wall2D(x,y,w,h){
   ctx.strokeRect(x/5,y/5,w/5,h/5);
  }
 
- // mismas paredes
  wall2D(0,0,750,4); wall2D(0,446,750,4);
  wall2D(0,0,4,450); wall2D(746,0,4,450);
-
  wall2D(0,300,350,4); wall2D(420,300,330,4);
- wall2D(0,160,120,4); wall2D(160,160,210,4);
- wall2D(410,160,210,4); wall2D(660,160,90,4);
 
- wall2D(250,0,4,240); wall2D(250,300,4,150);
- wall2D(500,0,4,240); wall2D(500,300,4,150);
-
- // salas
  ctx.fillStyle="blue";
- cuadros.forEach(c=>{
-  ctx.fillRect(c.px/5,c.py/5,4,4);
- });
+ cuadros.forEach(c=>ctx.fillRect(c.px/5,c.py/5,4,4));
 
- // jugador
- let px=controls.getObject().position.x;
- let pz=controls.getObject().position.z;
-
- let mx=(px/SCALE+375)/5;
- let my=(pz/SCALE+225)/5;
+ let mx=(camera.position.x/SCALE+375)/5;
+ let my=(camera.position.z/SCALE+225)/5;
 
  ctx.fillStyle="red";
  ctx.fillRect(mx,my,4,4);
-
- // orientación
- let dir=controls.getDirection(new THREE.Vector3());
- ctx.beginPath();
- ctx.moveTo(mx,my);
- ctx.lineTo(mx+dir.x*10,my+dir.z*10);
- ctx.stroke();
 }
 
 // colisión
@@ -321,20 +260,23 @@ function collide(pos){
  }
 }
 
-// animación
+// loop
 function animate(){
  requestAnimationFrame(animate);
 
- let old=controls.getObject().position.clone();
+ let speed=0.1;
+ let old=camera.position.clone();
 
- if(mf) controls.moveForward(0.1);
- if(mb) controls.moveForward(-0.1);
- if(ml) controls.moveRight(-0.1);
- if(mr) controls.moveRight(0.1);
+ if(keys["KeyW"]||keys["ArrowUp"]) camera.position.z-=speed;
+ if(keys["KeyS"]||keys["ArrowDown"]) camera.position.z+=speed;
+ if(keys["KeyA"]||keys["ArrowLeft"]) camera.position.x-=speed;
+ if(keys["KeyD"]||keys["ArrowRight"]) camera.position.x+=speed;
 
- if(collide(controls.getObject().position)){
-  controls.getObject().position.copy(old);
- }
+ // móvil
+ camera.position.x+=moveX*0.1;
+ camera.position.z+=moveY*0.1;
+
+ if(collide(camera.position)) camera.position.copy(old);
 
  interact();
  drawMap();
