@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Galería de Funciones</title>
+<style>
+* { box-sizing:border-box; }
+body { margin:0; overflow:hidden; font-family:'Georgia',serif; background:#000; }
+
+#hud {
+  position:absolute; top:0; left:0; right:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);
+  pointer-events:none;
+}
+#hud h1 { margin:0; font-size:15px; font-weight:400; color:#e8d98a; letter-spacing:3px; text-transform:uppercase; }
+#hud p  { margin:0; font-size:10px; color:rgba(232,217,138,0.4); letter-spacing:1.5px; }
+#visited-badge {
+  border:1px solid rgba(232,217,138,0.25); padding:6px 16px;
+  color:rgba(232,217,138,0.7); font-size:12px; letter-spacing:1px; font-family:system-ui,sans-serif;
+}
+
+/* Splash */
+#splash {
+  position:absolute; inset:0; background:rgba(4,3,8,0.94);
+  display:flex; align-items:center; justify-content:center; z-index:100;
+}
+#splash-card {
+  border:1px solid rgba(232,217,138,0.28); padding:48px 52px; max-width:420px;
+  text-align:center; color:#e8d98a; background:rgba(8,6,18,0.92);
+}
+#splash-card .pre  { font-size:10px; letter-spacing:3px; color:rgba(232,217,138,0.35); margin-bottom:16px; font-family:system-ui,sans-serif; }
+#splash-card h2    { margin:0 0 4px; font-size:26px; font-weight:400; letter-spacing:3px; text-transform:uppercase; }
+#splash-card .sub  { font-size:11px; color:rgba(232,217,138,0.38); letter-spacing:2px; margin-bottom:26px; font-family:system-ui,sans-serif; }
+#splash-card p     { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.9; margin-bottom:28px; font-family:system-ui,sans-serif; }
+#btn-enter {
+  padding:11px 36px; background:transparent;
+  border:1px solid rgba(232,217,138,0.45); color:#e8d98a;
+  font-size:12px; letter-spacing:2px; text-transform:uppercase;
+  cursor:pointer; font-family:'Georgia',serif; transition:background 0.2s;
+}
+#btn-enter:hover { background:rgba(232,217,138,0.08); }
+
+/* Ficha técnica lateral */
+#ficha {
+  position:absolute; top:50%; right:0;
+  transform:translateY(-50%);
+  width:280px;
+  background:rgba(4,3,10,0.93);
+  border-left:1px solid rgba(232,217,138,0.2);
+  border-top:1px solid rgba(232,217,138,0.2);
+  border-bottom:1px solid rgba(232,217,138,0.2);
+  color:#e8d98a;
+  padding:22px 22px 20px;
+  display:none;
+  font-family:system-ui,sans-serif;
+  pointer-events:none;
+  max-height:90vh;
+  overflow:hidden;
+}
+#ficha .f-tag    { font-size:8px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(232,217,138,0.35); margin-bottom:10px; }
+#ficha .f-nombre { font-family:'Georgia',serif; font-size:17px; font-weight:400; letter-spacing:1px; margin-bottom:4px; }
+#ficha .f-formula{
+  font-size:13px; color:rgba(255,255,255,0.85);
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(232,217,138,0.15);
+  padding:8px 12px; margin-bottom:14px;
+  letter-spacing:0.5px; line-height:1.6;
+}
+#ficha hr { border:none; border-top:1px solid rgba(232,217,138,0.12); margin:12px 0; }
+#ficha .f-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; font-size:12px; }
+#ficha .f-label { color:rgba(232,217,138,0.5); letter-spacing:0.5px; }
+#ficha .f-val   { color:rgba(255,255,255,0.88); text-align:right; font-size:11.5px; max-width:160px; line-height:1.5; }
+#ficha .f-badge {
+  display:inline-block; font-size:10px; padding:2px 8px;
+  border:1px solid rgba(232,217,138,0.25); margin:2px 2px 0 0;
+  color:rgba(232,217,138,0.75); letter-spacing:0.5px;
+}
+#ficha .badge-si  { border-color:rgba(100,200,120,0.4); color:rgba(100,220,130,0.85); }
+#ficha .badge-no  { border-color:rgba(200,80,80,0.4);   color:rgba(220,100,100,0.85); }
+
+/* Nombre al acercarse (centro abajo) */
+#popup {
+  position:absolute; bottom:155px; left:50%; transform:translateX(-50%);
+  background:rgba(4,3,10,0.85);
+  border:1px solid rgba(232,217,138,0.2);
+  border-top:2px solid rgba(232,217,138,0.55);
+  color:#e8d98a; padding:13px 26px;
+  display:none; text-align:center; pointer-events:none; white-space:nowrap;
+}
+#popup .p-tag    { font-size:8px; letter-spacing:2px; text-transform:uppercase; color:rgba(232,217,138,0.35); margin-bottom:5px; font-family:system-ui,sans-serif; }
+#popup .p-nombre { font-size:18px; letter-spacing:1px; }
+#popup .p-formula{ font-size:12px; color:rgba(255,255,255,0.55); font-family:system-ui,sans-serif; margin-top:3px; }
+
+/* Joysticks */
+.joystick-wrap { position:absolute; bottom:28px; width:110px; height:110px; touch-action:none; user-select:none; }
+#joy-move { left:24px; }
+#joy-look { right:24px; }
+.joystick-base {
+  width:110px; height:110px; border-radius:50%;
+  background:rgba(0,0,0,0.3); border:1.5px solid rgba(232,217,138,0.2); position:relative;
+}
+.joystick-knob {
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(232,217,138,0.15); border:1.5px solid rgba(232,217,138,0.45);
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none; transition:background 0.1s;
+}
+.joystick-label {
+  position:absolute; bottom:-18px; left:50%; transform:translateX(-50%);
+  font-size:8px; letter-spacing:1.5px; color:rgba(232,217,138,0.25);
+  font-family:system-ui,sans-serif; white-space:nowrap;
+}
+
+/* Minimapa */
+#map-wrapper {
+  position:absolute; top:68px; right:16px;
+  border:1px solid rgba(232,217,138,0.18); background:rgba(4,3,10,0.82);
+}
+#map-label { font-size:8px; letter-spacing:2px; text-transform:uppercase; color:rgba(232,217,138,0.3); text-align:center; padding:5px 0 2px; font-family:system-ui,sans-serif; }
+#map { display:block; width:150px; height:90px; }
+
+/* Contador */
+#progress { position:absolute; bottom:22px; left:145px; color:rgba(232,217,138,0.4); font-size:10px; letter-spacing:1px; font-family:system-ui,sans-serif; }
+#progress span { color:#e8d98a; }
+
+/* Crosshair */
+#crosshair { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; }
+#crosshair::before,#crosshair::after { content:''; position:absolute; background:rgba(232,217,138,0.45); }
+#crosshair::before { width:1px; height:12px; left:0; top:-6px; }
+#crosshair::after  { width:12px; height:1px; left:-6px; top:0; }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div id="splash-card">
+    <div class="pre">BIENVENIDO A LA</div>
+    <h2>Galería de Funciones</h2>
+    <div class="sub">Museo Matemático Interactivo — 7 Obras</div>
+    <p>Acercate a cada cuadro para ver la ficha técnica completa: dominio, raíces, extremos, ordenada al origen y propiedades de la función.</p>
+    <button id="btn-enter">Entrar a la galería</button>
+  </div>
+</div>
+
+<div id="hud">
+  <div>
+    <h1>Galería de Funciones</h1>
+    <p>Museo Matemático Interactivo</p>
+  </div>
+  <div id="visited-badge">Obras vistas: <span id="visited-count">0</span> / 7</div>
+</div>
+
+<div id="crosshair"></div>
+
+<div id="popup">
+  <div class="p-tag">Obra en exhibición</div>
+  <div class="p-nombre" id="popup-nombre"></div>
+  <div class="p-formula" id="popup-formula"></div>
+</div>
+
+<div id="ficha">
+  <div class="f-tag">Ficha Técnica</div>
+  <div class="f-nombre" id="f-nombre"></div>
+  <div class="f-formula" id="f-formula"></div>
+  <hr>
+  <div class="f-row"><span class="f-label">Dominio</span>      <span class="f-val" id="f-dom"></span></div>
+  <div class="f-row"><span class="f-label">Imagen</span>       <span class="f-val" id="f-img"></span></div>
+  <div class="f-row"><span class="f-label">Raíces (ceros)</span><span class="f-val" id="f-raices"></span></div>
+  <div class="f-row"><span class="f-label">Ord. al origen</span><span class="f-val" id="f-oo"></span></div>
+  <div class="f-row"><span class="f-label">Máximo</span>       <span class="f-val" id="f-max"></span></div>
+  <div class="f-row"><span class="f-label">Mínimo</span>       <span class="f-val" id="f-min"></span></div>
+  <hr>
+  <div class="f-row" style="align-items:center">
+    <span class="f-label">Propiedades</span>
+    <span class="f-val" id="f-props"></span>
+  </div>
+</div>
+
+<div id="map-wrapper">
+  <div id="map-label">Plano</div>
+  <canvas id="map" width="150" height="90"></canvas>
+</div>
+<div id="progress">Salas: <span id="visited-count2">0</span>/7</div>
+
+<div class="joystick-wrap" id="joy-move">
+  <div class="joystick-base" id="jmove-base"><div class="joystick-knob" id="jmove-knob"></div></div>
+  <div class="joystick-label">MOVER</div>
+</div>
+<div class="joystick-wrap" id="joy-look">
+  <div class="joystick-base" id="jlook-base"><div class="joystick-knob" id="jlook-knob"></div></div>
+  <div class="joystick-label">GIRAR</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/PointerLockControls.js"></script>
+<script>
+const SCALE = 0.1;
+let visitedCount = 0;
+
+// ── Escena ────────────────────────────────────────────────
+let scene = new THREE.Scene();
+scene.background = new THREE.Color(0x2a2218);
+scene.fog = new THREE.FogExp2(0x2a2218, 0.022);
+
+let camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(0, 1.7, 20);
+
+let renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.physicallyCorrectLights = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.3;
+document.body.appendChild(renderer.domElement);
+
+let controls = new THREE.PointerLockControls(camera, document.body);
+scene.add(controls.getObject());
+
+// Iluminación
+scene.add(new THREE.AmbientLight(0xfff5e0, 2.2));
+[[0,4.5,0],[12,4.5,0],[-12,4.5,0],[0,4.5,12],[0,4.5,-12],
+ [12,4.5,12],[12,4.5,-12],[-12,4.5,12],[-12,4.5,-12]].forEach(([x,y,z])=>{
+  let pl = new THREE.PointLight(0xfff0d0, 1.4, 24);
+  pl.position.set(x,y,z); scene.add(pl);
+});
+
+// ── Texturas procedurales ─────────────────────────────────
+function makeMarble(){
+  let c=document.createElement('canvas'); c.width=512; c.height=512;
+  let ctx=c.getContext('2d');
+  ctx.fillStyle='#cec6b4'; ctx.fillRect(0,0,512,512);
+  for(let i=0;i<22;i++){
+    ctx.beginPath();
+    let x0=Math.random()*512, y0=Math.random()*512;
+    ctx.moveTo(x0,y0);
+    for(let j=0;j<8;j++) ctx.lineTo(x0+(Math.random()-0.5)*100, y0+(Math.random()-0.5)*100);
+    ctx.strokeStyle=`rgba(185,175,160,${0.08+Math.random()*0.12})`;
+    ctx.lineWidth=0.5+Math.random()*1.5; ctx.stroke();
+  }
+  ctx.strokeStyle='rgba(140,130,115,0.3)'; ctx.lineWidth=1.5;
+  for(let i=0;i<=512;i+=64){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,512); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(512,i); ctx.stroke(); }
+  let t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(8,8); return t;
+}
+function makeWall(){
+  let c=document.createElement('canvas'); c.width=256; c.height=256;
+  let ctx=c.getContext('2d');
+  let g=ctx.createLinearGradient(0,0,0,256);
+  g.addColorStop(0,'#eae2d2'); g.addColorStop(1,'#dbd2c0');
+  ctx.fillStyle=g; ctx.fillRect(0,0,256,256);
+  ctx.strokeStyle='rgba(195,185,168,0.35)'; ctx.lineWidth=1;
+  for(let i=0;i<256;i+=52){ ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(256,i); ctx.stroke(); }
+  let t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(4,2); return t;
+}
+let marbleTex=makeMarble(), wallTex=makeWall();
+
+// Piso y techo
+let floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({map:marbleTex,roughness:0.22,metalness:0.04,color:0xd4ccbc}));
+floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+let ceil=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0x1c1814,roughness:1}));
+ceil.rotation.x=Math.PI/2; ceil.position.y=5; scene.add(ceil);
+
+// Paredes y zócalos
+let objects=[];
+function wall(x,y,w,h){
+  let m=new THREE.Mesh(new THREE.BoxGeometry(w*SCALE,5,h*SCALE),new THREE.MeshStandardMaterial({map:wallTex,roughness:0.82,color:0xe0d8c8}));
+  m.position.set((x+w/2-375)*SCALE,2.5,(y+h/2-225)*SCALE);
+  m.castShadow=true; m.receiveShadow=true; scene.add(m); objects.push(m);
+  let z=new THREE.Mesh(new THREE.BoxGeometry(w*SCALE,0.22,h*SCALE),new THREE.MeshStandardMaterial({color:0x7a6545,roughness:0.45,metalness:0.12}));
+  z.position.set((x+w/2-375)*SCALE,0.11,(y+h/2-225)*SCALE); scene.add(z);
+}
+wall(0,0,750,4);   wall(0,446,750,4);
+wall(0,0,4,450);   wall(746,0,4,450);
+wall(0,300,350,4); wall(420,300,330,4);
+wall(0,160,120,4); wall(160,160,210,4);
+wall(410,160,210,4);wall(660,160,90,4);
+wall(250,0,4,240); wall(250,300,4,150);
+wall(500,0,4,240); wall(500,300,4,150);
+
+// ── Generador de gráficas ─────────────────────────────────
+let cuadros=[];
+
+function drawGraph(f, W, H, xMin, xMax, yMin, yMax, info){
+  let cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  let ctx=cv.getContext('2d');
+
+  // Fondo papel envejecido
+  let bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#f8f3ea'); bg.addColorStop(1,'#ede6d6');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // Sombra borde interior
+  ctx.strokeStyle='rgba(0,0,0,0.07)'; ctx.lineWidth=10; ctx.strokeRect(5,5,W-10,H-10);
+
+  // Márgenes del área de graficado
+  const ML=58, MR=18, MT=18, MB=52;
+  const GW=W-ML-MR, GH=H-MT-MB;
+
+  // Funciones de coordenadas
+  const toX=x=>(ML + (x-xMin)/(xMax-xMin)*GW);
+  const toY=y=>(MT + (1-(y-yMin)/(yMax-yMin))*GH);
+  const fromPX=px=>(xMin+(px-ML)/GW*(xMax-xMin));
+
+  // Grilla
+  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=1;
+  ctx.setLineDash([3,4]);
+  for(let gx=Math.ceil(xMin);gx<=Math.floor(xMax);gx++){
+    if(gx===0) continue;
+    ctx.beginPath(); ctx.moveTo(toX(gx),MT); ctx.lineTo(toX(gx),MT+GH); ctx.stroke();
+  }
+  for(let gy=Math.ceil(yMin);gy<=Math.floor(yMax);gy++){
+    if(gy===0) continue;
+    ctx.beginPath(); ctx.moveTo(ML,toY(gy)); ctx.lineTo(ML+GW,toY(gy)); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // Marcas de escala en ejes
+  ctx.fillStyle='rgba(60,45,25,0.55)'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center';
+  for(let gx=Math.ceil(xMin);gx<=Math.floor(xMax);gx++){
+    if(gx===0) continue;
+    let px=toX(gx), py=toY(0);
+    let pyC = (py<MT||py>MT+GH) ? MT+GH : py;
+    ctx.beginPath(); ctx.moveTo(px,pyC-4); ctx.lineTo(px,pyC+4);
+    ctx.strokeStyle='rgba(60,45,25,0.4)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillText(gx, px, pyC+17);
+  }
+  ctx.textAlign='right';
+  for(let gy=Math.ceil(yMin);gy<=Math.floor(yMax);gy++){
+    if(gy===0) continue;
+    let py=toY(gy), px=toX(0);
+    let pxC = (px<ML||px>ML+GW) ? ML : px;
+    ctx.beginPath(); ctx.moveTo(pxC-4,py); ctx.lineTo(pxC+4,py);
+    ctx.strokeStyle='rgba(60,45,25,0.4)'; ctx.lineWidth=1.5; ctx.stroke();
+    if(Math.abs(gy)<100) ctx.fillText(gy, pxC-8, py+5);
+  }
+
+  // Ejes principales
+  ctx.strokeStyle='rgba(40,30,15,0.5)'; ctx.lineWidth=2; ctx.setLineDash([]);
+  // eje X
+  let yAxisPx = toY(0); if(yAxisPx<MT) yAxisPx=MT; if(yAxisPx>MT+GH) yAxisPx=MT+GH;
+  ctx.beginPath(); ctx.moveTo(ML,yAxisPx); ctx.lineTo(ML+GW,yAxisPx); ctx.stroke();
+  // eje Y
+  let xAxisPx = toX(0); if(xAxisPx<ML) xAxisPx=ML; if(xAxisPx>ML+GW) xAxisPx=ML+GW;
+  ctx.beginPath(); ctx.moveTo(xAxisPx,MT); ctx.lineTo(xAxisPx,MT+GH); ctx.stroke();
+  // flechas
+  ctx.fillStyle='rgba(40,30,15,0.5)';
+  ctx.beginPath(); ctx.moveTo(ML+GW,yAxisPx); ctx.lineTo(ML+GW-10,yAxisPx-5); ctx.lineTo(ML+GW-10,yAxisPx+5); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(xAxisPx,MT); ctx.lineTo(xAxisPx-5,MT+10); ctx.lineTo(xAxisPx+5,MT+10); ctx.fill();
+  // etiquetas ejes
+  ctx.fillStyle='rgba(40,30,15,0.5)'; ctx.font='bold 15px Georgia,serif'; ctx.textAlign='left';
+  ctx.fillText('x', ML+GW+4, yAxisPx+6);
+  ctx.fillText('y', xAxisPx+5, MT-4);
+  ctx.fillText('O', xAxisPx+4, yAxisPx+16);
+
+  // Curva principal (tinta azul oscuro)
+  ctx.save(); ctx.rect(ML,MT,GW,GH); ctx.clip();
+  ctx.strokeStyle='#1a2878'; ctx.lineWidth=3.5; ctx.setLineDash([]);
+  ctx.beginPath();
+  let first=true;
+  for(let px2=ML;px2<=ML+GW;px2+=0.5){
+    let xv=fromPX(px2), yv=f(xv);
+    if(!isFinite(yv)||yv>yMax*3||yv<yMin*3){first=true;continue;}
+    let py2=toY(yv);
+    if(first){ctx.moveTo(px2,py2);first=false;} else ctx.lineTo(px2,py2);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Puntos especiales ─────────────────────────────────
+  function dot(xv, yv, color, label, labelPos){
+    let px3=toX(xv), py3=toY(yv);
+    if(px3<ML-8||px3>ML+GW+8||py3<MT-8||py3>MT+GH+8) return;
+    ctx.beginPath(); ctx.arc(px3,py3,6,0,Math.PI*2);
+    ctx.fillStyle=color; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.8)'; ctx.lineWidth=2; ctx.stroke();
+    if(label){
+      ctx.fillStyle='rgba(20,15,5,0.8)'; ctx.font='bold 13px sans-serif';
+      let lx=px3+(labelPos==='r'?10:(labelPos==='l'?-10:0));
+      let ly=py3+(labelPos==='u'?-10:14);
+      ctx.textAlign=(labelPos==='l'?'right':'left');
+      ctx.fillText(label,lx,ly);
+    }
+  }
+
+  // Raíces — puntos rojos en eje X
+  if(info.raices){
+    info.raices.forEach(r=>{
+      dot(r, 0, '#c0392b', `(${r},0)`, 'u');
+    });
+  }
+
+  // Ordenada al origen — punto verde
+  let y0=f(0);
+  if(isFinite(y0) && y0>=yMin && y0<=yMax){
+    dot(0, y0, '#1a7a3a', `(0,${+y0.toFixed(2)})`, 'r');
+  }
+
+  // Máximos — punto naranja
+  if(info.maximos){
+    info.maximos.forEach(([mx,my])=>{
+      dot(mx,my,'#c87800',`máx (${mx},${my})`,'u');
+    });
+  }
+
+  // Mínimos — punto morado
+  if(info.minimos){
+    info.minimos.forEach(([mx,my])=>{
+      dot(mx,my,'#7340c0',`mín (${mx},${my})`,'u');
+    });
+  }
+
+  // Asíntotas verticales — línea roja discontinua
+  if(info.asintotas){
+    info.asintotas.forEach(xa=>{
+      let pxa=toX(xa);
+      if(pxa<ML||pxa>ML+GW) return;
+      ctx.strokeStyle='rgba(200,40,40,0.5)'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(pxa,MT); ctx.lineTo(pxa,MT+GH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(200,40,40,0.7)'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(`x=${xa}`,pxa,MT+GH+14);
+    });
+  }
+
+  // Leyenda de colores
+  const ley=[
+    {color:'#1a2878',label:'f(x)'},
+    {color:'#c0392b',label:'Raíz'},
+    {color:'#1a7a3a',label:'Ord. origen'},
+  ];
+  if(info.maximos) ley.push({color:'#c87800',label:'Máximo'});
+  if(info.minimos) ley.push({color:'#7340c0',label:'Mínimo'});
+  if(info.asintotas) ley.push({color:'rgba(200,40,40,0.65)',label:'Asíntota'});
+
+  ctx.font='12px sans-serif'; ctx.textAlign='left';
+  let lx0=ML, ly0=MT+GH+26;
+  ley.forEach((l,i)=>{
+    let lxI=lx0+i*Math.floor(GW/ley.length);
+    ctx.fillStyle=l.color;
+    ctx.fillRect(lxI,ly0,10,10);
+    ctx.fillStyle='rgba(40,30,15,0.6)';
+    ctx.fillText(l.label,lxI+14,ly0+10);
+  });
+
+  return cv;
+}
+
+// ── Función para crear cada obra ──────────────────────────
+function cuadro(px, py, f, nombre, formula, xMin, xMax, yMin, yMax, graphInfo, ficha){
+  let W=700, H=700;
+  let cv = drawGraph(f, W, H, xMin, xMax, yMin, yMax, graphInfo);
+  let tex = new THREE.CanvasTexture(cv);
+
+  let wx=(px-375)*SCALE, wz=(py-225)*SCALE;
+
+  // Marco dorado exterior
+  let outer=new THREE.Mesh(new THREE.BoxGeometry(4.2,4.2,0.14),
+    new THREE.MeshStandardMaterial({color:0xc8a830,roughness:0.18,metalness:0.92}));
+  outer.position.set(wx,2.5,wz+0.01); outer.castShadow=true; scene.add(outer);
+
+  // Marco interior más oscuro
+  let inner=new THREE.Mesh(new THREE.BoxGeometry(3.75,3.75,0.11),
+    new THREE.MeshStandardMaterial({color:0x8b6818,roughness:0.28,metalness:0.75}));
+  inner.position.set(wx,2.5,wz+0.02); scene.add(inner);
+
+  // Lienzo
+  let mesh=new THREE.Mesh(new THREE.PlaneGeometry(3.5,3.5),
+    new THREE.MeshBasicMaterial({map:tex}));
+  mesh.position.set(wx,2.5,wz+0.09); scene.add(mesh);
+
+  // Placa dorada
+  let plate=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.28,0.05),
+    new THREE.MeshStandardMaterial({color:0xc8a830,roughness:0.18,metalness:0.92}));
+  plate.position.set(wx,0.58,wz+0.03); scene.add(plate);
+
+  // Spotlight
+  let spot=new THREE.SpotLight(0xfff8e0,35,14,Math.PI/5.5,0.38,1.1);
+  spot.position.set(wx,5,wz+2.8);
+  spot.target.position.set(wx,2.5,wz);
+  scene.add(spot); scene.add(spot.target);
+
+  let fill=new THREE.PointLight(0xffe8c0,1.8,9);
+  fill.position.set(wx,3.2,wz+1.8); scene.add(fill);
+
+  cuadros.push({mesh, nombre, formula, ficha, visited:false, px, py});
+}
+
+// ── Las 7 obras ───────────────────────────────────────────
+
+cuadro(320,340,
+  x=>x**3-6*x**2+8*x,
+  "Cúbica I",
+  "f(x) = x³ − 6x² + 8x\n     = x(x − 2)(x − 4)",
+  -1.5, 5.5, -4, 6,
+  { raices:[0,2,4], minimos:[[3.2,-3.08]], maximos:[[0.8,3.08]] },
+  {
+    dom:"ℝ  (todos los reales)",
+    img:"ℝ  (todos los reales)",
+    raices:"x = 0,  x = 2,  x = 4",
+    oo:"f(0) = 0",
+    max:"Máx. local: (0.8 , 3.07)",
+    min:"Mín. local: (3.2 , −3.07)",
+    iny:false, sobre:true, biy:false
+  }
+);
+
+cuadro(320,220,
+  x=>(x*(x-1))/(x+1),
+  "Función Racional",
+  "f(x) = x(x − 1) / (x + 1)\n     = (x² − x) / (x + 1)",
+  -5, 5, -10, 10,
+  { raices:[0,1], asintotas:[-1] },
+  {
+    dom:"ℝ − {−1}",
+    img:"ℝ − {−1}  (aprox.)",
+    raices:"x = 0,  x = 1",
+    oo:"f(0) = 0",
+    max:"Sin máximo global",
+    min:"Sin mínimo global",
+    iny:true, sobre:false, biy:false
+  }
+);
+
+cuadro(100,220,
+  x=>Math.log(x+2),
+  "Logarítmica",
+  "f(x) = ln(x + 2)",
+  -1.9, 6, -3, 4,
+  { raices:[-1], asintotas:[] },
+  {
+    dom:"x > −2   →   (−2, +∞)",
+    img:"ℝ  (todos los reales)",
+    raices:"x = −1   (ln(1) = 0)",
+    oo:"f(0) = ln(2) ≈ 0.693",
+    max:"Sin máximo (creciente)",
+    min:"Sin mínimo global",
+    iny:true, sobre:true, biy:true
+  }
+);
+
+cuadro(540,220,
+  x=>2*x-5,
+  "Función Lineal",
+  "f(x) = 2x − 5",
+  -2, 6, -8, 7,
+  { raices:[2.5] },
+  {
+    dom:"ℝ  (todos los reales)",
+    img:"ℝ  (todos los reales)",
+    raices:"x = 5/2 = 2.5",
+    oo:"f(0) = −5",
+    max:"Sin máximo",
+    min:"Sin mínimo",
+    iny:true, sobre:true, biy:true
+  }
+);
+
+cuadro(100,80,
+  x=>-0.1*(x+3)*(x-2)*(x-6),
+  "Cúbica II",
+  "f(x) = −0.1(x+3)(x−2)(x−6)",
+  -4.5, 7.5, -5, 5,
+  { raices:[-3,2,6] },
+  {
+    dom:"ℝ  (todos los reales)",
+    img:"ℝ  (todos los reales)",
+    raices:"x = −3,  x = 2,  x = 6",
+    oo:"f(0) = −0.1·(3)·(−2)·(−6) = −3.6",
+    max:"Máx. local ≈ (−1.1 , 3.5)",
+    min:"Mín. local ≈ (4.4 , −2.8)",
+    iny:false, sobre:true, biy:false
+  }
+);
+
+cuadro(320,80,
+  x=>Math.abs(Math.exp(x)-1),
+  "Exponencial Absoluta",
+  "f(x) = |eˣ − 1|",
+  -3, 3, -0.5, 5,
+  { raices:[0] },
+  {
+    dom:"ℝ  (todos los reales)",
+    img:"[0, +∞)",
+    raices:"x = 0   (eˣ = 1 ⟹ x = 0)",
+    oo:"f(0) = |e⁰ − 1| = 0",
+    max:"Sin máximo global",
+    min:"Mínimo global: (0 , 0)",
+    iny:false, sobre:false, biy:false
+  }
+);
+
+cuadro(540,80,
+  x=>-0.5*(x-2)**2+4,
+  "Parábola",
+  "f(x) = −½(x − 2)² + 4\n     = −½x² + 2x + 2",
+  -2, 6.5, -2, 5.5,
+  { raices:[-0.83,4.83], maximos:[[2,4]] },
+  {
+    dom:"ℝ  (todos los reales)",
+    img:"(−∞ , 4]",
+    raices:"x = 2 ± 2√2\n≈ −0.83  y  4.83",
+    oo:"f(0) = −½(4) + 4 = 2",
+    max:"Máximo global: (2 , 4)",
+    min:"Sin mínimo global",
+    iny:false, sobre:false, biy:false
+  }
+);
+
+// ── Ficha técnica UI ──────────────────────────────────────
+let fichaEl   = document.getElementById('ficha');
+let popupEl   = document.getElementById('popup');
+let lastNear  = null, popupVisible=false, fichaVisible=false;
+
+function badge(ok){ return `<span class="f-badge ${ok?'badge-si':'badge-no'}">${ok?'Sí':'No'}</span>`; }
+
+function showFicha(c){
+  let f=c.ficha;
+  document.getElementById('f-nombre').textContent  = c.nombre;
+  document.getElementById('f-formula').textContent  = c.formula;
+  document.getElementById('f-dom').textContent      = f.dom;
+  document.getElementById('f-img').textContent      = f.img;
+  document.getElementById('f-raices').textContent   = f.raices;
+  document.getElementById('f-oo').textContent       = f.oo;
+  document.getElementById('f-max').textContent      = f.max;
+  document.getElementById('f-min').textContent      = f.min;
+  document.getElementById('f-props').innerHTML =
+    `Inyectiva ${badge(f.iny)} &nbsp; Sobreyectiva ${badge(f.sobre)} &nbsp; Biyectiva ${badge(f.biy)}`;
+  fichaEl.style.display='block';
+}
+
+function interact(){
+  let pos=controls.getObject().position;
+  let found=null;
+  for(let c of cuadros){
+    if(pos.distanceTo(c.mesh.position)<5.5){ found=c; break; }
+  }
+  if(found){
+    if(lastNear!==found){
+      // popup nombre
+      document.getElementById('popup-nombre').textContent = found.nombre;
+      document.getElementById('popup-formula').textContent = found.formula.split('\n')[0];
+      popupEl.style.display='block';
+      // ficha lateral
+      showFicha(found);
+      lastNear=found; popupVisible=true; fichaVisible=true;
+      if(!found.visited){
+        found.visited=true; visitedCount++;
+        document.getElementById('visited-count').textContent=visitedCount;
+        document.getElementById('visited-count2').textContent=visitedCount;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(new SpeechSynthesisUtterance(found.nombre));
+      }
+    }
+  } else {
+    if(popupVisible){ popupEl.style.display='none'; fichaEl.style.display='none'; popupVisible=false; fichaVisible=false; lastNear=null; }
+  }
+}
+
+// ── Splash / Lock ─────────────────────────────────────────
+document.getElementById('btn-enter').onclick=()=>{
+  document.getElementById('splash').style.display='none'; controls.lock();
+};
+controls.addEventListener('lock',()=>document.getElementById('splash').style.display='none');
+controls.addEventListener('unlock',()=>{
+  let s=document.getElementById('splash'); s.style.display='flex';
+  s.querySelector('h2').textContent='Pausado';
+  s.querySelector('p').textContent='Hacé clic para continuar la visita.';
+});
+
+// ── Joysticks ─────────────────────────────────────────────
+let jMoveX=0, jMoveY=0, jLookX=0, jLookY=0;
+
+function makeJoystick(baseEl, knobEl, onMove){
+  const R=55; let active=false, sx=0, sy=0, tid=null;
+  function center(){ let r=baseEl.getBoundingClientRect(); return {cx:r.left+r.width/2, cy:r.top+r.height/2}; }
+  function upd(cx,cy,ex,ey){
+    let dx=ex-cx, dy=ey-cy, dist=Math.sqrt(dx*dx+dy*dy);
+    let cap=Math.min(dist,R), ang=Math.atan2(dy,dx);
+    let kx=Math.cos(ang)*cap, ky=Math.sin(ang)*cap;
+    knobEl.style.transform=`translate(calc(-50% + ${kx}px), calc(-50% + ${ky}px))`;
+    knobEl.style.background='rgba(232,217,138,0.3)';
+    onMove(kx/R, ky/R);
+  }
+  function reset(){ knobEl.style.transform='translate(-50%,-50%)'; knobEl.style.background='rgba(232,217,138,0.15)'; onMove(0,0); active=false; tid=null; }
+  baseEl.addEventListener('touchstart',e=>{ e.preventDefault(); let t=e.changedTouches[0]; tid=t.identifier; active=true; let {cx,cy}=center(); sx=cx; sy=cy; upd(cx,cy,t.clientX,t.clientY); },{passive:false});
+  baseEl.addEventListener('touchmove',e=>{ e.preventDefault(); if(!active) return; for(let t of e.changedTouches) if(t.identifier===tid){ upd(sx,sy,t.clientX,t.clientY); break; } },{passive:false});
+  baseEl.addEventListener('touchend',e=>{ for(let t of e.changedTouches) if(t.identifier===tid){ reset(); break; } });
+  baseEl.addEventListener('touchcancel',reset);
+  baseEl.addEventListener('mousedown',e=>{ active=true; let {cx,cy}=center(); sx=cx; sy=cy; upd(cx,cy,e.clientX,e.clientY);
+    let mm=ev=>{ if(active) upd(sx,sy,ev.clientX,ev.clientY); };
+    let mu=()=>{ reset(); window.removeEventListener('mousemove',mm); window.removeEventListener('mouseup',mu); };
+    window.addEventListener('mousemove',mm); window.addEventListener('mouseup',mu);
+  });
+}
+makeJoystick(document.getElementById('jmove-base'),document.getElementById('jmove-knob'),(x,y)=>{jMoveX=x;jMoveY=y;});
+makeJoystick(document.getElementById('jlook-base'),document.getElementById('jlook-knob'),(x,y)=>{jLookX=x;jLookY=y;});
+
+// Teclado
+let kf=0,kb=0,kl=0,kr=0;
+window.addEventListener('keydown',e=>{ if(e.code==='KeyW'||e.code==='ArrowUp') kf=1; if(e.code==='KeyS'||e.code==='ArrowDown') kb=1; if(e.code==='KeyA'||e.code==='ArrowLeft') kl=1; if(e.code==='KeyD'||e.code==='ArrowRight') kr=1; });
+window.addEventListener('keyup',e=>{ if(e.code==='KeyW'||e.code==='ArrowUp') kf=0; if(e.code==='KeyS'||e.code==='ArrowDown') kb=0; if(e.code==='KeyA'||e.code==='ArrowLeft') kl=0; if(e.code==='KeyD'||e.code==='ArrowRight') kr=0; });
+
+// ── Minimapa ──────────────────────────────────────────────
+let mapCv=document.getElementById('map'), mctx=mapCv.getContext('2d');
+function drawMap(){
+  mctx.fillStyle='#06040e'; mctx.fillRect(0,0,150,90);
+  function w2(x,y,w,h){ mctx.fillStyle='rgba(200,185,158,0.18)'; mctx.fillRect(x/5,y/5,Math.max(w/5,1),Math.max(h/5,1)); }
+  w2(0,0,750,4); w2(0,446,750,4); w2(0,0,4,450); w2(746,0,4,450);
+  w2(0,300,350,4); w2(420,300,330,4); w2(0,160,120,4); w2(160,160,210,4);
+  w2(410,160,210,4); w2(660,160,90,4); w2(250,0,4,240); w2(250,300,4,150);
+  w2(500,0,4,240); w2(500,300,4,150);
+  cuadros.forEach(c=>{ mctx.fillStyle=c.visited?'#c8a830':'rgba(200,168,48,0.25)'; mctx.beginPath(); mctx.arc(c.px/5,c.py/5,3,0,Math.PI*2); mctx.fill(); });
+  let px=controls.getObject().position.x, pz=controls.getObject().position.z;
+  let mx=(px/SCALE+375)/5, my=(pz/SCALE+225)/5;
+  let dir=controls.getDirection(new THREE.Vector3());
+  mctx.strokeStyle='rgba(200,168,48,0.45)'; mctx.lineWidth=1;
+  mctx.beginPath(); mctx.moveTo(mx,my); mctx.lineTo(mx+dir.x*12,my+dir.z*12); mctx.stroke();
+  mctx.fillStyle='#e8d98a'; mctx.beginPath(); mctx.arc(mx,my,3,0,Math.PI*2); mctx.fill();
+}
+
+// ── Colisión ──────────────────────────────────────────────
+function collide(pos){
+  for(let o of objects){ let box=new THREE.Box3().setFromObject(o); let pl=new THREE.Box3().setFromCenterAndSize(pos,new THREE.Vector3(1,2,1)); if(box.intersectsBox(pl)) return true; }
+}
+
+window.addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+// ── Animación ─────────────────────────────────────────────
+function animate(){
+  requestAnimationFrame(animate);
+  let old=controls.getObject().position.clone(), sp=0.1;
+  let fw=-jMoveY+kf-kb, lr=jMoveX+kr-kl;
+  fw=Math.max(-1,Math.min(1,fw)); lr=Math.max(-1,Math.min(1,lr));
+  if(fw) controls.moveForward(fw*sp);
+  if(lr) controls.moveRight(lr*sp);
+  if(Math.abs(jLookX)>0.05||Math.abs(jLookY)>0.05){
+    let obj=controls.getObject();
+    obj.rotation.y-=jLookX*0.03;
+    let p=obj.children[0];
+    if(p){ p.rotation.x-=jLookY*0.02; p.rotation.x=Math.max(-Math.PI/3,Math.min(Math.PI/3,p.rotation.x)); }
+  }
+  if(collide(controls.getObject().position)) controls.getObject().position.copy(old);
+  interact(); drawMap();
+  renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>
