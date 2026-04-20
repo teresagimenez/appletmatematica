@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Medidas de Tendencia Central de Datos Agrupados</title>
+<style>
+body{font-family:Arial; padding:15px; background:#f4f4f4}
+@media (max-width:600px){
+  body{padding:10px}
+}
+.section{
+  background:white;
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:12px;
+}
+input{
+  width:100%;
+  margin:6px 0;
+  padding:10px;
+  font-size:16px;
+  box-sizing:border-box;
+}
+button{
+  margin-top:12px;
+  padding:12px;
+  width:100%;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  background:#333;
+  color:white;
+}
+.result{margin-top:10px; font-weight:bold}
+.formula{
+  font-size:18px;
+  margin:12px 0;
+  overflow-x:auto;
+}
+.paren{
+  display:inline-flex;
+  align-items:center;
+}
+.paren::before{
+  content:"(";
+  font-size:28px;
+  margin-right:4px;
+}
+.paren::after{
+  content:")";
+  font-size:28px;
+  margin-left:4px;
+}
+.frac{display:inline-block; text-align:center}
+.frac span{display:block; padding:2px}
+.bar{border-top:2px solid black}
+</style>
+</head>
+<body>
+
+<h2>Calculadora de Medidas de Tendencia Central de Datos Agrupados</h2>
+
+<!-- MEDIA -->
+<div class="section">
+<h3>Media</h3>
+<div class="formula">
+  x̄ = 
+  <span class="frac">
+    <span id="num_media">Σ xi·fi</span>
+    <span class="bar"></span>
+    <span id="den_media">N</span>
+  </span>
+</div>
+
+<p>Σ xi·fi (suma de marca de clase por frecuencia): <input id="sum_xifi" type="number" step="any" oninput="updateMedia()"></p>
+<p>N (total de datos): <input id="N_media" type="number" oninput="updateMedia()"></p>
+
+<button onclick="calcMedia()">Calcular</button>
+<div class="result" id="res_media"></div>
+</div>
+
+<!-- MEDIANA -->
+<div class="section">
+<h3>Mediana</h3>
+<div class="formula">
+Me = <span id="Li_txt">Li</span> + 
+<span class="paren"><span class="frac">
+<span id="num_med">N/2 - F</span>
+<span class="bar"></span>
+<span id="den_med">fi</span>
+</span></span> · <span id="a_txt">a</span>
+</div>
+
+<p>Li (límite inferior de la clase mediana): <input id="Li" type="number" step="any" oninput="updateMediana()"></p>
+<p>N (total de datos): <input id="N_med" type="number" oninput="updateMediana()"></p>
+<p>F anterior (frecuencia acumulada anterior): <input id="Fa" type="number" oninput="updateMediana()"></p>
+<p>fi (frecuencia de la clase mediana): <input id="fi_med" type="number" oninput="updateMediana()"></p>
+<p>a (amplitud del intervalo): <input id="a_med" type="number" step="any" oninput="updateMediana()"></p>
+
+<button onclick="calcMediana()">Calcular</button>
+<div class="result" id="res_mediana"></div>
+</div>
+
+<!-- MODA -->
+<div class="section">
+<h3>Moda</h3>
+<div class="formula">
+Mo = <span id="Li_mo_txt">Li</span> + 
+<span class="paren"><span class="frac">
+<span id="num_mo">fi - f0</span>
+<span class="bar"></span>
+<span id="den_mo">(fi-f0)+(fi-f2)</span>
+</span></span> · <span id="a_mo_txt">a</span>
+</div>
+
+<p>Li (límite inferior de la clase modal): <input id="Li_mo" type="number" step="any" oninput="updateModa()"></p>
+<p>fi (frecuencia de la clase modal): <input id="fi" type="number" oninput="updateModa()"></p>
+<p>f0 (frecuencia anterior): <input id="f0" type="number" oninput="updateModa()"></p>
+<p>f2 (frecuencia siguiente): <input id="f2" type="number" oninput="updateModa()"></p>
+<p>a (amplitud del intervalo): <input id="a_mo" type="number" step="any" oninput="updateModa()"></p>
+
+<button onclick="calcModa()">Calcular</button>
+<div class="result" id="res_moda"></div>
+</div>
+
+<script>
+function updateMedia(){
+  document.getElementById("num_media").innerText = document.getElementById("sum_xifi").value || "Σ xi·fi";
+  document.getElementById("den_media").innerText = document.getElementById("N_media").value || "N";
+}
+
+function calcMedia(){
+  let sum = parseFloat(document.getElementById("sum_xifi").value);
+  let N = parseFloat(document.getElementById("N_media").value);
+  let media = sum / N;
+  document.getElementById("res_media").innerText = "Media = " + media.toFixed(3);
+}
+
+function updateMediana(){
+  let Li = document.getElementById("Li").value;
+  let N = document.getElementById("N_med").value;
+  let Fa = document.getElementById("Fa").value;
+  let fi = document.getElementById("fi_med").value;
+  let a = document.getElementById("a_med").value;
+
+  document.getElementById("Li_txt").innerText = Li || "Li";
+  document.getElementById("num_med").innerText = (N && Fa) ? `${N}/2 - ${Fa}` : "N/2 - F";
+  document.getElementById("den_med").innerText = fi || "fi";
+  document.getElementById("a_txt").innerText = a || "a";
+}
+
+function calcMediana(){
+  let Li = parseFloat(document.getElementById("Li").value);
+  let N = parseFloat(document.getElementById("N_med").value);
+  let Fa = parseFloat(document.getElementById("Fa").value);
+  let fi = parseFloat(document.getElementById("fi_med").value);
+  let a = parseFloat(document.getElementById("a_med").value);
+
+  let mediana = Li + ((N/2 - Fa)/fi)*a;
+  document.getElementById("res_mediana").innerText = "Mediana = " + mediana.toFixed(3);
+}
+
+function updateModa(){
+  let Li = document.getElementById("Li_mo").value;
+  let fi = document.getElementById("fi").value;
+  let f0 = document.getElementById("f0").value;
+  let f2 = document.getElementById("f2").value;
+  let a = document.getElementById("a_mo").value;
+
+  document.getElementById("Li_mo_txt").innerText = Li || "Li";
+  document.getElementById("num_mo").innerText = (fi && f0) ? `${fi}-${f0}` : "fi-f0";
+  document.getElementById("den_mo").innerText = (fi && f0 && f2) ? `(${fi}-${f0})+(${fi}-${f2})` : "(fi-f0)+(fi-f2)";
+  document.getElementById("a_mo_txt").innerText = a || "a";
+}
+
+function calcModa(){
+  let Li = parseFloat(document.getElementById("Li_mo").value);
+  let fi = parseFloat(document.getElementById("fi").value);
+  let f0 = parseFloat(document.getElementById("f0").value);
+  let f2 = parseFloat(document.getElementById("f2").value);
+  let a = parseFloat(document.getElementById("a_mo").value);
+
+  let moda = Li + ((fi - f0)/((fi - f0)+(fi - f2))) * a;
+  document.getElementById("res_moda").innerText = "Moda = " + moda.toFixed(3);
+}
+</script>
+
+</body>
+</html>
