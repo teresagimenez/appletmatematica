@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Función Homográfica Interactiva</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f4f4f4;
+      margin:0;
+      padding:20px;
+      text-align:center;
+    }
+
+    .contenedor{
+      background:white;
+      max-width:1000px;
+      margin:auto;
+      padding:20px;
+      border-radius:15px;
+      box-shadow:0 0 10px rgba(0,0,0,0.2);
+    }
+
+    h1{
+      margin-bottom:10px;
+    }
+
+    .formula{
+      font-size:26px;
+      font-weight:bold;
+      margin-bottom:20px;
+    }
+
+    .sliders{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .slider-box{
+      background:#fafafa;
+      border:1px solid #ddd;
+      border-radius:10px;
+      padding:10px;
+    }
+
+    input[type="range"]{
+      width:100%;
+    }
+
+    canvas{
+      background:white;
+      border-radius:10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="contenedor">
+
+  <h1>Gráfica de Función Homográfica</h1>
+
+  <div class="formula">
+    f(x) = (ax + b) / (cx + d)
+  </div>
+
+  <div class="sliders">
+
+    <div class="slider-box">
+      <label>a = <span id="valorA">1</span></label>
+      <input type="range" id="a" min="-10" max="10" step="1" value="1">
+    </div>
+
+    <div class="slider-box">
+      <label>b = <span id="valorB">0</span></label>
+      <input type="range" id="b" min="-10" max="10" step="1" value="0">
+    </div>
+
+    <div class="slider-box">
+      <label>c = <span id="valorC">1</span></label>
+      <input type="range" id="c" min="-10" max="10" step="1" value="1">
+    </div>
+
+    <div class="slider-box">
+      <label>d = <span id="valorD">1</span></label>
+      <input type="range" id="d" min="-10" max="10" step="1" value="1">
+    </div>
+
+  </div>
+
+  <canvas id="grafica" width="900" height="500"></canvas>
+
+</div>
+
+<script>
+
+const ctx = document.getElementById('grafica').getContext('2d');
+
+let chart;
+
+function generarDatos(a,b,c,d){
+
+  let puntos = [];
+
+  for(let x = -20; x <= 20; x += 0.05){
+
+    let denominador = c*x + d;
+
+    if(Math.abs(denominador) > 0.03){
+
+      let y = (a*x + b)/denominador;
+
+      puntos.push({
+        x:x,
+        y:y
+      });
+    }
+  }
+
+  return puntos;
+}
+
+function actualizarGrafica(){
+
+  const a = Number(document.getElementById('a').value);
+  const b = Number(document.getElementById('b').value);
+  const c = Number(document.getElementById('c').value);
+  const d = Number(document.getElementById('d').value);
+
+  document.getElementById('valorA').innerText = a;
+  document.getElementById('valorB').innerText = b;
+  document.getElementById('valorC').innerText = c;
+  document.getElementById('valorD').innerText = d;
+
+  const datos = generarDatos(a,b,c,d);
+
+  if(chart){
+    chart.destroy();
+  }
+
+  chart = new Chart(ctx, {
+
+    type:'scatter',
+
+    data:{
+      datasets:[
+        {
+          label:`f(x)=(${a}x + ${b}) / (${c}x + ${d})`,
+          data:datos,
+          borderColor:'blue',
+          backgroundColor:'blue',
+          showLine:true,
+          pointRadius:0,
+          borderWidth:2
+        }
+      ]
+    },
+
+    options:{
+
+      responsive:true,
+
+      plugins:{
+        legend:{
+          display:true
+        }
+      },
+
+      scales:{
+
+        x:{
+
+          type:'linear',
+          min:-20,
+          max:20,
+
+          position:'center',
+
+          ticks:{
+            stepSize:1,
+            color:'black'
+          },
+
+          grid:{
+            color:(context)=>{
+              if(context.tick.value === 0){
+                return 'black';
+              }
+              return '#ddd';
+            },
+            lineWidth:(context)=>{
+              if(context.tick.value === 0){
+                return 3;
+              }
+              return 1;
+            }
+          }
+        },
+
+        y:{
+
+          min:-20,
+          max:20,
+
+          position:'center',
+
+          ticks:{
+            stepSize:1,
+            color:'black'
+          },
+
+          grid:{
+            color:(context)=>{
+              if(context.tick.value === 0){
+                return 'black';
+              }
+              return '#ddd';
+            },
+            lineWidth:(context)=>{
+              if(context.tick.value === 0){
+                return 3;
+              }
+              return 1;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+document.querySelectorAll('input').forEach(input=>{
+  input.addEventListener('input', actualizarGrafica);
+});
+
+actualizarGrafica();
+
+</script>
+
+</body>
+</html>
