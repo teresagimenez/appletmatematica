@@ -96,7 +96,7 @@
 
     .grafica-container{
       width:100%;
-      height:500px;
+      height:550px;
     }
 
     canvas{
@@ -117,7 +117,7 @@
       }
 
       .grafica-container{
-        height:380px;
+        height:420px;
       }
 
       .slider-box label{
@@ -187,17 +187,16 @@ const ctx = document.getElementById('grafica').getContext('2d');
 
 let chart;
 
-/* GENERA LOS DATOS */
+/* GENERA DATOS */
 
 function generarDatos(a,b,c,d){
 
   let puntos = [];
 
-  for(let x=-20; x<=20; x+=0.02){
+  for(let x=-10; x<=10; x+=0.01){
 
     let denominador = c*x + d;
 
-    /* CERCA DE LA ASINTOTA */
     if(Math.abs(denominador) < 0.001){
 
       puntos.push({
@@ -210,7 +209,6 @@ function generarDatos(a,b,c,d){
 
     let y = (a*x + b)/(c*x + d);
 
-    /* EVITA LINEAS INFINITAS */
     if(Math.abs(y) > 100){
 
       puntos.push({
@@ -230,7 +228,7 @@ function generarDatos(a,b,c,d){
   return puntos;
 }
 
-/* ACTUALIZA GRAFICA */
+/* ACTUALIZA */
 
 function actualizarGrafica(){
 
@@ -256,7 +254,7 @@ function actualizarGrafica(){
 
     data:{
       datasets:[{
-        label:`f(x)=(${a}x + ${b}) / (${c}x + ${d})`,
+
         data:datos,
         borderColor:'blue',
         backgroundColor:'blue',
@@ -264,6 +262,7 @@ function actualizarGrafica(){
         pointRadius:0,
         borderWidth:2,
         spanGaps:false
+
       }]
     },
 
@@ -290,10 +289,15 @@ function actualizarGrafica(){
           position:'center',
 
           ticks:{
+
             stepSize:1,
+
+            autoSkip:false,
+
             color:'black',
+
             font:{
-              size:11
+              size:14
             }
           },
 
@@ -321,10 +325,15 @@ function actualizarGrafica(){
           position:'center',
 
           ticks:{
+
             stepSize:1,
+
+            autoSkip:false,
+
             color:'black',
+
             font:{
-              size:11
+              size:14
             }
           },
 
