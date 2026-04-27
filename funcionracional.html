@@ -2,48 +2,55 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Función Racional Interactiva</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+
+    *{
+      box-sizing:border-box;
+    }
+
     body{
-      font-family: Arial, sans-serif;
+      font-family:Arial, sans-serif;
       background:#f4f4f4;
       margin:0;
-      padding:20px;
-      text-align:center;
+      padding:10px;
     }
 
     .contenedor{
+      width:100%;
       background:white;
-      max-width:1000px;
-      margin:auto;
-      padding:20px;
-      border-radius:15px;
-      box-shadow:0 0 10px rgba(0,0,0,0.2);
+      border-radius:18px;
+      padding:15px;
+      box-shadow:0 0 10px rgba(0,0,0,0.15);
     }
 
     h1{
-      margin-bottom:10px;
+      text-align:center;
+      font-size:24px;
+      margin-top:5px;
+      margin-bottom:20px;
     }
 
-    /* NUEVO ESTILO DE FRACCIÓN */
+    /* FORMULA */
+
     .formula{
       display:flex;
       justify-content:center;
       align-items:center;
       gap:10px;
-      margin-bottom:25px;
-      font-size:28px;
+      margin-bottom:20px;
+      font-size:24px;
       font-weight:bold;
+      flex-wrap:wrap;
     }
 
     .fraccion{
       display:inline-block;
       text-align:center;
-      vertical-align:middle;
     }
 
     .numerador{
@@ -55,42 +62,83 @@
       padding-top:5px;
     }
 
+    /* SLIDERS */
+
     .sliders{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-      gap:15px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
       margin-bottom:20px;
     }
 
     .slider-box{
       background:#fafafa;
       border:1px solid #ddd;
-      border-radius:10px;
-      padding:10px;
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .slider-box label{
+      display:block;
+      font-size:18px;
+      margin-bottom:8px;
+      font-weight:bold;
     }
 
     input[type="range"]{
       width:100%;
+      height:35px;
+    }
+
+    /* GRAFICA */
+
+    .grafica-container{
+      width:100%;
+      overflow:hidden;
+      border-radius:15px;
+      background:white;
     }
 
     canvas{
-      background:white;
-      border-radius:10px;
+      width:100% !important;
+      height:420px !important;
     }
+
+    /* MOVIL */
+
+    @media(max-width:600px){
+
+      h1{
+        font-size:22px;
+      }
+
+      .formula{
+        font-size:20px;
+      }
+
+      .slider-box label{
+        font-size:16px;
+      }
+
+      canvas{
+        height:350px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
 
 <div class="contenedor">
 
-  <h1>Gráfica de Función Racional</h1>
+  <h1>Función Racional</h1>
 
-  <!-- NUEVA PRESENTACIÓN -->
   <div class="formula">
 
-    <span>f(x) =</span>
+    <span>f(x)=</span>
 
     <div class="fraccion">
+
       <div class="numerador">
         ax + b
       </div>
@@ -98,6 +146,7 @@
       <div class="denominador">
         cx + d
       </div>
+
     </div>
 
   </div>
@@ -126,7 +175,9 @@
 
   </div>
 
-  <canvas id="grafica" width="900" height="500"></canvas>
+  <div class="grafica-container">
+    <canvas id="grafica"></canvas>
+  </div>
 
 </div>
 
@@ -140,13 +191,13 @@ function generarDatos(a,b,c,d){
 
   let puntos = [];
 
-  for(let x = -20; x <= 20; x += 0.05){
+  for(let x=-20; x<=20; x+=0.05){
 
     let denominador = c*x + d;
 
     if(Math.abs(denominador) > 0.03){
 
-      let y = (a*x + b)/denominador;
+      let y = (a*x + b)/(c*x + d);
 
       puntos.push({
         x:x,
@@ -181,26 +232,25 @@ function actualizarGrafica(){
     type:'scatter',
 
     data:{
-      datasets:[
-        {
-          label:`f(x)=(${a}x + ${b}) / (${c}x + ${d})`,
-          data:datos,
-          borderColor:'blue',
-          backgroundColor:'blue',
-          showLine:true,
-          pointRadius:0,
-          borderWidth:2
-        }
-      ]
+      datasets:[{
+        label:`f(x)=(${a}x+${b})/(${c}x+${d})`,
+        data:datos,
+        borderColor:'blue',
+        backgroundColor:'blue',
+        showLine:true,
+        pointRadius:0,
+        borderWidth:2
+      }]
     },
 
     options:{
 
       responsive:true,
+      maintainAspectRatio:false,
 
       plugins:{
         legend:{
-          display:true
+          display:false
         }
       },
 
@@ -211,26 +261,23 @@ function actualizarGrafica(){
           type:'linear',
           min:-20,
           max:20,
-
           position:'center',
 
           ticks:{
-            stepSize:1,
-            color:'black'
+            stepSize:2,
+            color:'black',
+            font:{
+              size:12
+            }
           },
 
           grid:{
             color:(context)=>{
-              if(context.tick.value === 0){
-                return 'black';
-              }
-              return '#ddd';
+              return context.tick.value === 0 ? 'black' : '#ddd';
             },
+
             lineWidth:(context)=>{
-              if(context.tick.value === 0){
-                return 3;
-              }
-              return 1;
+              return context.tick.value === 0 ? 3 : 1;
             }
           }
         },
@@ -239,26 +286,23 @@ function actualizarGrafica(){
 
           min:-20,
           max:20,
-
           position:'center',
 
           ticks:{
-            stepSize:1,
-            color:'black'
+            stepSize:2,
+            color:'black',
+            font:{
+              size:12
+            }
           },
 
           grid:{
             color:(context)=>{
-              if(context.tick.value === 0){
-                return 'black';
-              }
-              return '#ddd';
+              return context.tick.value === 0 ? 'black' : '#ddd';
             },
+
             lineWidth:(context)=>{
-              if(context.tick.value === 0){
-                return 3;
-              }
-              return 1;
+              return context.tick.value === 0 ? 3 : 1;
             }
           }
         }
