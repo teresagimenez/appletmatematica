@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Función Racional Interactiva</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,14 +14,16 @@
     }
 
     body{
-      font-family:Arial, sans-serif;
-      background:#f4f4f4;
       margin:0;
       padding:10px;
+      background:#f4f4f4;
+      font-family:Arial, sans-serif;
     }
 
     .contenedor{
       width:100%;
+      max-width:1000px;
+      margin:auto;
       background:white;
       border-radius:18px;
       padding:15px;
@@ -30,9 +32,9 @@
 
     h1{
       text-align:center;
-      font-size:24px;
       margin-top:5px;
       margin-bottom:20px;
+      font-size:28px;
     }
 
     /* FORMULA */
@@ -42,8 +44,8 @@
       justify-content:center;
       align-items:center;
       gap:10px;
-      margin-bottom:20px;
-      font-size:24px;
+      margin-bottom:25px;
+      font-size:28px;
       font-weight:bold;
       flex-wrap:wrap;
     }
@@ -55,7 +57,7 @@
 
     .numerador{
       border-bottom:3px solid black;
-      padding:0 12px 5px 12px;
+      padding:0 14px 5px 14px;
     }
 
     .denominador{
@@ -67,7 +69,7 @@
     .sliders{
       display:flex;
       flex-direction:column;
-      gap:14px;
+      gap:15px;
       margin-bottom:20px;
     }
 
@@ -81,8 +83,8 @@
     .slider-box label{
       display:block;
       font-size:18px;
-      margin-bottom:8px;
       font-weight:bold;
+      margin-bottom:8px;
     }
 
     input[type="range"]{
@@ -94,14 +96,12 @@
 
     .grafica-container{
       width:100%;
-      overflow:hidden;
-      border-radius:15px;
-      background:white;
+      height:500px;
     }
 
     canvas{
       width:100% !important;
-      height:420px !important;
+      height:100% !important;
     }
 
     /* MOVIL */
@@ -109,19 +109,19 @@
     @media(max-width:600px){
 
       h1{
-        font-size:22px;
+        font-size:23px;
       }
 
       .formula{
-        font-size:20px;
+        font-size:22px;
+      }
+
+      .grafica-container{
+        height:380px;
       }
 
       .slider-box label{
         font-size:16px;
-      }
-
-      canvas{
-        height:350px !important;
       }
     }
 
@@ -187,17 +187,38 @@ const ctx = document.getElementById('grafica').getContext('2d');
 
 let chart;
 
+/* GENERA LOS DATOS */
+
 function generarDatos(a,b,c,d){
 
   let puntos = [];
 
-  for(let x=-20; x<=20; x+=0.05){
+  for(let x=-20; x<=20; x+=0.02){
 
     let denominador = c*x + d;
 
-    if(Math.abs(denominador) > 0.03){
+    /* CERCA DE LA ASINTOTA */
+    if(Math.abs(denominador) < 0.001){
 
-      let y = (a*x + b)/(c*x + d);
+      puntos.push({
+        x:NaN,
+        y:NaN
+      });
+
+      continue;
+    }
+
+    let y = (a*x + b)/(c*x + d);
+
+    /* EVITA LINEAS INFINITAS */
+    if(Math.abs(y) > 100){
+
+      puntos.push({
+        x:NaN,
+        y:NaN
+      });
+
+    }else{
 
       puntos.push({
         x:x,
@@ -208,6 +229,8 @@ function generarDatos(a,b,c,d){
 
   return puntos;
 }
+
+/* ACTUALIZA GRAFICA */
 
 function actualizarGrafica(){
 
@@ -233,13 +256,14 @@ function actualizarGrafica(){
 
     data:{
       datasets:[{
-        label:`f(x)=(${a}x+${b})/(${c}x+${d})`,
+        label:`f(x)=(${a}x + ${b}) / (${c}x + ${d})`,
         data:datos,
         borderColor:'blue',
         backgroundColor:'blue',
         showLine:true,
         pointRadius:0,
-        borderWidth:2
+        borderWidth:2,
+        spanGaps:false
       }]
     },
 
@@ -259,50 +283,63 @@ function actualizarGrafica(){
         x:{
 
           type:'linear',
-          min:-20,
-          max:20,
+
+          min:-10,
+          max:10,
+
           position:'center',
 
           ticks:{
-            stepSize:2,
+            stepSize:1,
             color:'black',
             font:{
-              size:12
+              size:11
             }
           },
 
           grid:{
+
             color:(context)=>{
-              return context.tick.value === 0 ? 'black' : '#ddd';
+              return context.tick.value === 0
+              ? 'black'
+              : '#d9d9d9';
             },
 
             lineWidth:(context)=>{
-              return context.tick.value === 0 ? 3 : 1;
+              return context.tick.value === 0
+              ? 3
+              : 1;
             }
           }
         },
 
         y:{
 
-          min:-20,
-          max:20,
+          min:-10,
+          max:10,
+
           position:'center',
 
           ticks:{
-            stepSize:2,
+            stepSize:1,
             color:'black',
             font:{
-              size:12
+              size:11
             }
           },
 
           grid:{
+
             color:(context)=>{
-              return context.tick.value === 0 ? 'black' : '#ddd';
+              return context.tick.value === 0
+              ? 'black'
+              : '#d9d9d9';
             },
 
             lineWidth:(context)=>{
-              return context.tick.value === 0 ? 3 : 1;
+              return context.tick.value === 0
+              ? 3
+              : 1;
             }
           }
         }
@@ -311,9 +348,15 @@ function actualizarGrafica(){
   });
 }
 
+/* EVENTOS */
+
 document.querySelectorAll('input').forEach(input=>{
+
   input.addEventListener('input', actualizarGrafica);
+
 });
+
+/* INICIO */
 
 actualizarGrafica();
 
