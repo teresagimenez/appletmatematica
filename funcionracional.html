@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Función Homográfica Interactiva</title>
+  <title>Función Racional Interactiva</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -29,10 +29,30 @@
       margin-bottom:10px;
     }
 
+    /* NUEVO ESTILO DE FRACCIÓN */
     .formula{
-      font-size:26px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin-bottom:25px;
+      font-size:28px;
       font-weight:bold;
-      margin-bottom:20px;
+    }
+
+    .fraccion{
+      display:inline-block;
+      text-align:center;
+      vertical-align:middle;
+    }
+
+    .numerador{
+      border-bottom:3px solid black;
+      padding:0 12px 5px 12px;
+    }
+
+    .denominador{
+      padding-top:5px;
     }
 
     .sliders{
@@ -63,10 +83,23 @@
 
 <div class="contenedor">
 
-  <h1>Gráfica de Función Homográfica</h1>
+  <h1>Gráfica de Función Racional</h1>
 
+  <!-- NUEVA PRESENTACIÓN -->
   <div class="formula">
-    f(x) = (ax + b) / (cx + d)
+
+    <span>f(x) =</span>
+
+    <div class="fraccion">
+      <div class="numerador">
+        ax + b
+      </div>
+
+      <div class="denominador">
+        cx + d
+      </div>
+    </div>
+
   </div>
 
   <div class="sliders">
@@ -242,5 +275,7 @@ actualizarGrafica();
 
 </script>
 
+</body>
+</html>
 </body>
 </html>
