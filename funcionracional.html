@@ -1,183 +1,177 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Función Racional Interactiva</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Función Racional</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
+<style>
 
-    *{
-      box-sizing:border-box;
-    }
+*{
+  box-sizing:border-box;
+}
 
-    body{
-      margin:0;
-      padding:10px;
-      background:#f4f4f4;
-      font-family:Arial, sans-serif;
-    }
+body{
+  margin:0;
+  padding:10px;
+  background:#f4f4f4;
+  font-family:Arial,sans-serif;
+}
 
-    .contenedor{
-      width:100%;
-      max-width:1000px;
-      margin:auto;
-      background:white;
-      border-radius:18px;
-      padding:15px;
-      box-shadow:0 0 10px rgba(0,0,0,0.15);
-    }
+.contenedor{
+  width:100%;
+  max-width:1000px;
+  margin:auto;
+  background:white;
+  border-radius:18px;
+  padding:15px;
+  box-shadow:0 0 10px rgba(0,0,0,0.15);
+}
 
-    h1{
-      text-align:center;
-      margin-top:5px;
-      margin-bottom:20px;
-      font-size:28px;
-    }
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
 
-    /* FORMULA */
+/* FORMULA */
 
-    .formula{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      margin-bottom:25px;
-      font-size:28px;
-      font-weight:bold;
-      flex-wrap:wrap;
-    }
+.formula{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-bottom:25px;
+  font-size:28px;
+  font-weight:bold;
+  flex-wrap:wrap;
+}
 
-    .fraccion{
-      display:inline-block;
-      text-align:center;
-    }
+.fraccion{
+  display:inline-block;
+  text-align:center;
+}
 
-    .numerador{
-      border-bottom:3px solid black;
-      padding:0 14px 5px 14px;
-    }
+.numerador{
+  border-bottom:3px solid black;
+  padding:0 14px 5px 14px;
+}
 
-    .denominador{
-      padding-top:5px;
-    }
+.denominador{
+  padding-top:5px;
+}
 
-    /* SLIDERS */
+/* SLIDERS */
 
-    .sliders{
-      display:flex;
-      flex-direction:column;
-      gap:15px;
-      margin-bottom:20px;
-    }
+.sliders{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  margin-bottom:20px;
+}
 
-    .slider-box{
-      background:#fafafa;
-      border:1px solid #ddd;
-      border-radius:14px;
-      padding:12px;
-    }
+.slider-box{
+  background:#fafafa;
+  border:1px solid #ddd;
+  border-radius:14px;
+  padding:12px;
+}
 
-    .slider-box label{
-      display:block;
-      font-size:18px;
-      font-weight:bold;
-      margin-bottom:8px;
-    }
+.slider-box label{
+  display:block;
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:8px;
+}
 
-    input[type="range"]{
-      width:100%;
-      height:35px;
-    }
+input[type="range"]{
+  width:100%;
+  height:35px;
+}
 
-    /* GRAFICA */
+/* GRAFICA */
 
-    .grafica-container{
-      width:100%;
-      height:550px;
-    }
+.grafica-container{
+  width:100%;
+  height:550px;
+}
 
-    canvas{
-      width:100% !important;
-      height:100% !important;
-    }
+canvas{
+  width:100% !important;
+  height:100% !important;
+}
 
-    /* MOVIL */
+/* MOVIL */
 
-    @media(max-width:600px){
+@media(max-width:600px){
 
-      h1{
-        font-size:23px;
-      }
+  .grafica-container{
+    height:420px;
+  }
 
-      .formula{
-        font-size:22px;
-      }
+  .formula{
+    font-size:22px;
+  }
 
-      .grafica-container{
-        height:420px;
-      }
+  .slider-box label{
+    font-size:16px;
+  }
+}
 
-      .slider-box label{
-        font-size:16px;
-      }
-    }
-
-  </style>
+</style>
 </head>
 <body>
 
 <div class="contenedor">
 
-  <h1>Función Racional</h1>
+<h1>Función Racional</h1>
 
-  <div class="formula">
+<div class="formula">
 
-    <span>f(x)=</span>
+<span>f(x)=</span>
 
-    <div class="fraccion">
+<div class="fraccion">
 
-      <div class="numerador">
-        ax + b
-      </div>
+<div class="numerador">
+ax + b
+</div>
 
-      <div class="denominador">
-        cx + d
-      </div>
+<div class="denominador">
+cx + d
+</div>
 
-    </div>
+</div>
 
-  </div>
+</div>
 
-  <div class="sliders">
+<div class="sliders">
 
-    <div class="slider-box">
-      <label>a = <span id="valorA">1</span></label>
-      <input type="range" id="a" min="-10" max="10" step="1" value="1">
-    </div>
+<div class="slider-box">
+<label>a = <span id="valorA">1</span></label>
+<input type="range" id="a" min="-10" max="10" step="1" value="1">
+</div>
 
-    <div class="slider-box">
-      <label>b = <span id="valorB">0</span></label>
-      <input type="range" id="b" min="-10" max="10" step="1" value="0">
-    </div>
+<div class="slider-box">
+<label>b = <span id="valorB">0</span></label>
+<input type="range" id="b" min="-10" max="10" step="1" value="0">
+</div>
 
-    <div class="slider-box">
-      <label>c = <span id="valorC">1</span></label>
-      <input type="range" id="c" min="-10" max="10" step="1" value="1">
-    </div>
+<div class="slider-box">
+<label>c = <span id="valorC">1</span></label>
+<input type="range" id="c" min="-10" max="10" step="1" value="1">
+</div>
 
-    <div class="slider-box">
-      <label>d = <span id="valorD">1</span></label>
-      <input type="range" id="d" min="-10" max="10" step="1" value="1">
-    </div>
+<div class="slider-box">
+<label>d = <span id="valorD">1</span></label>
+<input type="range" id="d" min="-10" max="10" step="1" value="1">
+</div>
 
-  </div>
+</div>
 
-  <div class="grafica-container">
-    <canvas id="grafica"></canvas>
-  </div>
+<div class="grafica-container">
+<canvas id="grafica"></canvas>
+</div>
 
 </div>
 
@@ -187,17 +181,19 @@ const ctx = document.getElementById('grafica').getContext('2d');
 
 let chart;
 
-/* GENERA DATOS */
+/* GENERAR DATOS */
 
 function generarDatos(a,b,c,d){
 
   let puntos = [];
 
-  for(let x=-10; x<=10; x+=0.01){
+  for(let x=-10; x<=10; x+=0.002){
 
     let denominador = c*x + d;
 
-    if(Math.abs(denominador) < 0.001){
+    /* ASINTOTA */
+
+    if(Math.abs(denominador) < 0.0001){
 
       puntos.push({
         x:NaN,
@@ -207,28 +203,35 @@ function generarDatos(a,b,c,d){
       continue;
     }
 
-    let y = (a*x + b)/(c*x + d);
+    let y = (a*x + b)/denominador;
 
-    if(Math.abs(y) > 100){
-
-      puntos.push({
-        x:NaN,
-        y:NaN
-      });
-
-    }else{
-
-      puntos.push({
-        x:x,
-        y:y
-      });
-    }
+    /* NO CORTAR RAMAS */
+    puntos.push({
+      x:x,
+      y:y
+    });
   }
 
   return puntos;
 }
 
-/* ACTUALIZA */
+/* ASINTOTA VERTICAL */
+
+function generarAsintota(c,d){
+
+  if(c === 0){
+    return [];
+  }
+
+  let xAsintota = -d/c;
+
+  return [
+    {x:xAsintota, y:-100},
+    {x:xAsintota, y:100}
+  ];
+}
+
+/* ACTUALIZAR */
 
 function actualizarGrafica(){
 
@@ -242,7 +245,9 @@ function actualizarGrafica(){
   document.getElementById('valorC').innerText = c;
   document.getElementById('valorD').innerText = d;
 
-  const datos = generarDatos(a,b,c,d);
+  const datosFuncion = generarDatos(a,b,c,d);
+
+  const datosAsintota = generarAsintota(c,d);
 
   if(chart){
     chart.destroy();
@@ -253,23 +258,39 @@ function actualizarGrafica(){
     type:'scatter',
 
     data:{
-      datasets:[{
+      datasets:[
 
-        data:datos,
-        borderColor:'blue',
-        backgroundColor:'blue',
-        showLine:true,
-        pointRadius:0,
-        borderWidth:2,
-        spanGaps:false
+        /* FUNCION */
 
-      }]
+        {
+          data:datosFuncion,
+          borderColor:'blue',
+          backgroundColor:'blue',
+          showLine:true,
+          pointRadius:0,
+          borderWidth:2,
+          spanGaps:false
+        },
+
+        /* ASINTOTA */
+
+        {
+          data:datosAsintota,
+          borderColor:'red',
+          borderDash:[8,8],
+          showLine:true,
+          pointRadius:0,
+          borderWidth:2
+        }
+      ]
     },
 
     options:{
 
       responsive:true,
       maintainAspectRatio:false,
+
+      animation:false,
 
       plugins:{
         legend:{
@@ -289,15 +310,11 @@ function actualizarGrafica(){
           position:'center',
 
           ticks:{
-
             stepSize:1,
-
             autoSkip:false,
-
             color:'black',
-
             font:{
-              size:14
+              size:13
             }
           },
 
@@ -325,15 +342,11 @@ function actualizarGrafica(){
           position:'center',
 
           ticks:{
-
             stepSize:1,
-
             autoSkip:false,
-
             color:'black',
-
             font:{
-              size:14
+              size:13
             }
           },
 
