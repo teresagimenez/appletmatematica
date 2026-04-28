@@ -416,15 +416,9 @@ Enviar
 
 </div>
 
-<!-- HTML2CANVAS -->
-
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <script>
-
-// ------------------------------------
-// MODO EXAMEN
-// ------------------------------------
 
 function activarModoExamen(){
 
@@ -439,10 +433,6 @@ function activarModoExamen(){
 
 }
 
-// ------------------------------------
-// DATOS
-// ------------------------------------
-
 let datos1 = [];
 let datos2 = [];
 
@@ -453,10 +443,6 @@ let intervalos = [
     [23,28],
     [29,34]
 ];
-
-// ------------------------------------
-// COMENZAR
-// ------------------------------------
 
 function comenzarActividad(){
 
@@ -481,10 +467,6 @@ document.getElementById("pantalla1")
 .classList.add("activa");
 
 }
-
-// ------------------------------------
-// ACTIVIDAD 1
-// ------------------------------------
 
 function generarDatos1(){
 
@@ -525,10 +507,6 @@ valores.forEach((v,i)=>{
 });
 
 }
-
-// ------------------------------------
-// ACTIVIDAD 2
-// ------------------------------------
 
 function generarDatos2(){
 
@@ -574,10 +552,6 @@ intervalos.forEach((int,i)=>{
 
 }
 
-// ------------------------------------
-// PANTALLAS
-// ------------------------------------
-
 function irPantalla2(){
 
 document.getElementById("pantalla1")
@@ -620,10 +594,6 @@ document.getElementById("pantalla2")
 
 }
 
-// ------------------------------------
-// CALCULADORA
-// ------------------------------------
-
 function mostrarCalculadora(){
 
 let calc =
@@ -640,10 +610,6 @@ if(calc.style.display=="none"){
 }
 
 }
-
-// ------------------------------------
-// CALCULADORA MEDIA
-// ------------------------------------
 
 function updateMedia(){
 
@@ -678,10 +644,6 @@ document.getElementById("res_media")
 "Media = " + media.toFixed(2);
 
 }
-
-// ------------------------------------
-// CALCULADORA MEDIANA
-// ------------------------------------
 
 function updateMediana(){
 
@@ -728,10 +690,6 @@ document.getElementById("res_mediana")
 
 }
 
-// ------------------------------------
-// CALCULADORA MODA
-// ------------------------------------
-
 function updateModa(){
 
 document.getElementById("Li_mo_txt")
@@ -772,11 +730,21 @@ document.getElementById("res_moda")
 
 }
 
-// ------------------------------------
-// RESUMEN
-// ------------------------------------
-
 function generarResumen(){
+
+let encabezado = `
+
+<h3>Datos del estudiante</h3>
+
+<p><b>Nombre:</b>
+${document.getElementById("nombre").value}</p>
+
+<p><b>Grupo:</b>
+${document.getElementById("grupo").value}</p>
+
+<hr>
+
+`;
 
 let resumen1 = `
 <h3>Actividad 1</h3>
@@ -862,16 +830,12 @@ ${document.getElementById("moda2").value}</p>
 `;
 
 document.getElementById("resumen1")
-.innerHTML = resumen1;
+.innerHTML = encabezado + resumen1;
 
 document.getElementById("resumen2")
 .innerHTML = resumen2;
 
 }
-
-// ------------------------------------
-// ENVIAR
-// ------------------------------------
 
 async function corregirTodo(){
 
@@ -899,8 +863,6 @@ await html2canvas(resumen);
 let imagenBase64 =
 canvas.toDataURL("image/jpeg",0.5);
 
-console.log(imagenBase64);
-
 guardarEnFirebase(imagenBase64);
 
 document.getElementById(
@@ -910,10 +872,6 @@ document.getElementById(
 "Actividad enviada correctamente.";
 
 }
-
-// ------------------------------------
-// FIREBASE
-// ------------------------------------
 
 async function guardarEnFirebase(imagenBase64){
 
@@ -936,8 +894,6 @@ let datos = {
 
 };
 
-console.log(datos);
-
 fetch(
 
 "https://estadistica-evaluacion-default-rtdb.firebaseio.com/resultados.json",
@@ -952,25 +908,9 @@ fetch(
 
     body:JSON.stringify(datos)
 
-})
-
-.then(response => response.json())
-
-.then(data => {
-
-    console.log("Guardado correctamente",data);
-
-})
-
-.catch(error => {
-
-    console.log("Error",error);
-
 });
 
 }
-
-// ------------------------------------
 
 generarDatos1();
 generarDatos2();
