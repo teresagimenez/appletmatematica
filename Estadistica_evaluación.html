@@ -400,15 +400,15 @@ Finalizar
 
 <div id="resultadoCorreccion"></div>
 
-<button onclick="volverActividad1()">
+<button id="btnVolver1" onclick="volverActividad1()">
 Volver a Actividad 1
 </button>
 
-<button onclick="volverActividad2()">
+<button id="btnVolver2" onclick="volverActividad2()">
 Volver a Actividad 2
 </button>
 
-<button onclick="corregirTodo()">
+<button id="btnEnviar" onclick="corregirTodo()">
 Enviar
 </button>
 
@@ -638,7 +638,7 @@ if(calc.style.display=="none"){
 }
 
 // ------------------------------------
-// MEDIA
+// CALCULADORA MEDIA
 // ------------------------------------
 
 function updateMedia(){
@@ -676,7 +676,7 @@ document.getElementById("res_media")
 }
 
 // ------------------------------------
-// MEDIANA
+// CALCULADORA MEDIANA
 // ------------------------------------
 
 function updateMediana(){
@@ -725,7 +725,7 @@ document.getElementById("res_mediana")
 }
 
 // ------------------------------------
-// MODA
+// CALCULADORA MODA
 // ------------------------------------
 
 function updateModa(){
@@ -866,10 +866,10 @@ document.getElementById("resumen2")
 }
 
 // ------------------------------------
-// ENVIAR Y FIREBASE
+// ENVIAR
 // ------------------------------------
 
-function corregirTodo(){
+async function corregirTodo(){
 
 document.getElementById(
 "resultadoCorreccion"
@@ -877,9 +877,39 @@ document.getElementById(
 
 "Actividad enviada correctamente.";
 
+// OCULTAR BOTONES
+
+document.getElementById("btnVolver1")
+.style.display="none";
+
+document.getElementById("btnVolver2")
+.style.display="none";
+
+// BLOQUEAR ENVIAR
+
+document.getElementById("btnEnviar")
+.disabled=true;
+
+// DESACTIVAR INPUTS
+
+let inputs =
+document.querySelectorAll("input");
+
+inputs.forEach(input=>{
+
+    input.disabled=true;
+
+});
+
+// GUARDAR EN FIREBASE
+
 guardarEnFirebase();
 
 }
+
+// ------------------------------------
+// FIREBASE
+// ------------------------------------
 
 async function guardarEnFirebase(){
 
