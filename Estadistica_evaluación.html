@@ -416,6 +416,8 @@ Enviar
 
 </div>
 
+<!-- HTML2CANVAS -->
+
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <script>
@@ -873,13 +875,20 @@ document.getElementById("resumen2")
 
 async function corregirTodo(){
 
+document.getElementById("btnVolver1")
+.style.display="none";
+
+document.getElementById("btnVolver2")
+.style.display="none";
+
+document.getElementById("btnEnviar")
+.style.display="none";
+
 document.getElementById(
 "resultadoCorreccion"
 ).innerHTML =
 
 "Generando captura...";
-
-// CAPTURA
 
 let resumen =
 document.querySelector(".resumen");
@@ -888,43 +897,17 @@ let canvas =
 await html2canvas(resumen);
 
 let imagenBase64 =
-canvas.toDataURL("image/png");
+canvas.toDataURL("image/jpeg",0.5);
 
-// MENSAJE
+console.log(imagenBase64);
+
+guardarEnFirebase(imagenBase64);
 
 document.getElementById(
 "resultadoCorreccion"
 ).innerHTML =
 
 "Actividad enviada correctamente.";
-
-// OCULTAR BOTONES
-
-document.getElementById("btnVolver1")
-.style.display="none";
-
-document.getElementById("btnVolver2")
-.style.display="none";
-
-// BLOQUEAR BOTÓN
-
-document.getElementById("btnEnviar")
-.disabled=true;
-
-// BLOQUEAR INPUTS
-
-let inputs =
-document.querySelectorAll("input");
-
-inputs.forEach(input=>{
-
-    input.disabled=true;
-
-});
-
-// GUARDAR
-
-guardarEnFirebase(imagenBase64);
 
 }
 
@@ -942,42 +925,18 @@ let datos = {
     grupo:
     document.getElementById("grupo").value,
 
-    actividad1:{
-
-        media:
-        document.getElementById("media1").value,
-
-        mediana:
-        document.getElementById("mediana1").value,
-
-        moda:
-        document.getElementById("moda1").value
-
-    },
-
-    actividad2:{
-
-        media:
-        document.getElementById("media2").value,
-
-        mediana:
-        document.getElementById("mediana2").value,
-
-        moda:
-        document.getElementById("moda2").value
-
-    },
+    capturaResumen:
+    imagenBase64,
 
     resumenHTML:
     document.querySelector(".resumen").innerHTML,
-
-    capturaResumen:
-    imagenBase64,
 
     fecha:
     new Date().toLocaleString()
 
 };
+
+console.log(datos);
 
 fetch(
 
@@ -992,6 +951,20 @@ fetch(
     },
 
     body:JSON.stringify(datos)
+
+})
+
+.then(response => response.json())
+
+.then(data => {
+
+    console.log("Guardado correctamente",data);
+
+})
+
+.catch(error => {
+
+    console.log("Error",error);
 
 });
 
