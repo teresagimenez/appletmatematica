@@ -259,10 +259,6 @@ N:
 <input id="N_media" type="number" oninput="updateMedia()">
 </p>
 
-<button onclick="cargarMediaAuto()">
-Cargar datos automáticamente
-</button>
-
 <button onclick="calcMedia()">
 Calcular media
 </button>
@@ -675,38 +671,6 @@ document.getElementById("den_media")
 .innerText =
 document.getElementById("N_media").value
 || "N";
-
-}
-
-function cargarMediaAuto(){
-
-let suma = 0;
-let total = 0;
-
-intervalos.forEach((int,i)=>{
-
-    let xi =
-    parseFloat(
-    document.getElementById("xi"+i).value
-    ) || 0;
-
-    let fi =
-    parseFloat(
-    document.getElementById("gfi"+i).value
-    ) || 0;
-
-    suma += xi*fi;
-    total += fi;
-
-});
-
-document.getElementById("sum_xifi")
-.value = suma;
-
-document.getElementById("N_media")
-.value = total;
-
-updateMedia();
 
 }
 
