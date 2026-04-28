@@ -416,6 +416,8 @@ Enviar
 
 </div>
 
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
 <script>
 
 // ------------------------------------
@@ -875,6 +877,25 @@ document.getElementById(
 "resultadoCorreccion"
 ).innerHTML =
 
+"Generando captura...";
+
+// CAPTURA
+
+let resumen =
+document.querySelector(".resumen");
+
+let canvas =
+await html2canvas(resumen);
+
+let imagenBase64 =
+canvas.toDataURL("image/png");
+
+// MENSAJE
+
+document.getElementById(
+"resultadoCorreccion"
+).innerHTML =
+
 "Actividad enviada correctamente.";
 
 // OCULTAR BOTONES
@@ -885,12 +906,12 @@ document.getElementById("btnVolver1")
 document.getElementById("btnVolver2")
 .style.display="none";
 
-// BLOQUEAR ENVIAR
+// BLOQUEAR BOTÓN
 
 document.getElementById("btnEnviar")
 .disabled=true;
 
-// DESACTIVAR INPUTS
+// BLOQUEAR INPUTS
 
 let inputs =
 document.querySelectorAll("input");
@@ -901,9 +922,9 @@ inputs.forEach(input=>{
 
 });
 
-// GUARDAR EN FIREBASE
+// GUARDAR
 
-guardarEnFirebase();
+guardarEnFirebase(imagenBase64);
 
 }
 
@@ -911,7 +932,7 @@ guardarEnFirebase();
 // FIREBASE
 // ------------------------------------
 
-async function guardarEnFirebase(){
+async function guardarEnFirebase(imagenBase64){
 
 let datos = {
 
@@ -949,6 +970,9 @@ let datos = {
 
     resumenHTML:
     document.querySelector(".resumen").innerHTML,
+
+    capturaResumen:
+    imagenBase64,
 
     fecha:
     new Date().toLocaleString()
