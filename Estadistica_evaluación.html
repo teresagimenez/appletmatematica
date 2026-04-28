@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Actividad de Estadística</title>
 
 <style>
 
 body{
-    font-family: Arial;
+    font-family:Arial;
     text-align:center;
     background:#f4f4f4;
     margin:0;
@@ -79,11 +80,53 @@ h2{
     font-weight:bold;
 }
 
+.section{
+    background:white;
+    padding:20px;
+    margin-top:20px;
+    border-radius:12px;
+}
+
+.formula{
+    font-size:18px;
+    margin:12px 0;
+}
+
+.frac{
+    display:inline-block;
+    text-align:center;
+}
+
+.frac span{
+    display:block;
+    padding:2px;
+}
+
+.bar{
+    border-top:2px solid black;
+}
+
+.paren{
+    display:inline-flex;
+    align-items:center;
+}
+
+.paren::before{
+    content:"(";
+    font-size:28px;
+    margin-right:4px;
+}
+
+.paren::after{
+    content:")";
+    font-size:28px;
+    margin-left:4px;
+}
+
 </style>
 </head>
-<body>
 
-<!-- MODO EXAMEN -->
+<body>
 
 <button id="btnExamen" onclick="activarModoExamen()">
 Iniciar modo examen
@@ -96,11 +139,9 @@ Iniciar modo examen
 <h2>Datos del estudiante</h2>
 
 <p>Nombre:</p>
-
 <input id="nombre" style="width:250px;">
 
 <p>Grupo:</p>
-
 <input id="grupo" style="width:250px;">
 
 <br><br>
@@ -126,10 +167,12 @@ En una feria escolar se registró la cantidad de entradas vendidas por 20 estudi
 <h3>Completa la tabla de frecuencias</h3>
 
 <table id="tabla1">
+
 <tr>
 <th>Entradas vendidas</th>
 <th>fi</th>
 </tr>
+
 </table>
 
 <h3>Medidas de tendencia central</h3>
@@ -138,7 +181,9 @@ En una feria escolar se registró la cantidad de entradas vendidas por 20 estudi
 <p>Mediana: <input id="mediana1"></p>
 <p>Moda: <input id="moda1"></p>
 
-<button onclick="irPantalla2()">Siguiente</button>
+<button onclick="irPantalla2()">
+Siguiente
+</button>
 
 </div>
 
@@ -157,6 +202,7 @@ Se registró la cantidad de botellas recicladas por distintos grupos:
 <h3>Completa la tabla de frecuencias agrupadas</h3>
 
 <table id="tabla2">
+
 <tr>
 <th>Intervalo</th>
 <th>xi</th>
@@ -164,15 +210,202 @@ Se registró la cantidad de botellas recicladas por distintos grupos:
 <th>Fi</th>
 <th>xi·fi</th>
 </tr>
+
 </table>
 
 <h3>Medidas de tendencia central</h3>
 
 <p>Media aproximada: <input id="media2"></p>
+
 <p>Mediana aproximada: <input id="mediana2"></p>
+
 <p>Moda aproximada: <input id="moda2"></p>
 
-<button onclick="irPantalla3()">Finalizar</button>
+<button onclick="mostrarCalculadora()">
+Mostrar calculadora de ayuda
+</button>
+
+<div id="calculadoraAgrupados" style="display:none;">
+
+<!-- MEDIA -->
+
+<div class="section">
+
+<h3>Calculadora de Media</h3>
+
+<div class="formula">
+
+x̄ =
+
+<span class="frac">
+
+<span id="num_media">Σ xi·fi</span>
+
+<span class="bar"></span>
+
+<span id="den_media">N</span>
+
+</span>
+
+</div>
+
+<p>
+Σ xi·fi:
+<input id="sum_xifi" type="number" step="any" oninput="updateMedia()">
+</p>
+
+<p>
+N:
+<input id="N_media" type="number" oninput="updateMedia()">
+</p>
+
+<button onclick="cargarMediaAuto()">
+Cargar datos automáticamente
+</button>
+
+<button onclick="calcMedia()">
+Calcular media
+</button>
+
+<div id="res_media"></div>
+
+</div>
+
+<!-- MEDIANA -->
+
+<div class="section">
+
+<h3>Calculadora de Mediana</h3>
+
+<div class="formula">
+
+Me = <span id="Li_txt">Li</span>
+
++
+
+<span class="paren">
+
+<span class="frac">
+
+<span id="num_med">N/2 - F</span>
+
+<span class="bar"></span>
+
+<span id="den_med">fi</span>
+
+</span>
+
+</span>
+
+·
+
+<span id="a_txt">a</span>
+
+</div>
+
+<p>
+Li:
+<input id="Li" type="number" oninput="updateMediana()">
+</p>
+
+<p>
+N:
+<input id="N_med" type="number" oninput="updateMediana()">
+</p>
+
+<p>
+F anterior:
+<input id="Fa" type="number" oninput="updateMediana()">
+</p>
+
+<p>
+fi:
+<input id="fi_med" type="number" oninput="updateMediana()">
+</p>
+
+<p>
+a:
+<input id="a_med" type="number" oninput="updateMediana()">
+</p>
+
+<button onclick="calcMediana()">
+Calcular mediana
+</button>
+
+<div id="res_mediana"></div>
+
+</div>
+
+<!-- MODA -->
+
+<div class="section">
+
+<h3>Calculadora de Moda</h3>
+
+<div class="formula">
+
+Mo = <span id="Li_mo_txt">Li</span>
+
++
+
+<span class="paren">
+
+<span class="frac">
+
+<span id="num_mo">fi-f0</span>
+
+<span class="bar"></span>
+
+<span id="den_mo">(fi-f0)+(fi-f2)</span>
+
+</span>
+
+</span>
+
+·
+
+<span id="a_mo_txt">a</span>
+
+</div>
+
+<p>
+Li:
+<input id="Li_mo" type="number" oninput="updateModa()">
+</p>
+
+<p>
+fi:
+<input id="fi" type="number" oninput="updateModa()">
+</p>
+
+<p>
+f0:
+<input id="f0" type="number" oninput="updateModa()">
+</p>
+
+<p>
+f2:
+<input id="f2" type="number" oninput="updateModa()">
+</p>
+
+<p>
+a:
+<input id="a_mo" type="number" oninput="updateModa()">
+</p>
+
+<button onclick="calcModa()">
+Calcular moda
+</button>
+
+<div id="res_moda"></div>
+
+</div>
+
+</div>
+
+<button onclick="irPantalla3()">
+Finalizar
+</button>
 
 </div>
 
@@ -192,15 +425,15 @@ Se registró la cantidad de botellas recicladas por distintos grupos:
 
 <div id="resultadoCorreccion"></div>
 
-<button id="btnVolver1" onclick="volverActividad1()">
+<button onclick="volverActividad1()">
 Volver a Actividad 1
 </button>
 
-<button id="btnVolver2" onclick="volverActividad2()">
+<button onclick="volverActividad2()">
 Volver a Actividad 2
 </button>
 
-<button id="btnCorregir" onclick="corregirTodo()">
+<button onclick="corregirTodo()">
 Corregir
 </button>
 
@@ -214,17 +447,16 @@ Corregir
 // MODO EXAMEN
 // ------------------------------------
 
-let modoExamen = false;
-
 function activarModoExamen(){
 
-    modoExamen = true;
-
     if(document.documentElement.requestFullscreen){
+
         document.documentElement.requestFullscreen();
+
     }
 
-    document.getElementById("btnExamen").style.display = "none";
+    document.getElementById("btnExamen")
+    .style.display="none";
 
 }
 
@@ -242,7 +474,7 @@ function comenzarActividad(){
 
     if(nombre=="" || grupo==""){
 
-        alert("Completa nombre y grupo.");
+        alert("Completa nombre y grupo");
 
         return;
 
@@ -257,10 +489,23 @@ function comenzarActividad(){
 }
 
 // ------------------------------------
-// ACTIVIDAD 1
+// DATOS
 // ------------------------------------
 
 let datos1 = [];
+let datos2 = [];
+
+let intervalos = [
+    [5,10],
+    [11,16],
+    [17,22],
+    [23,28],
+    [29,34]
+];
+
+// ------------------------------------
+// GENERAR ACTIVIDAD 1
+// ------------------------------------
 
 function generarDatos1(){
 
@@ -268,15 +513,14 @@ function generarDatos1(){
 
     for(let i=0;i<20;i++){
 
-        let valor =
-        posibles[Math.floor(Math.random()*posibles.length)];
-
-        datos1.push(valor);
+        datos1.push(
+        posibles[Math.floor(Math.random()*5)]
+        );
 
     }
 
-    document.getElementById("datos1").innerText =
-    datos1.join(" - ");
+    document.getElementById("datos1")
+    .innerText = datos1.join(" - ");
 
     crearTabla1();
 
@@ -284,7 +528,8 @@ function generarDatos1(){
 
 function crearTabla1(){
 
-    let tabla = document.getElementById("tabla1");
+    let tabla =
+    document.getElementById("tabla1");
 
     let valores =
     [...new Set(datos1)].sort((a,b)=>a-b);
@@ -303,18 +548,8 @@ function crearTabla1(){
 }
 
 // ------------------------------------
-// ACTIVIDAD 2
+// GENERAR ACTIVIDAD 2
 // ------------------------------------
-
-let datos2 = [];
-
-let intervalos = [
-    [5,10],
-    [11,16],
-    [17,22],
-    [23,28],
-    [29,34]
-];
 
 function generarDatos2(){
 
@@ -326,8 +561,8 @@ function generarDatos2(){
 
     }
 
-    document.getElementById("datos2").innerText =
-    datos2.join(" - ");
+    document.getElementById("datos2")
+    .innerText = datos2.join(" - ");
 
     crearTabla2();
 
@@ -335,7 +570,8 @@ function generarDatos2(){
 
 function crearTabla2(){
 
-    let tabla = document.getElementById("tabla2");
+    let tabla =
+    document.getElementById("tabla2");
 
     intervalos.forEach((int,i)=>{
 
@@ -356,81 +592,6 @@ function crearTabla2(){
         `;
 
     });
-
-}
-
-// ------------------------------------
-// MEDIDAS
-// ------------------------------------
-
-function media1Calc(){
-
-    let suma = datos1.reduce((a,b)=>a+b,0);
-
-    return (suma/datos1.length).toFixed(2);
-
-}
-
-function mediana1Calc(){
-
-    let ordenados =
-    [...datos1].sort((a,b)=>a-b);
-
-    return ((ordenados[9]+ordenados[10])/2).toFixed(2);
-
-}
-
-function moda1Calc(){
-
-    let frec = {};
-
-    datos1.forEach(x=>{
-        frec[x]=(frec[x]||0)+1;
-    });
-
-    let max =
-    Math.max(...Object.values(frec));
-
-    return Object.keys(frec)
-    .filter(x=>frec[x]==max)
-    .join(", ");
-
-}
-
-function media2Calc(){
-
-    let suma =
-    datos2.reduce((a,b)=>a+b,0);
-
-    return (suma/datos2.length).toFixed(2);
-
-}
-
-function mediana2Calc(){
-
-    let ordenados =
-    [...datos2].sort((a,b)=>a-b);
-
-    return ordenados[
-    Math.floor(ordenados.length/2)
-    ];
-
-}
-
-function moda2Calc(){
-
-    let frec = {};
-
-    datos2.forEach(x=>{
-        frec[x]=(frec[x]||0)+1;
-    });
-
-    let max =
-    Math.max(...Object.values(frec));
-
-    return Object.keys(frec)
-    .filter(x=>frec[x]==max)
-    .join(", ");
 
 }
 
@@ -456,8 +617,6 @@ function irPantalla3(){
     document.getElementById("pantalla3")
     .classList.add("activa");
 
-    generarResumen();
-
 }
 
 function volverActividad1(){
@@ -481,441 +640,206 @@ function volverActividad2(){
 }
 
 // ------------------------------------
-// RESUMEN
+// CALCULADORA
 // ------------------------------------
 
-function generarResumen(){
+function mostrarCalculadora(){
 
-let resumen1 = `
-<h3>Actividad 1</h3>
+let calc =
+document.getElementById("calculadoraAgrupados");
 
-<table>
-<tr>
-<th>Valor</th>
-<th>fi</th>
-</tr>
-`;
+if(calc.style.display=="none"){
 
-let valores =
-[...new Set(datos1)].sort((a,b)=>a-b);
+    calc.style.display="block";
 
-valores.forEach((v,i)=>{
+}else{
 
-    resumen1 += `
-    <tr>
-    <td>${v}</td>
-    <td>${document.getElementById("fi"+i).value}</td>
-    </tr>
-    `;
+    calc.style.display="none";
 
-});
-
-resumen1 += `
-</table>
-
-<p><b>Media:</b>
-${document.getElementById("media1").value}</p>
-
-<p><b>Mediana:</b>
-${document.getElementById("mediana1").value}</p>
-
-<p><b>Moda:</b>
-${document.getElementById("moda1").value}</p>
-`;
-
-let resumen2 = `
-<h3>Actividad 2</h3>
-
-<table>
-<tr>
-<th>Intervalo</th>
-<th>xi</th>
-<th>fi</th>
-<th>Fi</th>
-<th>xi·fi</th>
-</tr>
-`;
-
-intervalos.forEach((int,i)=>{
-
-    resumen2 += `
-    <tr>
-
-    <td>${int[0]} - ${int[1]}</td>
-
-    <td>${document.getElementById("xi"+i).value}</td>
-
-    <td>${document.getElementById("gfi"+i).value}</td>
-
-    <td>${document.getElementById("fac"+i).value}</td>
-
-    <td>${document.getElementById("xifi"+i).value}</td>
-
-    </tr>
-    `;
-
-});
-
-resumen2 += `
-</table>
-
-<p><b>Media:</b>
-${document.getElementById("media2").value}</p>
-
-<p><b>Mediana:</b>
-${document.getElementById("mediana2").value}</p>
-
-<p><b>Moda:</b>
-${document.getElementById("moda2").value}</p>
-`;
-
-document.getElementById("resumen1").innerHTML =
-resumen1;
-
-document.getElementById("resumen2").innerHTML =
-resumen2;
+}
 
 }
 
 // ------------------------------------
-// CORRECCIÓN
+// MEDIA
+// ------------------------------------
+
+function updateMedia(){
+
+document.getElementById("num_media")
+.innerText =
+document.getElementById("sum_xifi").value
+|| "Σ xi·fi";
+
+document.getElementById("den_media")
+.innerText =
+document.getElementById("N_media").value
+|| "N";
+
+}
+
+function cargarMediaAuto(){
+
+let suma = 0;
+let total = 0;
+
+intervalos.forEach((int,i)=>{
+
+    let xi =
+    parseFloat(
+    document.getElementById("xi"+i).value
+    ) || 0;
+
+    let fi =
+    parseFloat(
+    document.getElementById("gfi"+i).value
+    ) || 0;
+
+    suma += xi*fi;
+    total += fi;
+
+});
+
+document.getElementById("sum_xifi")
+.value = suma;
+
+document.getElementById("N_media")
+.value = total;
+
+updateMedia();
+
+}
+
+function calcMedia(){
+
+let suma =
+parseFloat(
+document.getElementById("sum_xifi").value
+);
+
+let N =
+parseFloat(
+document.getElementById("N_media").value
+);
+
+let media = suma/N;
+
+document.getElementById("res_media")
+.innerText =
+"Media = " + media.toFixed(2);
+
+}
+
+// ------------------------------------
+// MEDIANA
+// ------------------------------------
+
+function updateMediana(){
+
+document.getElementById("Li_txt")
+.innerText =
+document.getElementById("Li").value
+|| "Li";
+
+document.getElementById("num_med")
+.innerText =
+"N/2 - F";
+
+document.getElementById("den_med")
+.innerText =
+document.getElementById("fi_med").value
+|| "fi";
+
+document.getElementById("a_txt")
+.innerText =
+document.getElementById("a_med").value
+|| "a";
+
+}
+
+function calcMediana(){
+
+let Li =
+parseFloat(document.getElementById("Li").value);
+
+let N =
+parseFloat(document.getElementById("N_med").value);
+
+let Fa =
+parseFloat(document.getElementById("Fa").value);
+
+let fi =
+parseFloat(document.getElementById("fi_med").value);
+
+let a =
+parseFloat(document.getElementById("a_med").value);
+
+let mediana =
+Li + ((N/2 - Fa)/fi)*a;
+
+document.getElementById("res_mediana")
+.innerText =
+"Mediana = " + mediana.toFixed(2);
+
+}
+
+// ------------------------------------
+// MODA
+// ------------------------------------
+
+function updateModa(){
+
+document.getElementById("Li_mo_txt")
+.innerText =
+document.getElementById("Li_mo").value
+|| "Li";
+
+document.getElementById("num_mo")
+.innerText =
+"fi-f0";
+
+document.getElementById("den_mo")
+.innerText =
+"(fi-f0)+(fi-f2)";
+
+document.getElementById("a_mo_txt")
+.innerText =
+document.getElementById("a_mo").value
+|| "a";
+
+}
+
+function calcModa(){
+
+let Li =
+parseFloat(document.getElementById("Li_mo").value);
+
+let fi =
+parseFloat(document.getElementById("fi").value);
+
+let f0 =
+parseFloat(document.getElementById("f0").value);
+
+let f2 =
+parseFloat(document.getElementById("f2").value);
+
+let a =
+parseFloat(document.getElementById("a_mo").value);
+
+let moda =
+Li + ((fi-f0)/((fi-f0)+(fi-f2)))*a;
+
+document.getElementById("res_moda")
+.innerText =
+"Moda = " + moda.toFixed(2);
+
+}
+
 // ------------------------------------
 
 function corregirTodo(){
 
-let correctas = 0;
-let total = 0;
-
-// ACTIVIDAD 1
-
-let valores =
-[...new Set(datos1)].sort((a,b)=>a-b);
-
-valores.forEach((v,i)=>{
-
-    total++;
-
-    let correcta =
-    datos1.filter(x=>x==v).length;
-
-    let input =
-    document.getElementById("fi"+i);
-
-    if(parseInt(input.value)===correcta){
-
-        input.className="correcto";
-
-        correctas++;
-
-    }else{
-
-        input.className="incorrecto";
-
-    }
-
-});
-
-total += 3;
-
-if(
-parseFloat(
-document.getElementById("media1").value
-).toFixed(2)==media1Calc()
-){
-
-    document.getElementById("media1")
-    .className="correcto";
-
-    correctas++;
-
-}else{
-
-    document.getElementById("media1")
-    .className="incorrecto";
-
-}
-
-if(
-parseFloat(
-document.getElementById("mediana1").value
-).toFixed(2)==mediana1Calc()
-){
-
-    document.getElementById("mediana1")
-    .className="correcto";
-
-    correctas++;
-
-}else{
-
-    document.getElementById("mediana1")
-    .className="incorrecto";
-
-}
-
-if(
-document.getElementById("moda1").value
-==moda1Calc()
-){
-
-    document.getElementById("moda1")
-    .className="correcto";
-
-    correctas++;
-
-}else{
-
-    document.getElementById("moda1")
-    .className="incorrecto";
-
-}
-
-// ACTIVIDAD 2
-
-let acumulada = 0;
-
-intervalos.forEach((int,i)=>{
-
-    let xiCorrecta =
-    ((int[0]+int[1])/2).toFixed(1);
-
-    let fiCorrecta =
-    datos2.filter(x =>
-    x>=int[0] && x<=int[1]).length;
-
-    acumulada += fiCorrecta;
-
-    let xifiCorrecta =
-    (parseFloat(xiCorrecta)
-    * fiCorrecta).toFixed(1);
-
-    total += 4;
-
-    let xiInput =
-    document.getElementById("xi"+i);
-
-    if(
-    parseFloat(xiInput.value).toFixed(1)
-    ==xiCorrecta
-    ){
-
-        xiInput.className="correcto";
-
-        correctas++;
-
-    }else{
-
-        xiInput.className="incorrecto";
-
-    }
-
-    let fiInput =
-    document.getElementById("gfi"+i);
-
-    if(parseInt(fiInput.value)==fiCorrecta){
-
-        fiInput.className="correcto";
-
-        correctas++;
-
-    }else{
-
-        fiInput.className="incorrecto";
-
-    }
-
-    let facInput =
-    document.getElementById("fac"+i);
-
-    if(parseInt(facInput.value)==acumulada){
-
-        facInput.className="correcto";
-
-        correctas++;
-
-    }else{
-
-        facInput.className="incorrecto";
-
-    }
-
-    let xifiInput =
-    document.getElementById("xifi"+i);
-
-    if(
-    parseFloat(xifiInput.value).toFixed(1)
-    ==xifiCorrecta
-    ){
-
-        xifiInput.className="correcto";
-
-        correctas++;
-
-    }else{
-
-        xifiInput.className="incorrecto";
-
-    }
-
-});
-
-total += 3;
-
-if(
-parseFloat(
-document.getElementById("media2").value
-).toFixed(2)==media2Calc()
-){
-
-    document.getElementById("media2")
-    .className="correcto";
-
-    correctas++;
-
-}else{
-
-    document.getElementById("media2")
-    .className="incorrecto";
-
-}
-
-if(
-parseFloat(
-document.getElementById("mediana2").value
-).toFixed(2)==mediana2Calc()
-){
-
-    document.getElementById("mediana2")
-    .className="correcto";
-
-    correctas++;
-
-}else{
-
-    document.getElementById("mediana2")
-    .className="incorrecto";
-
-}
-
-if(
-document.getElementById("moda2").value
-==moda2Calc()
-){
-
-    document.getElementById("moda2")
-    .className="correcto";
-
-    correctas++;
-
-}else{
-
-    document.getElementById("moda2")
-    .className="incorrecto";
-
-}
-
-document.getElementById(
-"resultadoCorreccion"
-).innerHTML =
-
-"Respuestas correctas: "
-+ correctas +
-" de " + total;
-
-// BLOQUEAR
-
-document.getElementById("btnVolver1")
-.style.display="none";
-
-document.getElementById("btnVolver2")
-.style.display="none";
-
-document.getElementById("btnCorregir")
-.disabled=true;
-
-let inputs =
-document.querySelectorAll("input");
-
-inputs.forEach(input=>{
-
-    input.disabled=true;
-
-});
-
-// FIREBASE
-
-guardarEnFirebase(correctas,total);
-
-}
-
-// ------------------------------------
-// FIREBASE
-// ------------------------------------
-
-async function guardarEnFirebase(correctas,total){
-
-let datos = {
-
-    nombre:
-    document.getElementById("nombre").value,
-
-    grupo:
-    document.getElementById("grupo").value,
-
-    actividad1:{
-
-        media:
-        document.getElementById("media1").value,
-
-        mediana:
-        document.getElementById("mediana1").value,
-
-        moda:
-        document.getElementById("moda1").value
-
-    },
-
-    actividad2:{
-
-        media:
-        document.getElementById("media2").value,
-
-        mediana:
-        document.getElementById("mediana2").value,
-
-        moda:
-        document.getElementById("moda2").value
-
-    },
-
-    resumenHTML:
-    document.querySelector(".resumen").innerHTML,
-
-    correctas: correctas,
-
-    total: total,
-
-    fecha:
-    new Date().toLocaleString()
-
-};
-
-// CAMBIAR POR TU URL
-
-fetch(
-"https://estadistica-evaluacion-default-rtdb.firebaseio.com/resultados.json",
-
-{
-
-    method:"POST",
-
-    headers:{
-        "Content-Type":"application/json"
-    },
-
-    body:JSON.stringify(datos)
-
-});
+alert("Corrección lista.");
 
 }
 
