@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Diagrama de Dispersión</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f2f2f2;
+    margin:0;
+    padding:20px;
+    display:flex;
+    justify-content:center;
+}
+
+.contenedor{
+    background:white;
+    width:100%;
+    max-width:700px;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+h1{
+    text-align:center;
+}
+
+.fila{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+input{
+    flex:1;
+    padding:15px;
+    font-size:18px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    text-align:center;
+}
+
+button{
+    flex:1;
+    padding:15px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    color:white;
+}
+
+.agregar{
+    background:#2563eb;
+}
+
+.limpiar{
+    background:#dc2626;
+}
+
+svg{
+    width:100%;
+    background:white;
+    border:1px solid #ccc;
+    border-radius:15px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th, td{
+    border:1px solid #ccc;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#e5e5e5;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+<h1>Diagrama de Dispersión</h1>
+
+<div class="fila">
+    <input type="text" id="nombreX" placeholder="Nombre variable X">
+    <input type="text" id="nombreY" placeholder="Nombre variable Y">
+</div>
+
+<div class="fila">
+    <input type="number" id="valorX" placeholder="X">
+    <input type="number" id="valorY" placeholder="Y">
+</div>
+
+<div class="fila">
+    <button class="agregar" onclick="agregarPunto()">Agregar punto</button>
+    <button class="limpiar" onclick="limpiar()">Limpiar</button>
+</div>
+
+<svg id="grafico" viewBox="0 0 400 400">
+
+    <!-- Ejes -->
+    <line x1="40" y1="360" x2="360" y2="360" stroke="black" stroke-width="2"/>
+    <line x1="40" y1="40" x2="40" y2="360" stroke="black" stroke-width="2"/>
+
+</svg>
+
+<table>
+
+<thead>
+<tr>
+    <th id="tituloX">X</th>
+    <th id="tituloY">Y</th>
+</tr>
+</thead>
+
+<tbody id="tablaDatos"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+let puntos = [];
+
+function agregarPunto(){
+
+    let nombreX = document.getElementById("nombreX").value || "X";
+    let nombreY = document.getElementById("nombreY").value || "Y";
+
+    let x = parseFloat(document.getElementById("valorX").value);
+    let y = parseFloat(document.getElementById("valorY").value);
+
+    if(isNaN(x) || isNaN(y)){
+        alert("Ingrese valores válidos");
+        return;
+    }
+
+    puntos.push({x,y});
+
+    document.getElementById("tituloX").innerText = nombreX;
+    document.getElementById("tituloY").innerText = nombreY;
+
+    document.getElementById("valorX").value = "";
+    document.getElementById("valorY").value = "";
+
+    dibujarGrafico();
+    actualizarTabla();
+}
+
+function limpiar(){
+    puntos = [];
+    dibujarGrafico();
+    actualizarTabla();
+}
+
+function actualizarTabla(){
+
+    let tabla = document.getElementById("tablaDatos");
+
+    tabla.innerHTML = "";
+
+    puntos.forEach(p => {
+
+        tabla.innerHTML += `
+        <tr>
+            <td>${p.x}</td>
+            <td>${p.y}</td>
+        </tr>
+        `;
+    });
+}
+
+function dibujarGrafico(){
+
+    let svg = document.getElementById("grafico");
+
+    svg.innerHTML = `
+    <line x1="40" y1="360" x2="360" y2="360" stroke="black" stroke-width="2"/>
+    <line x1="40" y1="40" x2="40" y2="360" stroke="black" stroke-width="2"/>
+    `;
+
+    let nombreX = document.getElementById("nombreX").value || "Variable X";
+    let nombreY = document.getElementById("nombreY").value || "Variable Y";
+
+    let maxX = 10;
+    let maxY = 10;
+
+    if(puntos.length > 0){
+
+        maxX = Math.max(...puntos.map(p => p.x),10);
+        maxY = Math.max(...puntos.map(p => p.y),10);
+    }
+
+    for(let i=0;i<=10;i++){
+
+        let x = 40 + (320/10)*i;
+        let y = 360 - (320/10)*i;
+
+        svg.innerHTML += `
+        <line x1="${x}" y1="40" x2="${x}" y2="360" stroke="#ddd"/>
+        <line x1="40" y1="${y}" x2="360" y2="${y}" stroke="#ddd"/>
+
+        <text x="${x}" y="380" font-size="12" text-anchor="middle">
+            ${Math.round((maxX/10)*i)}
+        </text>
+
+        <text x="30" y="${y+5}" font-size="12" text-anchor="end">
+            ${Math.round((maxY/10)*i)}
+        </text>
+        `;
+    }
+
+    svg.innerHTML += `
+    <text x="200" y="395" text-anchor="middle" font-size="16" font-weight="bold">
+        ${nombreX}
+    </text>
+
+    <text x="15" y="200" text-anchor="middle"
+    font-size="16"
+    font-weight="bold"
+    transform="rotate(-90 15 200)">
+        ${nombreY}
+    </text>
+    `;
+
+    puntos.forEach(p => {
+
+        let px = 40 + (p.x/maxX)*320;
+        let py = 360 - (p.y/maxY)*320;
+
+        svg.innerHTML += `
+        <circle cx="${px}" cy="${py}" r="5" fill="red"/>
+        `;
+    });
+
+}
+
+dibujarGrafico();
+
+</script>
+
+</body>
+</html>
