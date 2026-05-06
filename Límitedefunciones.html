@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applet Interactiva - Límites</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f2f2f2;
+    margin:0;
+    padding:15px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    color:#1f4e79;
+}
+
+.grafico-box{
+    background:white;
+    margin-bottom:25px;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:15px;
+}
+
+.control-box{
+    background:#eef5ff;
+    padding:10px;
+    border-radius:10px;
+    flex:1;
+    min-width:220px;
+}
+
+canvas{
+    width:100%;
+    max-width:100%;
+    height:auto;
+    background:white;
+    border:2px solid #ccc;
+    border-radius:10px;
+}
+
+
+
+input[type=range]{
+    width:100%;
+}
+
+.valor{
+    color:#c0392b;
+    font-weight:bold;
+}
+
+@media(max-width:700px){
+    body{
+        padding:8px;
+    }
+
+    h1{
+        font-size:24px;
+    }
+
+    h2{
+        font-size:20px;
+    }
+
+    .controls{
+        flex-direction:column;
+    }
+
+    .grafico-box{
+        padding:12px;
+    }
+
+    .control-box{
+        min-width:unset;
+        font-size:15px;
+    }
+
+    .info{
+        font-size:15px;
+        line-height:1.5;
+    }
+
+    canvas{
+        height:260px;
+        touch-action:none;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Introducción al Concepto de Límite</h1>
+
+<!-- GRAFICO 1 -->
+<div class="grafico-box">
+
+<h2>Función cuadrática</h2>
+
+<div class="controls">
+    <div class="control-box">
+        <label><b>x acercándose a distintos valores</b></label>
+        <input type="range" id="slider1" min="0" max="4" step="0.01" value="0">
+        <p>x = <span id="x1">0</span></p>
+    </div>
+
+    <div class="control-box">
+        <p><b>f(x)=x²−1</b></p>
+        <p>Explora distintos valores de x</p>
+        <p>f(x) → <span class="valor" id="fx1"></span></p>
+    </div>
+</div>
+
+<canvas id="canvas1" width="900" height="400"></canvas>
+
+
+
+</div>
+
+<!-- GRAFICO 2 -->
+<div class="grafico-box">
+
+<h2>Función lineal</h2>
+
+<div class="controls">
+    <div class="control-box">
+        <label><b>x acercándose a distintos valores</b></label>
+        <input type="range" id="slider2" min="-2" max="4" step="0.01" value="-2">
+        <p>x = <span id="x2">0</span></p>
+    </div>
+
+    <div class="control-box">
+        <p><b>f(x)=2x+1</b></p>
+        <p>Explora distintos valores de x</p>
+        <p>f(x) → <span class="valor" id="fx2"></span></p>
+    </div>
+</div>
+
+<canvas id="canvas2" width="900" height="400"></canvas>
+
+
+
+</div>
+
+<!-- GRAFICO 3 -->
+<div class="grafico-box">
+
+<h2>Función polinómica de tercer grado</h2>
+
+<div class="controls">
+    <div class="control-box">
+        <label><b>x acercándose a 1</b></label>
+        <input type="range" id="slider3" min="-1" max="4" step="0.01" value="-1">
+        <p>x = <span id="x3">0</span></p>
+    </div>
+
+    <div class="control-box">
+        <p><b>f(x)=x³−3x²+2x+1</b></p>
+        <p>Explora distintos valores de x</p>
+        <p>f(x) → <span class="valor" id="fx3"></span></p>
+    </div>
+</div>
+
+<canvas id="canvas3" width="900" height="400"></canvas>
+
+
+
+</div>
+
+</div>
+
+<script>
+function crearGrafico(canvasId, sliderId, xText, fxText, funcion, xLimite, rangoX, rangoY){
+
+    function ajustarCanvas(){
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = 400 * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+
+    const slider = document.getElementById(sliderId);
+    const xValor = document.getElementById(xText);
+    const fxValor = document.getElementById(fxText);
+
+    ajustarCanvas();
+
+    window.addEventListener('resize', ()=>{
+        ajustarCanvas();
+        dibujar();
+    });
+
+    function mapX(x){
+        return 50 + ((x-rangoX.min)/(rangoX.max-rangoX.min))*((canvas.width/window.devicePixelRatio)-70);
+    }
+
+    function mapY(y){
+        return (canvas.height/window.devicePixelRatio)-20 - ((y-rangoY.min)/(rangoY.max-rangoY.min))*((canvas.height/window.devicePixelRatio)-40);
+    }
+
+    function dibujar(){
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        const width = canvas.width/window.devicePixelRatio;
+        const height = canvas.height/window.devicePixelRatio;
+
+        // ejes
+        ctx.strokeStyle='black';
+        ctx.lineWidth=2;
+
+        const ejeX = mapY(0);
+        const ejeY = mapX(0);
+
+        // eje x
+        ctx.beginPath();
+        ctx.moveTo(50,ejeX);
+        ctx.lineTo(width-20,ejeX);
+        ctx.stroke();
+
+        // eje y
+        ctx.beginPath();
+        ctx.moveTo(ejeY,20);
+        ctx.lineTo(ejeY,height-20);
+        ctx.stroke();
+
+        // numeración de ejes
+        ctx.fillStyle='black';
+        ctx.font='14px Arial';
+
+        // números eje x
+        for(let i=Math.ceil(rangoX.min); i<=rangoX.max; i++){
+            let px = mapX(i);
+
+            ctx.beginPath();
+            ctx.moveTo(px, ejeX -5);
+            ctx.lineTo(px, ejeX +5);
+            ctx.stroke();
+
+            ctx.fillText(i, px-5, ejeX +20);
+        }
+
+        // números eje y
+        for(let j=Math.ceil(rangoY.min); j<=rangoY.max; j+=2){
+            let py = mapY(j);
+
+            ctx.beginPath();
+            ctx.moveTo(ejeY -5, py);
+            ctx.lineTo(ejeY +5, py);
+            ctx.stroke();
+
+            if(j !== 0){
+                ctx.fillText(j, ejeY +10, py+5);
+            }
+        }
+
+        // función
+        ctx.strokeStyle='#1f77b4';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+
+        let first=true;
+
+        for(let x=rangoX.min; x<=rangoX.max; x+=0.01){
+
+            let y = funcion(x);
+
+            if(!isFinite(y)) continue;
+
+            let px = mapX(x);
+            let py = mapY(y);
+
+            if(first){
+                ctx.moveTo(px,py);
+                first=false;
+            }else{
+                ctx.lineTo(px,py);
+            }
+        }
+
+        ctx.stroke();
+
+        // línea vertical
+        ctx.strokeStyle='red';
+        ctx.setLineDash([5,5]);
+
+        ctx.beginPath();
+        ctx.moveTo(mapX(xLimite),20);
+        ctx.lineTo(mapX(xLimite),height-20);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+
+        // punto principal
+        let x = parseFloat(slider.value);
+        let y = funcion(x);
+
+        ctx.fillStyle = '#e74c3c';
+
+        ctx.beginPath();
+        ctx.arc(mapX(x),mapY(y),8,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.fillStyle='black';
+        ctx.font='14px Arial';
+
+        ctx.fillText(
+            `(${x.toFixed(2)}, ${y.toFixed(2)})`,
+            mapX(x)+10,
+            mapY(y)-10
+        );
+
+        xValor.textContent = x.toFixed(2);
+        fxValor.textContent = y.toFixed(2);
+    }
+
+    slider.addEventListener('input',dibujar);
+
+    dibujar();
+}
+
+// gráfico 1
+crearGrafico(
+    'canvas1',
+    'slider1',
+    'x1',
+    'fx1',
+    x => x*x -1,
+    2,
+    {min:-4,max:4},
+    {min:-5,max:15}
+);
+
+// gráfico 2
+crearGrafico(
+    'canvas2',
+    'slider2',
+    'x2',
+    'fx2',
+    x => 2*x +1,
+    1,
+    {min:-4,max:4},
+    {min:-10,max:10}
+);
+
+// gráfico 3
+crearGrafico(
+    'canvas3',
+    'slider3',
+    'x3',
+    'fx3',
+    x => x*x*x -3*x*x +2*x +1,
+    2,
+    {min:-3,max:5},
+    {min:-10,max:10}
+);
+
+</script>
+
+</body>
+</html>
