@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teorema del Seno - Fórmula</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#f2f5f9;
+    margin:0;
+    padding:12px;
+}
+
+.contenedor{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:18px;
+    border-radius:18px;
+    box-shadow:0 0 12px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#1f4e79;
+}
+
+p{
+    text-align:center;
+}
+
+.pantalla{
+    display:none;
+}
+
+.pantalla.activa{
+    display:block;
+}
+
+.numeroPantalla{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    color:#1f4e79;
+    margin-bottom:15px;
+}
+
+.zona{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+}
+
+svg{
+    width:100%;
+    max-width:420px;
+    height:auto;
+}
+
+.formula{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-top:15px;
+}
+
+.fraccion{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:20px;
+}
+
+.linea{
+    width:120px;
+    border-top:2px solid black;
+    margin:6px 0;
+}
+
+input{
+    text-align:center;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #999;
+    font-size:16px;
+}
+
+.inputGrande{
+    width:95px;
+}
+
+.inputChico{
+    width:65px;
+}
+
+::placeholder{
+    color:#999;
+}
+
+.resultadosAbajo{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+    margin-top:25px;
+    flex-wrap:wrap;
+}
+
+button{
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#1f4e79;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#163956;
+}
+
+button:disabled{
+    opacity:0.7;
+}
+
+.resultado{
+    margin-top:20px;
+    background:#fff5d8;
+    padding:15px;
+    border-radius:12px;
+    text-align:center;
+    font-size:18px;
+}
+
+.controles{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.controles button,
+.controles div{
+    flex:1;
+}
+
+.resumenCaja{
+    background:#eef4ff;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+
+.correcto{
+    color:green;
+    font-weight:bold;
+}
+
+.incorrecto{
+    color:red;
+    font-weight:bold;
+}
+
+@media(min-width:850px){
+
+.zona{
+    flex-direction:row;
+    justify-content:center;
+    align-items:flex-start;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="contenedor">
+
+<h1>Teorema del Seno</h1>
+
+<p>
+Completa la fórmula y los resultados de las divisiones.
+</p>
+
+<div id="pantallas"></div>
+
+</div>
+
+<script>
+
+const ejercicios = [
+
+{
+a:10,b:14,
+A:40,B:65,
+r1:(10/Math.sin(40*Math.PI/180)).toFixed(1),
+r2:(14/Math.sin(65*Math.PI/180)).toFixed(1),
+puntos:"90,280 360,280 250,90"
+},
+
+{
+a:12,b:20,
+A:35,B:95,
+r1:(12/Math.sin(35*Math.PI/180)).toFixed(1),
+r2:(20/Math.sin(95*Math.PI/180)).toFixed(1),
+puntos:"120,290 370,250 180,80"
+},
+
+{
+a:8,b:13,
+A:30,B:70,
+r1:(8/Math.sin(30*Math.PI/180)).toFixed(1),
+r2:(13/Math.sin(70*Math.PI/180)).toFixed(1),
+puntos:"70,280 380,280 270,70"
+},
+
+{
+a:17,b:11,
+A:85,B:40,
+r1:(17/Math.sin(85*Math.PI/180)).toFixed(1),
+r2:(11/Math.sin(40*Math.PI/180)).toFixed(1),
+puntos:"90,300 330,260 290,70"
+},
+
+{
+a:9,b:12,
+A:25,B:45,
+r1:(9/Math.sin(25*Math.PI/180)).toFixed(1),
+r2:(12/Math.sin(45*Math.PI/180)).toFixed(1),
+puntos:"60,290 390,290 170,60"
+}
+
+];
+
+let actual = 0;
+let resultados = [];
+
+const contenedor = document.getElementById("pantallas");
+
+ejercicios.forEach((e,i)=>{
+
+let puntos = e.puntos.split(" ");
+
+let Avert = puntos[0].split(",");
+let Bvert = puntos[1].split(",");
+let Cvert = puntos[2].split(",");
+
+contenedor.innerHTML += `
+
+<div class="pantalla ${i===0 ? 'activa':''}" id="pantalla${i}">
+
+<div class="numeroPantalla">
+Pantalla ${i+1} de 6
+</div>
+
+<div class="zona">
+
+<svg viewBox="0 0 450 340">
+
+<polygon points="${e.puntos}"
+fill="#dfefff"
+stroke="#1f4e79"
+stroke-width="3"/>
+
+<text x="${Avert[0]-20}"
+y="${parseInt(Avert[1])+25}"
+font-size="28">A</text>
+
+<text x="${parseInt(Bvert[0])+10}"
+y="${parseInt(Bvert[1])+25}"
+font-size="28">B</text>
+
+<text x="${Cvert[0]-5}"
+y="${Cvert[1]-15}"
+font-size="28">C</text>
+
+<text x="210" y="305"
+font-size="24" fill="#c0392b">${e.b}</text>
+
+<text x="145" y="180"
+font-size="24" fill="#c0392b">${e.a}</text>
+
+<text x="120" y="255"
+font-size="22" fill="#1a7f37">${e.A}°</text>
+
+<text x="310" y="255"
+font-size="22" fill="#1a7f37">${e.B}°</text>
+
+</svg>
+
+<div>
+
+<div class="formula">
+
+<div class="fraccion">
+
+<input class="inputGrande"
+id="n1${i}"
+placeholder="lado a">
+
+<div class="linea"></div>
+
+<div>
+sen(
+<input class="inputChico"
+id="d1${i}"
+placeholder="Â">
+)
+</div>
+
+</div>
+
+<div style="font-size:28px;margin-top:55px;">
+=
+</div>
+
+<div class="fraccion">
+
+<input class="inputGrande"
+id="n2${i}"
+placeholder="lado b">
+
+<div class="linea"></div>
+
+<div>
+sen(
+<input class="inputChico"
+id="d2${i}"
+placeholder="B̂">
+)
+</div>
+
+</div>
+
+</div>
+
+<div class="resultadosAbajo">
+
+<input class="inputGrande"
+id="r1${i}"
+placeholder="resultado">
+
+<div style="font-size:28px;">
+=
+</div>
+
+<input class="inputGrande"
+id="r2${i}"
+placeholder="resultado">
+
+</div>
+
+<div style="text-align:center;margin-top:20px;">
+
+<button id="btn${i}" onclick="verificar(${i})">
+Verificar
+</button>
+
+</div>
+
+<div class="resultado" id="resultado${i}">
+Completa la fórmula.
+</div>
+
+</div>
+
+</div>
+
+<div class="controles">
+
+${i > 0 ? `
+<button onclick="anterior()">
+Anterior
+</button>
+` : `<div></div>`}
+
+<button onclick="siguiente()">
+${i === ejercicios.length-1 ? "Ir al resumen" : "Siguiente"}
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+contenedor.innerHTML += `
+
+<div class="pantalla" id="pantalla5">
+
+<div class="numeroPantalla">
+Pantalla 6 de 6
+</div>
+
+<h2 style="text-align:center;color:#1f4e79;">
+Resumen Final
+</h2>
+
+<div id="resumenFinal"></div>
+
+<div class="controles">
+<button onclick="anterior()">
+Anterior
+</button>
+</div>
+
+</div>
+
+`;
+
+document.addEventListener("input",function(e){
+
+if(e.target.value !== ""){
+e.target.placeholder = "";
+}
+
+});
+
+function verificar(i){
+
+if(resultados[i]) return;
+
+let e = ejercicios[i];
+
+let respuestas = {
+
+n1:document.getElementById(`n1${i}`).value,
+d1:document.getElementById(`d1${i}`).value,
+r1:document.getElementById(`r1${i}`).value,
+
+n2:document.getElementById(`n2${i}`).value,
+d2:document.getElementById(`d2${i}`).value,
+r2:document.getElementById(`r2${i}`).value
+
+};
+
+resultados[i] = respuestas;
+
+document.querySelectorAll(`#pantalla${i} input`).forEach(inp=>{
+inp.disabled = true;
+});
+
+document.getElementById(`btn${i}`).disabled = true;
+
+let correctas = 0;
+
+if(respuestas.n1 == e.a) correctas++;
+if(respuestas.d1 == e.A) correctas++;
+if(respuestas.r1 == e.r1) correctas++;
+
+if(respuestas.n2 == e.b) correctas++;
+if(respuestas.d2 == e.B) correctas++;
+if(respuestas.r2 == e.r2) correctas++;
+
+document.getElementById(`resultado${i}`).innerHTML =
+"Respuestas correctas: " + correctas + " de 6";
+
+}
+
+function generarResumen(){
+
+let html = "";
+
+ejercicios.forEach((e,i)=>{
+
+let r = resultados[i] || {};
+
+html += `
+
+<div class="resumenCaja">
+
+<h3>Triángulo ${i+1}</h3>
+
+<p class="${r.n1 == e.a ? 'correcto':'incorrecto'}">
+lado a → ${r.n1 || '-'} (correcto: ${e.a})
+</p>
+
+<p class="${r.d1 == e.A ? 'correcto':'incorrecto'}">
+Â → ${r.d1 || '-'} (correcto: ${e.A})
+</p>
+
+<p class="${r.r1 == e.r1 ? 'correcto':'incorrecto'}">
+resultado → ${r.r1 || '-'} (correcto: ${e.r1})
+</p>
+
+<p class="${r.n2 == e.b ? 'correcto':'incorrecto'}">
+lado b → ${r.n2 || '-'} (correcto: ${e.b})
+</p>
+
+<p class="${r.d2 == e.B ? 'correcto':'incorrecto'}">
+B̂ → ${r.d2 || '-'} (correcto: ${e.B})
+</p>
+
+<p class="${r.r2 == e.r2 ? 'correcto':'incorrecto'}">
+resultado → ${r.r2 || '-'} (correcto: ${e.r2})
+</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("resumenFinal").innerHTML = html;
+
+}
+
+function mostrarPantalla(){
+
+document.querySelectorAll(".pantalla").forEach(p=>{
+p.classList.remove("activa");
+});
+
+document.getElementById("pantalla"+actual).classList.add("activa");
+
+if(actual === 5){
+generarResumen();
+}
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+function siguiente(){
+
+if(actual < 5){
+actual++;
+mostrarPantalla();
+}
+
+}
+
+function anterior(){
+
+if(actual > 0){
+actual--;
+mostrarPantalla();
+}
+
+}
+
+</script>
+
+</body>
+</html>
