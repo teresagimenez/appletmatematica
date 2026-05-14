@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teorema del Seno</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f2f5f9;
+    margin:0;
+    padding:12px;
+}
+
+.contenedor{
+    width:100%;
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:18px;
+    border-radius:18px;
+    box-shadow:0 0 12px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#1f4e79;
+    font-size:30px;
+    margin-top:0;
+}
+
+p{
+    text-align:center;
+    font-size:16px;
+}
+
+.numeroPantalla{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    color:#1f4e79;
+    margin-bottom:15px;
+}
+
+.pantalla{
+    display:none;
+}
+
+.pantalla.activa{
+    display:block;
+}
+
+.zona{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+}
+
+svg{
+    width:100%;
+    max-width:420px;
+    height:auto;
+}
+
+.panel{
+    width:100%;
+    max-width:420px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.caja{
+    background:#eef4ff;
+    padding:14px;
+    border-radius:12px;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+    font-weight:bold;
+    font-size:15px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #aaa;
+    font-size:16px;
+}
+
+button{
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#1f4e79;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#163956;
+}
+
+button:disabled{
+    opacity:0.7;
+}
+
+.resultado{
+    margin-top:8px;
+    background:#fff5d8;
+    padding:15px;
+    border-radius:12px;
+    text-align:center;
+    font-size:18px;
+}
+
+.controles{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+}
+
+.controles button,
+.controles div{
+    flex:1;
+}
+
+.fraccion{
+    display:inline-block;
+    text-align:center;
+    margin:0 5px;
+    font-size:20px;
+}
+
+.arriba{
+    border-bottom:2px solid black;
+    padding:0 8px 4px 8px;
+}
+
+.abajo{
+    padding-top:4px;
+}
+
+.formula{
+    text-align:center;
+    margin-bottom:20px;
+    overflow-x:auto;
+    white-space:nowrap;
+}
+
+.resumenCaja{
+    background:#eef4ff;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+
+.correcto{
+    color:green;
+    font-weight:bold;
+}
+
+.incorrecto{
+    color:red;
+    font-weight:bold;
+}
+
+@media(min-width:850px){
+
+.zona{
+    flex-direction:row;
+    justify-content:center;
+    align-items:flex-start;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="contenedor">
+
+<h1>Teorema del Seno</h1>
+
+<p>
+Observa cada triángulo e identifica qué medida corresponde a cada lado y ángulo.
+</p>
+
+<div class="formula">
+
+<div class="fraccion">
+<div class="arriba">a</div>
+<div class="abajo">sen(A)</div>
+</div>
+
+=
+
+<div class="fraccion">
+<div class="arriba">b</div>
+<div class="abajo">sen(B)</div>
+</div>
+
+=
+
+<div class="fraccion">
+<div class="arriba">c</div>
+<div class="abajo">sen(C)</div>
+</div>
+
+</div>
+
+<div id="pantallas"></div>
+
+</div>
+
+<script>
+
+const ejercicios = [
+
+{
+a:10,b:14,c:18,
+A:40,B:65,C:75,
+puntos:"90,280 360,280 250,90",
+tx1:210, ty1:305,
+tx2:145, ty2:180,
+tx3:305, ty3:170,
+Ax:120,Ay:255,
+Bx:310,By:255,
+Cx:245,Cy:125
+},
+
+{
+a:12,b:20,c:16,
+A:35,B:95,C:50,
+puntos:"120,290 370,250 180,80",
+tx1:230, ty1:290,
+tx2:135, ty2:175,
+tx3:300, ty3:145,
+Ax:145,Ay:265,
+Bx:325,By:235,
+Cx:185,Cy:115
+},
+
+{
+a:8,b:13,c:15,
+A:30,B:70,C:80,
+puntos:"70,280 380,280 270,70",
+tx1:220, ty1:305,
+tx2:145, ty2:170,
+tx3:320, ty3:170,
+Ax:105,Ay:255,
+Bx:325,By:255,
+Cx:265,Cy:105
+},
+
+{
+a:17,b:11,c:14,
+A:85,B:40,C:55,
+puntos:"90,300 330,260 290,70",
+tx1:205, ty1:295,
+tx2:165, ty2:185,
+tx3:320, ty3:160,
+Ax:125,Ay:270,
+Bx:295,By:240,
+Cx:285,Cy:105
+},
+
+{
+a:9,b:12,c:19,
+A:25,B:45,C:110,
+puntos:"60,290 390,290 170,60",
+tx1:220, ty1:315,
+tx2:95, ty2:175,
+tx3:300, ty3:170,
+Ax:100,Ay:265,
+Bx:330,By:265,
+Cx:175,Cy:105
+}
+
+];
+
+let actual = 0;
+let resultados = [];
+
+const contenedor = document.getElementById("pantallas");
+
+ejercicios.forEach((e,i)=>{
+
+let puntos = e.puntos.split(" ");
+
+let Avert = puntos[0].split(",");
+let Bvert = puntos[1].split(",");
+let Cvert = puntos[2].split(",");
+
+contenedor.innerHTML += `
+
+<div class="pantalla ${i===0 ? 'activa':''}" id="pantalla${i}">
+
+<div class="numeroPantalla">
+Pantalla ${i+1} de 6
+</div>
+
+<div class="zona">
+
+<svg viewBox="0 0 450 340">
+
+<polygon points="${e.puntos}"
+fill="#dfefff"
+stroke="#1f4e79"
+stroke-width="3"/>
+
+<text x="${Avert[0]-20}"
+y="${parseInt(Avert[1])+25}"
+font-size="28">A</text>
+
+<text x="${parseInt(Bvert[0])+10}"
+y="${parseInt(Bvert[1])+25}"
+font-size="28">B</text>
+
+<text x="${Cvert[0]-5}"
+y="${Cvert[1]-15}"
+font-size="28">C</text>
+
+<text x="${e.tx1}" y="${e.ty1}"
+font-size="24" fill="#c0392b">${e.c}</text>
+
+<text x="${e.tx2}" y="${e.ty2}"
+font-size="24" fill="#c0392b">${e.b}</text>
+
+<text x="${e.tx3}" y="${e.ty3}"
+font-size="24" fill="#c0392b">${e.a}</text>
+
+<text x="${e.Ax}" y="${e.Ay}"
+font-size="22" fill="#1a7f37">${e.A}°</text>
+
+<text x="${e.Bx}" y="${e.By}"
+font-size="22" fill="#1a7f37">${e.B}°</text>
+
+<text x="${e.Cx}" y="${e.Cy}"
+font-size="22" fill="#1a7f37">${e.C}°</text>
+
+</svg>
+
+<div class="panel">
+
+<div class="caja">
+<label>Valor del lado a</label>
+<input id="a${i}">
+</div>
+
+<div class="caja">
+<label>Valor del lado b</label>
+<input id="b${i}">
+</div>
+
+<div class="caja">
+<label>Valor del lado c</label>
+<input id="c${i}">
+</div>
+
+<div class="caja">
+<label>Valor del ángulo A</label>
+<input id="A${i}">
+</div>
+
+<div class="caja">
+<label>Valor del ángulo B</label>
+<input id="B${i}">
+</div>
+
+<div class="caja">
+<label>Valor del ángulo C</label>
+<input id="C${i}">
+</div>
+
+<button id="btn${i}" onclick="verificar(${i})">
+Verificar
+</button>
+
+<div class="resultado" id="resultado${i}">
+Completa los valores.
+</div>
+
+</div>
+
+</div>
+
+<div class="controles">
+
+${i > 0 ? `
+<button onclick="anterior()">
+Anterior
+</button>
+` : `<div></div>`}
+
+<button onclick="siguiente()">
+${i === ejercicios.length-1 ? "Ir al resumen" : "Siguiente"}
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+contenedor.innerHTML += `
+
+<div class="pantalla" id="pantalla5">
+
+<div class="numeroPantalla">
+Pantalla 6 de 6
+</div>
+
+<h2 style="text-align:center;color:#1f4e79;">
+Resumen Final
+</h2>
+
+<div id="resumenFinal"></div>
+
+<div class="controles">
+<button onclick="anterior()">
+Anterior
+</button>
+</div>
+
+</div>
+
+`;
+
+function verificar(i){
+
+if(resultados[i]) return;
+
+let e = ejercicios[i];
+
+let respuestas = {
+
+a:document.getElementById(`a${i}`).value,
+b:document.getElementById(`b${i}`).value,
+c:document.getElementById(`c${i}`).value,
+
+A:document.getElementById(`A${i}`).value,
+B:document.getElementById(`B${i}`).value,
+C:document.getElementById(`C${i}`).value
+
+};
+
+resultados[i] = respuestas;
+
+document.querySelectorAll(`#pantalla${i} input`).forEach(inp=>{
+inp.disabled = true;
+});
+
+document.getElementById(`btn${i}`).disabled = true;
+
+let correctas = 0;
+
+if(respuestas.a == e.a) correctas++;
+if(respuestas.b == e.b) correctas++;
+if(respuestas.c == e.c) correctas++;
+
+if(respuestas.A == e.A) correctas++;
+if(respuestas.B == e.B) correctas++;
+if(respuestas.C == e.C) correctas++;
+
+document.getElementById(`resultado${i}`).innerHTML =
+"Respuestas correctas: " + correctas + " de 6";
+
+}
+
+function generarResumen(){
+
+let html = "";
+
+ejercicios.forEach((e,i)=>{
+
+let r = resultados[i] || {};
+
+html += `
+
+<div class="resumenCaja">
+
+<h3>Triángulo ${i+1}</h3>
+
+<p class="${r.a == e.a ? 'correcto':'incorrecto'}">
+lado a → ${r.a || '-'} (correcto: ${e.a})
+</p>
+
+<p class="${r.b == e.b ? 'correcto':'incorrecto'}">
+lado b → ${r.b || '-'} (correcto: ${e.b})
+</p>
+
+<p class="${r.c == e.c ? 'correcto':'incorrecto'}">
+lado c → ${r.c || '-'} (correcto: ${e.c})
+</p>
+
+<p class="${r.A == e.A ? 'correcto':'incorrecto'}">
+ángulo A → ${r.A || '-'}° (correcto: ${e.A}°)
+</p>
+
+<p class="${r.B == e.B ? 'correcto':'incorrecto'}">
+ángulo B → ${r.B || '-'}° (correcto: ${e.B}°)
+</p>
+
+<p class="${r.C == e.C ? 'correcto':'incorrecto'}">
+ángulo C → ${r.C || '-'}° (correcto: ${e.C}°)
+</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("resumenFinal").innerHTML = html;
+
+}
+
+function mostrarPantalla(){
+
+document.querySelectorAll(".pantalla").forEach(p=>{
+p.classList.remove("activa");
+});
+
+document.getElementById("pantalla"+actual).classList.add("activa");
+
+if(actual === 5){
+generarResumen();
+}
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+function siguiente(){
+
+if(actual < 5){
+actual++;
+mostrarPantalla();
+}
+
+}
+
+function anterior(){
+
+if(actual > 0){
+actual--;
+mostrarPantalla();
+}
+
+}
+
+</script>
+
+</body>
+</html>
