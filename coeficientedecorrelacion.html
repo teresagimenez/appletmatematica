@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coeficiente de Correlación</title>
+
+<!-- MathJax (raíz matemática real) -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$', '$']] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'STIX Two Text', serif;
+    background:#f2f2f2;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.card{
+    width:95%;
+    max-width:700px;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+h2{
+    text-align:center;
+    font-size:18px;
+}
+
+/* inputs */
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+input{
+    width:100%;
+    padding:9px;
+    font-size:14px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-family:'STIX Two Text', serif;
+}
+
+/* botones */
+.buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:15px;
+}
+
+button{
+    padding:10px;
+    font-size:15px;
+    border:none;
+    border-radius:8px;
+    color:white;
+}
+
+.calc{ background:#007bff; }
+.clear{ background:#dc3545; }
+
+/* resultado */
+.result{
+    text-align:center;
+    margin-top:15px;
+    font-size:18px;
+    font-weight:600;
+}
+
+/* fórmula */
+.formula{
+    text-align:center;
+    margin:15px 0;
+    font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Coeficiente de Correlación de Pearson</h2>
+
+<!-- FORMULA REAL (MathJax) -->
+<div class="formula" id="formula">
+\[
+r = \frac{n\sum xy - (\sum x)(\sum y)}
+{\sqrt{(n\sum x^2 - (\sum x)^2)(n\sum y^2 - (\sum y)^2)}}
+\]
+</div>
+
+<!-- INPUTS -->
+<div class="grid">
+    <input id="n" placeholder="n" oninput="actualizar()">
+    <input id="sx" placeholder="Σx" oninput="actualizar()">
+    <input id="sy" placeholder="Σy" oninput="actualizar()">
+    <input id="sxy" placeholder="Σxy" oninput="actualizar()">
+    <input id="sx2" placeholder="Σx²" oninput="actualizar()">
+    <input id="sy2" placeholder="Σy²" oninput="actualizar()">
+</div>
+
+<div class="buttons">
+    <button class="calc" onclick="calcular()">Calcular r</button>
+    <button class="clear" onclick="limpiar()">Limpiar</button>
+</div>
+
+<div class="result" id="res">r = —</div>
+
+</div>
+
+<script>
+
+function actualizar(){
+
+    let n = document.getElementById("n").value || "n";
+    let sx = document.getElementById("sx").value || "\\sum x";
+    let sy = document.getElementById("sy").value || "\\sum y";
+    let sxy = document.getElementById("sxy").value || "\\sum xy";
+    let sx2 = document.getElementById("sx2").value || "\\sum x^2";
+    let sy2 = document.getElementById("sy2").value || "\\sum y^2";
+
+    let formula =
+`\\[
+r = \\frac{${n}\\cdot${sxy} - (${sx})(${sy})}
+{\\sqrt{(${n}\\cdot${sx2} - (${sx})^2)(${n}\\cdot${sy2} - (${sy})^2)}}
+\\]`;
+
+    document.getElementById("formula").innerHTML = formula;
+    MathJax.typeset();
+}
+
+function calcular(){
+
+    let n = parseFloat(document.getElementById("n").value);
+    let sx = parseFloat(document.getElementById("sx").value);
+    let sy = parseFloat(document.getElementById("sy").value);
+    let sxy = parseFloat(document.getElementById("sxy").value);
+    let sx2 = parseFloat(document.getElementById("sx2").value);
+    let sy2 = parseFloat(document.getElementById("sy2").value);
+
+    if([n,sx,sy,sxy,sx2,sy2].some(isNaN)){
+        document.getElementById("res").innerHTML = "Completa todos los datos";
+        return;
+    }
+
+    let r =
+    ((n*sxy) - (sx*sy)) /
+    Math.sqrt((n*sx2 - sx*sx)*(n*sy2 - sy*sy));
+
+    document.getElementById("res").innerHTML =
+        "r = " + r.toFixed(4);
+}
+
+function limpiar(){
+    document.getElementById("n").value="";
+    document.getElementById("sx").value="";
+    document.getElementById("sy").value="";
+    document.getElementById("sxy").value="";
+    document.getElementById("sx2").value="";
+    document.getElementById("sy2").value="";
+    document.getElementById("res").innerHTML="r = —";
+    actualizar();
+}
+
+</script>
+
+</body>
+</html>
