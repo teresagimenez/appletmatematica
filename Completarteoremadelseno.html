@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teorema del Seno</title>
+
+<style>
+
+/* ===== TU CSS ORIGINAL SIN CAMBIOS ===== */
+
+*{
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    margin:0;
+    background:#eef3ff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:15px;
+}
+
+.app{
+    width:100%;
+    max-width:1150px;
+    background:white;
+    border-radius:24px;
+    padding:22px;
+    box-shadow:0 0 20px rgba(0,0,0,0.15);
+}
+
+h1{
+    text-align:center;
+    color:#1f3d7a;
+    margin-top:0;
+}
+
+.screen{
+    display:none;
+    animation:fade .35s;
+}
+
+.screen.active{
+    display:block;
+}
+
+@keyframes fade{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+.content{
+    display:flex;
+    flex-wrap:wrap;
+    gap:25px;
+    justify-content:center;
+    align-items:center;
+}
+
+.triangle-box{
+    width:430px;
+    background:#f6f8ff;
+    border-radius:18px;
+    padding:12px;
+}
+
+svg{width:100%;height:auto;}
+
+.formula-box{
+    width:560px;
+}
+
+.formula{
+    background:#f8f8f8;
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:16px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    font-size:25px;
+}
+
+.fraction{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:120px;
+}
+
+.line{
+    width:100%;
+    height:2px;
+    background:#222;
+    margin:6px 0;
+}
+
+.equal{
+    font-size:34px;
+    font-weight:bold;
+}
+
+input{
+    width:58px;
+    padding:6px;
+    text-align:center;
+    font-size:20px;
+    border-radius:10px;
+    border:2px solid #b8b8b8;
+}
+
+input.correct{background:#b7ffbf;border-color:#16a34a;}
+input.wrong{background:#ffd0d0;border-color:#dc2626;}
+
+.inputWrap{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.hint{
+    font-size:14px;
+    color:#9ca3af;
+    margin-top:5px;
+}
+
+.value-box{
+    margin-top:25px;
+    text-align:center;
+    font-size:24px;
+}
+
+.value-box input{width:120px;}
+
+.nav{
+    display:flex;
+    justify-content:space-between;
+    margin-top:25px;
+}
+
+button{
+    background:#3157d5;
+    color:white;
+    border:none;
+    padding:12px 24px;
+    border-radius:12px;
+    font-size:18px;
+    cursor:pointer;
+}
+
+button:hover{background:#2146be;}
+
+.counter{
+    text-align:center;
+    margin-top:15px;
+    color:#1f3d7a;
+    font-weight:bold;
+}
+
+@media(max-width:950px){
+    .triangle-box,.formula-box{width:100%;}
+    .formula{font-size:20px;}
+    input{width:52px;font-size:18px;}
+    .fraction{min-width:90px;}
+}
+/* ===== SOLO ADAPTACIÓN MÓVIL (SIN CAMBIAR NADA MÁS) ===== */
+@media (max-width: 950px){
+
+    body{
+        padding:8px;
+    }
+
+    .app{
+        width:100%;
+        padding:12px;
+    }
+
+    h1{
+        font-size:20px;
+    }
+
+    .content{
+        gap:15px;
+    }
+
+    .triangle-box{
+        width:100%;
+        padding:8px;
+    }
+
+    .formula-box{
+        width:100%;
+    }
+
+    svg{
+        width:100%;
+        height:auto;
+    }
+
+    .formula{
+        font-size:18px;
+        gap:6px;
+        padding:12px;
+        flex-wrap:wrap;
+    }
+
+    .fraction{
+        min-width:80px;
+    }
+
+    input{
+        width:48px;
+        font-size:15px;
+    }
+
+    .value-box{
+        font-size:16px;
+        margin-top:15px;
+    }
+
+    .value-box input{
+        width:90px;
+    }
+
+    button{
+        font-size:14px;
+        padding:10px 14px;
+    }
+
+    .counter{
+        font-size:13px;
+    }
+
+    .equal{
+        font-size:22px;
+    }
+
+    .nav{
+        margin-top:15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>Teorema del Seno</h1>
+
+<div id="screens"></div>
+
+<div class="nav">
+<button onclick="prevScreen()">◀ Anterior</button>
+<button onclick="nextScreen()">Siguiente ▶</button>
+</div>
+
+<div class="counter" id="counter"></div>
+
+</div>
+
+<script>
+
+const triangles = [
+
+{
+A:50,B:60,C:70,a:8,b:9,c:10,
+points:"120,300 320,280 220,80",
+anglePos:{A:{x:135,y:285},B:{x:285,y:272},C:{x:205,y:123}}
+},
+
+{
+A:40,B:80,C:60,a:7,b:11,c:9,
+points:"100,300 340,300 250,90",
+anglePos:{A:{x:135,y:285},B:{x:298,y:285},C:{x:245,y:125}},
+sidePos:{a:{x:295,y:185},b:{x:160,y:185},c:{x:225,y:328}}
+},
+
+{
+A:30,B:100,C:50,a:6,b:12,c:8,
+points:"90,300 360,280 310,90",
+anglePos:{A:{x:140,y:285},B:{x:305,y:255},C:{x:285,y:125}},
+sidePos:{a:{x:333,y:190},b:{x:190,y:175},c:{x:235,y:315}}
+},
+
+{
+A:75,B:45,C:60,a:11,b:7,c:9,
+points:"120,300 330,260 180,90",
+anglePos:{A:{x:138,y:264},B:{x:285,y:250},C:{x:184,y:126}},
+sidePos:{a:{x:268,y:175},b:{x:138,y:185},c:{x:225,y:305}},
+vertexPos:{A:{x:92,y:325},B:{x:335,y:305},C:{x:206,y:62}}
+},
+
+{
+A:55,B:55,C:70,a:9,b:9,c:10,
+points:"120,300 320,300 220,80",
+anglePos:{A:{x:150,y:292},B:{x:275,y:292},C:{x:210,y:122}}
+},
+
+{
+A:35,B:65,C:80,a:5,b:8,c:9,
+points:"100,300 350,280 220,70",
+anglePos:{A:{x:128,y:285},B:{x:295,y:275},C:{x:210,y:118}},
+sidePos:{a:{x:290,y:175},b:{x:148,y:180},c:{x:225,y:315}}
+}
+
+];
+
+const screensContainer=document.getElementById("screens");
+
+triangles.forEach((t,i)=>{
+
+const value=(t.a/Math.sin(t.A*Math.PI/180)).toFixed(3);
+
+const div=document.createElement("div");
+div.className="screen";
+if(i===0) div.classList.add("active");
+
+div.innerHTML=`
+<div class="content">
+
+<div class="triangle-box">
+
+<svg viewBox="0 0 450 380">
+
+<polygon points="${t.points}" fill="#dbe7ff" stroke="#274690" stroke-width="4"/>
+
+<text x="${t.vertexPos?.A?.x||92}" y="${t.vertexPos?.A?.y||325}">A</text>
+<text x="${t.vertexPos?.B?.x||335}" y="${t.vertexPos?.B?.y||305}">B</text>
+<text x="${t.vertexPos?.C?.x||220}" y="${t.vertexPos?.C?.y||58}">C</text>
+
+<text x="${t.anglePos?.A?.x}" y="${t.anglePos?.A?.y}">${t.A}°</text>
+<text x="${t.anglePos?.B?.x}" y="${t.anglePos?.B?.y}">${t.B}°</text>
+<text x="${t.anglePos?.C?.x}" y="${t.anglePos?.C?.y}">${t.C}°</text>
+
+<text x="${t.sidePos?.c?.x||225}" y="${t.sidePos?.c?.y||315}">${t.c}</text>
+<text x="${t.sidePos?.b?.x||155}" y="${t.sidePos?.b?.y||185}">${t.b}</text>
+<text x="${t.sidePos?.a?.x||290}" y="${t.sidePos?.a?.y||185}">${t.a}</text>
+
+</svg>
+
+</div>
+
+<div class="formula-box">
+
+<div class="formula">
+
+<div class="fraction">
+
+<div class="numerator">
+<div class="inputWrap">
+<input data-answer="${t.a}">
+<div class="hint">a</div>
+</div>
+</div>
+
+<div class="line"></div>
+
+<div class="denominator">
+sen(
+<div class="inputWrap">
+<input data-answer="${t.A}">
+<div class="hint">A</div>
+</div>
+)
+</div>
+
+</div>
+
+<div class="equal">=</div>
+
+<div class="fraction">
+
+<div class="numerator">
+<div class="inputWrap">
+<input data-answer="${t.b}">
+<div class="hint">b</div>
+</div>
+</div>
+
+<div class="line"></div>
+
+<div class="denominator">
+sen(
+<div class="inputWrap">
+<input data-answer="${t.B}">
+<div class="hint">B</div>
+</div>
+)
+</div>
+
+</div>
+
+<div class="equal">=</div>
+
+<div class="fraction">
+
+<div class="numerator">
+<div class="inputWrap">
+<input data-answer="${t.c}">
+<div class="hint">c</div>
+</div>
+</div>
+
+<div class="line"></div>
+
+<div class="denominator">
+sen(
+<div class="inputWrap">
+<input data-answer="${t.C}">
+<div class="hint">C</div>
+</div>
+)
+</div>
+
+</div>
+
+</div>
+
+<div class="value-box">
+
+Valor común de las igualdades
+
+<br><br>
+
+<input data-answer="${value}">
+
+</div>
+
+</div>
+
+</div>
+`;
+
+screensContainer.appendChild(div);
+
+});
+
+// 🔥 PANTALLA 7 (RESUMEN)
+const summaryDiv=document.createElement("div");
+summaryDiv.className="screen";
+summaryDiv.innerHTML=`
+<h2 style="text-align:center;color:#1f3d7a">Resumen Final</h2>
+<div id="summaryContent"></div>
+`;
+
+screensContainer.appendChild(summaryDiv);
+
+const screens=document.querySelectorAll(".screen");
+let current=0;
+
+function showScreen(i){
+
+screens.forEach(s=>s.classList.remove("active"));
+screens[i].classList.add("active");
+
+document.getElementById("counter").innerHTML=
+"Pantalla "+(i+1)+" de "+screens.length;
+// ocultar botón siguiente en última pantalla
+const nextBtn = document.querySelectorAll("button")[1];
+nextBtn.style.display = (i === screens.length - 1) ? "none" : "inline-block";
+
+if(i===screens.length-1){
+buildSummary();
+}
+
+}
+
+function nextScreen(){
+if(current<screens.length-1){
+current++;
+showScreen(current);
+}
+}
+
+function prevScreen(){
+if(current>0){
+current--;
+showScreen(current);
+}
+}
+
+function buildSummary(){
+
+const summary=document.getElementById("summaryContent");
+
+let html="";
+
+screens.forEach((screen,i)=>{
+
+if(i===screens.length-1) return;
+
+html+=`<div style="background:#f6f8ff;margin:15px;padding:12px;border-radius:12px">`;
+html+=`<h3>Ejercicio ${i+1}</h3>`;
+
+screen.querySelectorAll("input").forEach(inp=>{
+
+const expected=inp.dataset.answer;
+const value=inp.value||"—";
+const ok=inp.classList.contains("correct");
+
+html+=`
+<div>
+Ingresado: ${value} |
+Correcto: ${expected} |
+<b style="color:${ok?'green':'red'}">${ok?'✔':'✘'}</b>
+</div>`;
+});
+
+html+="</div>";
+
+});
+
+summary.innerHTML=html;
+
+}
+
+document.querySelectorAll("input").forEach(input=>{
+
+input.addEventListener("input",()=>{
+
+const expected=parseFloat(input.dataset.answer);
+const value=parseFloat(input.value.replace(",","."));
+
+if(input.value.trim()===""){
+input.classList.remove("correct","wrong");
+return;
+}
+
+if(Math.abs(value-expected)<0.005){
+input.classList.add("correct");
+input.classList.remove("wrong");
+}else{
+input.classList.add("wrong");
+input.classList.remove("correct");
+}
+
+});
+
+});
+
+showScreen(0);
+
+</script>
+
+</body>
+</html>
