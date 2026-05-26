@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluación de Funciones</title>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#e5e7eb;
+    display:flex;
+    justify-content:center;
+    padding:15px;
+}
+
+.app{
+    width:100%;
+    max-width:430px;
+    background:white;
+    border-radius:25px;
+    padding:18px;
+    box-shadow:0 0 20px rgba(0,0,0,0.2);
+}
+
+h1,h2,h3{
+    text-align:center;
+}
+
+.screen{
+    display:none;
+}
+
+.screen.active{
+    display:block;
+}
+
+.card{
+    background:#f3f4f6;
+    padding:15px;
+    border-radius:20px;
+    margin-bottom:20px;
+}
+
+input{
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #bbb;
+    text-align:center;
+}
+
+.small{
+    width:45px;
+    padding:6px;
+}
+
+.full{
+    width:100%;
+    box-sizing:border-box;
+    margin-top:5px;
+}
+
+button{
+    padding:12px 18px;
+    border:none;
+    border-radius:15px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+}
+
+.nav{
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+}
+
+canvas{
+    background:white;
+    border:2px solid #ccc;
+    border-radius:20px;
+    touch-action:none;
+}
+
+.plano,
+.grafica{
+    display:flex;
+    justify-content:center;
+    margin-top:15px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    text-align:center;
+    margin-top:15px;
+}
+
+table td{
+    padding:4px;
+}
+
+.alerta{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#dc2626;
+    color:white;
+    padding:14px 20px;
+    border-radius:15px;
+    display:none;
+    z-index:9999;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="alerta" id="alerta">
+No debés salir de la evaluación
+</div>
+
+<div class="app">
+
+<h1>Evaluación de Funciones</h1>
+
+<!-- INICIO -->
+
+<div class="screen active" id="screenInicio">
+
+<div class="card">
+
+<h2>Datos del estudiante</h2>
+
+<p>Nombre y apellido</p>
+<input class="full" id="nombreAlumno">
+
+<p>Grupo</p>
+<input class="full" id="grupoAlumno">
+
+<div style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+
+<input type="checkbox" id="modoExamen">
+
+<label for="modoExamen">
+Modo evaluación
+</label>
+
+</div>
+
+<button
+id="btnComenzar"
+disabled
+style="width:100%; margin-top:20px; opacity:0.5;">
+Comenzar
+</button>
+
+</div>
+
+</div>
+
+<!-- PANTALLA 1 -->
+
+<div class="screen" id="screen0">
+
+<div class="card">
+
+<h3>Función 1</h3>
+
+<p><strong>y = 2x - 1</strong></p>
+
+<table>
+
+<tr>
+<td><strong>x</strong></td>
+<td>-3</td>
+<td>-2</td>
+<td>-1</td>
+<td>0</td>
+<td>2</td>
+<td>4</td>
+</tr>
+
+<tr>
+<td><strong>f(x)</strong></td>
+
+<td><input class="small" id="v1"></td>
+<td><input class="small" id="v2"></td>
+<td><input class="small" id="v3"></td>
+<td><input class="small" id="v4"></td>
+<td><input class="small" id="v5"></td>
+<td><input class="small" id="v6"></td>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h3>Función 2</h3>
+
+<p><strong>y = -3x + 6</strong></p>
+
+<table>
+
+<tr>
+<td><strong>x</strong></td>
+<td>-2</td>
+<td>-1</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+</tr>
+
+<tr>
+<td><strong>f(x)</strong></td>
+
+<td><input class="small" id="v7"></td>
+<td><input class="small" id="v8"></td>
+<td><input class="small" id="v9"></td>
+<td><input class="small" id="v10"></td>
+<td><input class="small" id="v11"></td>
+<td><input class="small" id="v12"></td>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h3>Función 3</h3>
+
+<p id="funcionAleatoriaTabla"></p>
+
+<table>
+
+<tr>
+<td><strong>x</strong></td>
+<td>-2</td>
+<td>-1</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+</tr>
+
+<tr>
+<td><strong>f(x)</strong></td>
+
+<td><input class="small" id="v13"></td>
+<td><input class="small" id="v14"></td>
+<td><input class="small" id="v15"></td>
+<td><input class="small" id="v16"></td>
+<td><input class="small" id="v17"></td>
+<td><input class="small" id="v18"></td>
+
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<!-- PANTALLA 2 -->
+
+<div class="screen" id="screen1">
+
+<div class="card">
+
+<h3>Función Afín 1</h3>
+
+<p id="funcionTexto"></p>
+
+<p>1) Calculá la raíz</p>
+<input class="full" id="raizInput">
+
+<p>2) Calculá la ordenada en el origen</p>
+<input class="full" id="ordenadaInput">
+
+<p>3) Marcá los puntos de corte</p>
+
+<div class="plano">
+<canvas id="canvas2" width="320" height="320"></canvas>
+</div>
+
+<button onclick="limpiarGrafico()"
+style="width:100%; margin-top:15px;">
+Limpiar gráfico
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Función Afín 2</h3>
+
+<p id="funcionTexto2"></p>
+
+<p>1) Calculá la raíz</p>
+<input class="full" id="raizInput2">
+
+<p>2) Calculá la ordenada en el origen</p>
+<input class="full" id="ordenadaInput2">
+
+<p>3) Marcá los puntos de corte</p>
+
+<div class="plano">
+<canvas id="canvas22" width="320" height="320"></canvas>
+</div>
+
+<button onclick="limpiarGrafico2()"
+style="width:100%; margin-top:15px;">
+Limpiar gráfico
+</button>
+
+</div>
+
+</div>
+
+<!-- PANTALLA 3 -->
+
+<div class="screen" id="screen2">
+
+<div class="card">
+
+<h3>Encontrá la expresión 1</h3>
+
+<div class="grafica">
+<canvas id="canvas3" width="320" height="320"></canvas>
+</div>
+
+<p style="margin-top:15px;">
+Escribí la expresión:
+</p>
+
+<input class="full" id="expresionInput">
+
+</div>
+
+<div class="card">
+
+<h3>Encontrá la expresión 2</h3>
+
+<div class="grafica">
+<canvas id="canvas4" width="320" height="320"></canvas>
+</div>
+
+<p style="margin-top:15px;">
+Escribí la expresión:
+</p>
+
+<input class="full" id="expresionInput2">
+
+</div>
+
+</div>
+
+<!-- FINAL -->
+
+<div class="screen" id="screen3">
+
+<div class="card" id="pantallaResumen">
+
+<h2>Resumen</h2>
+
+<p>
+<strong>Alumno:</strong>
+<span id="resumenNombre"></span>
+</p>
+
+<p>
+<strong>Grupo:</strong>
+<span id="resumenGrupo"></span>
+</p>
+
+<hr>
+
+<h3>Actividad 1</h3>
+
+<div id="resumenTablas"></div>
+
+<hr>
+
+<h3>Actividad 2</h3>
+
+<p id="resumenFuncion"></p>
+<p><strong>Raíz:</strong> <span id="resumenRaiz"></span></p>
+<p><strong>Ordenada:</strong> <span id="resumenOrdenada"></span></p>
+<div class="plano">
+<canvas id="canvasResumen1" width="320" height="320"></canvas>
+</div>
+
+<hr>
+
+<p id="resumenFuncion2"></p>
+<p><strong>Raíz:</strong> <span id="resumenRaiz2"></span></p>
+<p><strong>Ordenada:</strong> <span id="resumenOrdenada2"></span></p>
+
+<div class="plano">
+<canvas id="canvasResumen2" width="320" height="320"></canvas>
+</div>
+
+<hr>
+
+<h3>Actividad 3</h3>
+
+<p><strong>Expresión 1:</strong> <span id="resumenExpresion"></span></p>
+
+<p><strong>Expresión 2:</strong> <span id="resumenExpresion2"></span></p>
+
+<hr>
+
+<p>
+<strong>Advertencias:</strong>
+<span id="resumenAdvertencias"></span>
+</p>
+
+</div>
+
+</div>
+
+<div class="nav">
+
+<button id="btnAnterior" onclick="prev()">
+Anterior
+</button>
+
+<button id="btnSiguiente" onclick="next()">
+Siguiente
+</button>
+
+<button id="btnEnviar"
+style="display:none;"
+onclick="mostrarResumenYEnviar()">
+Enviar
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const funciones = [
+    {m:2,b:-6},
+    {m:-3,b:9},
+    {m:4,b:-16},
+    {m:5,b:-5},
+    {m:-4,b:8},
+    {m:-2,b:2},
+    {m:4,b:4}
+];
+
+function randomFuncion(){
+    return funciones[
+        Math.floor(Math.random()*funciones.length)
+    ];
+}
+
+const funcion = randomFuncion();
+const funcion2 = randomFuncion();
+const funcionTabla = randomFuncion();
+
+document.getElementById("funcionTexto").innerHTML =
+`<strong>f(x)=${funcion.m}x ${funcion.b>=0?'+':'-'} ${Math.abs(funcion.b)}</strong>`;
+
+document.getElementById("funcionTexto2").innerHTML =
+`<strong>f(x)=${funcion2.m}x ${funcion2.b>=0?'+':'-'} ${Math.abs(funcion2.b)}</strong>`;
+
+document.getElementById("funcionAleatoriaTabla").innerHTML =
+`<strong>f(x)=${funcionTabla.m}x ${funcionTabla.b>=0?'+':'-'} ${Math.abs(funcionTabla.b)}</strong>`;
+
+let current=-1;
+
+const screens=document.querySelectorAll(".screen");
+
+function actualizarBotones(){
+
+    const btnAnterior=document.getElementById("btnAnterior");
+    const btnSiguiente=document.getElementById("btnSiguiente");
+    const btnEnviar=document.getElementById("btnEnviar");
+
+    if(current===-1){
+
+        btnAnterior.style.display="none";
+        btnSiguiente.style.display="none";
+        btnEnviar.style.display="none";
+        return;
+    }
+
+    btnAnterior.style.display=current===0?"none":"inline-block";
+
+    if(current===2){
+
+        btnSiguiente.style.display="none";
+        btnEnviar.style.display="inline-block";
+
+    }else{
+
+        btnSiguiente.style.display="inline-block";
+        btnEnviar.style.display="none";
+    }
+
+    if(current===3){
+
+        btnAnterior.style.display="none";
+        btnSiguiente.style.display="none";
+        btnEnviar.style.display="none";
+    }
+
+}
+
+function showScreen(){
+
+    screens.forEach(s=>s.classList.remove("active"));
+
+    if(current===-1){
+
+        document.getElementById("screenInicio")
+        .classList.add("active");
+
+    }else{
+
+        screens[current+1].classList.add("active");
+    }
+
+    actualizarBotones();
+
+}
+
+function next(){
+
+    if(current<2){
+
+        current++;
+        showScreen();
+    }
+
+}
+
+function prev(){
+
+    if(current>0){
+
+        current--;
+        showScreen();
+    }
+
+}
+
+function mostrarResumenYEnviar(){
+
+    current=3;
+
+    actualizarResumen();
+
+    showScreen();
+
+    setTimeout(async ()=>{
+
+        copiarCanvas("canvas2","canvasResumen1");
+        copiarCanvas("canvas22","canvasResumen2");
+
+        await enviarFirebase();
+
+    },500);
+
+}
+
+const modoExamen=document.getElementById("modoExamen");
+const btnComenzar=document.getElementById("btnComenzar");
+
+modoExamen.addEventListener("change",()=>{
+
+    if(modoExamen.checked){
+
+        btnComenzar.disabled=false;
+        btnComenzar.style.opacity="1";
+
+    }else{
+
+        btnComenzar.disabled=true;
+        btnComenzar.style.opacity="0.5";
+    }
+
+});
+
+btnComenzar.addEventListener("click",()=>{
+
+    current=0;
+    showScreen();
+
+    document.documentElement.requestFullscreen()
+    .catch(()=>{});
+
+});
+
+function dibujarPlano(canvasId,dibujarRecta=false,m=-1,b=2,numerarY5=false){
+
+    const canvas=document.getElementById(canvasId);
+    const ctx=canvas.getContext("2d");
+
+    ctx.clearRect(0,0,320,320);
+
+    const cx=160;
+    const cy=160;
+
+    ctx.strokeStyle="#ddd";
+
+    for(let i=0;i<=320;i+=20){
+
+        ctx.beginPath();
+        ctx.moveTo(i,0);
+        ctx.lineTo(i,320);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0,i);
+        ctx.lineTo(320,i);
+        ctx.stroke();
+
+    }
+
+    ctx.strokeStyle="black";
+    ctx.lineWidth=2;
+
+    ctx.beginPath();
+    ctx.moveTo(0,cy);
+    ctx.lineTo(320,cy);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(cx,0);
+    ctx.lineTo(cx,320);
+    ctx.stroke();
+
+    ctx.fillStyle="black";
+    ctx.font="12px Arial";
+
+    for(let i=-7;i<=7;i++){
+
+        if(i!==0){
+
+            ctx.fillText(i,cx+i*20-4,cy+15);
+
+            if(numerarY5){
+
+                ctx.fillText(
+                    i*5,
+                    cx+5,
+                    cy-i*20+4
+                );
+
+            }else{
+
+                ctx.fillText(
+                    i,
+                    cx+5,
+                    cy-i*20+4
+                );
+
+            }
+
+        }
+    }
+
+    if(dibujarRecta){
+
+        ctx.strokeStyle="red";
+        ctx.lineWidth=3;
+
+        ctx.beginPath();
+
+        for(let x=-7;x<=7;x++){
+
+            let y=m*x+b;
+
+            let px=cx+x*20;
+            let py=cy-y*20;
+
+            if(x===-7){
+
+                ctx.moveTo(px,py);
+
+            }else{
+
+                ctx.lineTo(px,py);
+
+            }
+
+        }
+
+        ctx.stroke();
+
+    }
+
+}
+
+dibujarPlano("canvas2",false,0,0,true);
+dibujarPlano("canvas22",false,0,0,true);
+
+dibujarPlano("canvas3",true,-1,2,false);
+dibujarPlano("canvas4",true,2,-6,false);
+
+let puntos=[];
+let puntos2=[];
+
+const canvas2 = document.getElementById("canvas2");
+const ctx2 = canvas2.getContext("2d");
+
+const canvas22 = document.getElementById("canvas22");
+const ctx22 = canvas22.getContext("2d");
+
+canvas2.addEventListener("click",(e)=>{
+
+    if(puntos.length>=2) return;
+
+    const rect = canvas2.getBoundingClientRect();
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    puntos.push({x,y});
+
+    ctx2.fillStyle="blue";
+
+    ctx2.beginPath();
+    ctx2.arc(x,y,6,0,Math.PI*2);
+    ctx2.fill();
+
+    if(puntos.length===2){
+
+        const p1 = puntos[0];
+        const p2 = puntos[1];
+
+        ctx2.strokeStyle="blue";
+        ctx2.lineWidth=3;
+
+        const dx = p2.x-p1.x;
+        const dy = p2.y-p1.y;
+
+        if(dx!==0){
+
+            const m = dy/dx;
+
+            const y1 = p1.y + m*(0-p1.x);
+            const y2 = p1.y + m*(320-p1.x);
+
+            ctx2.beginPath();
+            ctx2.moveTo(0,y1);
+            ctx2.lineTo(320,y2);
+            ctx2.stroke();
+
+        }
+
+    }
+
+});
+
+canvas22.addEventListener("click",(e)=>{
+
+    if(puntos2.length>=2) return;
+
+    const rect = canvas22.getBoundingClientRect();
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    puntos2.push({x,y});
+
+    ctx22.fillStyle="blue";
+
+    ctx22.beginPath();
+    ctx22.arc(x,y,6,0,Math.PI*2);
+    ctx22.fill();
+
+    if(puntos2.length===2){
+
+        const p1 = puntos2[0];
+        const p2 = puntos2[1];
+
+        ctx22.strokeStyle="blue";
+        ctx22.lineWidth=3;
+
+        const dx = p2.x-p1.x;
+        const dy = p2.y-p1.y;
+
+        if(dx!==0){
+
+            const m = dy/dx;
+
+            const y1 = p1.y + m*(0-p1.x);
+            const y2 = p1.y + m*(320-p1.x);
+
+            ctx22.beginPath();
+            ctx22.moveTo(0,y1);
+            ctx22.lineTo(320,y2);
+            ctx22.stroke();
+
+        }
+
+    }
+
+});
+
+function limpiarGrafico(){
+
+    puntos=[];
+
+    dibujarPlano("canvas2",false,0,0,true);
+
+}
+
+function limpiarGrafico2(){
+
+    puntos2=[];
+
+    dibujarPlano("canvas22",false,0,0,true);
+
+}
+
+let advertencias=0;
+
+function mostrarAlerta(){
+
+    const alerta=document.getElementById("alerta");
+
+    alerta.style.display="block";
+
+    setTimeout(()=>{
+        alerta.style.display="none";
+    },3000);
+
+}
+
+window.addEventListener("blur",()=>{
+
+    if(current>=0){
+
+        advertencias++;
+        mostrarAlerta();
+    }
+
+});
+
+document.addEventListener("visibilitychange",()=>{
+
+    if(document.hidden && current>=0){
+
+        advertencias++;
+        mostrarAlerta();
+    }
+
+});
+
+function copiarCanvas(origenId,destinoId){
+
+    const original =
+    document.getElementById(origenId);
+
+    const copia =
+    document.getElementById(destinoId);
+
+    const ctx =
+    copia.getContext("2d");
+
+    ctx.clearRect(0,0,320,320);
+
+    ctx.drawImage(original,0,0);
+
+}
+
+function actualizarResumen(){
+
+document.getElementById("resumenNombre").innerText=
+document.getElementById("nombreAlumno").value;
+
+document.getElementById("resumenGrupo").innerText=
+document.getElementById("grupoAlumno").value;
+
+document.getElementById("resumenFuncion").innerText=
+document.getElementById("funcionTexto").innerText;
+
+document.getElementById("resumenRaiz").innerText=
+document.getElementById("raizInput").value;
+
+document.getElementById("resumenOrdenada").innerText=
+document.getElementById("ordenadaInput").value;
+
+document.getElementById("resumenFuncion2").innerText=
+document.getElementById("funcionTexto2").innerText;
+
+document.getElementById("resumenRaiz2").innerText=
+document.getElementById("raizInput2").value;
+
+document.getElementById("resumenOrdenada2").innerText=
+document.getElementById("ordenadaInput2").value;
+
+document.getElementById("resumenExpresion").innerText=
+document.getElementById("expresionInput").value;
+
+document.getElementById("resumenExpresion2").innerText=
+document.getElementById("expresionInput2").value;
+
+copiarCanvas("canvas2","canvasResumen1");
+copiarCanvas("canvas22","canvasResumen2");
+
+document.getElementById("resumenTablas").innerHTML = `
+
+<h4>Función 1</h4>
+<p>${v1.value}, ${v2.value}, ${v3.value}, ${v4.value}, ${v5.value}, ${v6.value}</p>
+
+<h4>Función 2</h4>
+<p>${v7.value}, ${v8.value}, ${v9.value}, ${v10.value}, ${v11.value}, ${v12.value}</p>
+
+<h4>Función 3</h4>
+<p>${v13.value}, ${v14.value}, ${v15.value}, ${v16.value}, ${v17.value}, ${v18.value}</p>
+
+`;
+
+document.getElementById("resumenAdvertencias").innerText=
+advertencias;
+
+}
+
+async function enviarFirebase(){
+
+    const resumen=
+    document.getElementById("pantallaResumen");
+
+    const canvas=
+    await html2canvas(resumen);
+
+    const imagen=
+    canvas.toDataURL("image/png");
+
+    const datos={
+
+        nombre:
+        document.getElementById("nombreAlumno").value,
+
+        imagen:imagen,
+
+        fecha:
+        new Date().toLocaleString()
+
+    };
+
+    fetch(
+    "https://estadistica-evaluacion-3bd0b-default-rtdb.firebaseio.com/evaluaciones.json",
+    {
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify(datos)
+
+    });
+
+}
+
+showScreen();
+
+</script>
+
+</body>
+</html>
