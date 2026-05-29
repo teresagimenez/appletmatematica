@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluación Distribución Bidimensional</title>
+
+<script>
+window.MathJax = {
+tex: {
+inlineMath: [['\\(','\\)'], ['$', '$']]
+}
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f2f2f2;
+    display:flex;
+    justify-content:center;
+}
+
+.card{
+    width:95%;
+    max-width:1100px;
+    background:white;
+    padding:20px;
+    margin-top:20px;
+    border-radius:10px;
+}
+
+.screen{
+    display:none;
+}
+
+.active{
+    display:block;
+}
+
+input{
+    width:100%;
+    padding:6px;
+    box-sizing:border-box;
+}
+
+button{
+    padding:10px;
+    margin:5px;
+    cursor:pointer;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+td,th{
+    border:1px solid #ccc;
+    text-align:center;
+    padding:6px;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+canvas{
+    border:1px solid #999;
+    background:white;
+    margin-top:10px;
+    max-width:100%;
+}
+
+#calcBox{
+    background:#f9f9f9;
+    padding:15px;
+    border-radius:10px;
+    margin-top:20px;
+}
+
+.formula{
+    text-align:center;
+    font-size:24px;
+    margin:20px 0;
+}
+
+.calcGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.resultado{
+    text-align:center;
+    font-size:18px;
+    margin-top:15px;
+}
+
+#miniCorreccion{
+position:absolute;
+left:-9999px;
+top:0;
+font-size:12px;
+color:black;
+background:white;
+padding:10px;
+}
+
+@media(max-width:700px){
+
+.calcGrid{
+grid-template-columns:1fr;
+}
+
+table{
+font-size:12px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<!-- =========================================
+PANTALLA INICIAL
+========================================= -->
+
+<div class="screen active" id="s0">
+
+<h2>Evaluación Distribución Bidimensional</h2>
+
+<input id="nombre" placeholder="Nombre">
+
+<br><br>
+
+<input id="grupo" placeholder="Grupo">
+
+<br><br>
+
+<label style="display:flex;align-items:center;gap:10px;">
+<input type="checkbox" id="modoExamCheck">
+Activar modo examen
+</label>
+
+<br>
+
+<button onclick="start()">
+Comenzar
+</button>
+
+</div>
+
+<!-- =========================================
+ACTIVIDAD 1
+========================================= -->
+
+<div class="screen" id="s1">
+
+<h3>Actividad 1: Tabla de frecuencia bidimensional</h3>
+<p>
+
+<b>Situación:</b>
+
+Un docente registró la cantidad de horas de estudio
+(x) y la cantidad de ejercicios correctos (y)
+realizados por distintos estudiantes durante una práctica.
+
+A partir de los datos obtenidos:
+
+</p>
+
+<ul>
+
+<li>Construye la tabla de frecuencia bidimensional.</li>
+
+<li>Representa los datos en el diagrama de dispersión.</li>
+
+</ul>
+
+<p><b>Datos:</b></p>
+
+<table>
+
+<thead>
+
+<tr>
+<th>x</th>
+<th>y</th>
+</tr>
+
+</thead>
+
+<tbody id="datos1"></tbody>
+
+</table>
+
+<p><b>Completa la tabla de doble entrada:</b></p>
+
+<table id="tablaBidimensional"></table>
+
+<h3>Diagrama de dispersión</h3>
+
+<p>
+Haz clic sobre el gráfico para ubicar los puntos.
+</p>
+
+<canvas id="canvas1" width="700" height="450"></canvas>
+
+<div class="buttons">
+
+<button onclick="undoPoint()">
+Borrar último punto
+</button>
+
+<button onclick="clearCanvas1()">
+Limpiar gráfico
+</button>
+
+<button onclick="go2()">
+Ir a Actividad 2
+</button>
+
+</div>
+
+</div>
+
+<!-- =========================================
+ACTIVIDAD 2
+========================================= -->
+
+<div class="screen" id="s2">
+
+<h3>
+Actividad 2: Coeficiente de correlación de Pearson
+</h3>
+
+<p>
+
+<b>Situación:</b>
+
+Un docente de Educación Física quiso estudiar
+la relación entre las horas de entrenamiento
+semanal y la cantidad de abdominales que
+logran realizar algunos estudiantes.
+
+</p>
+
+<p>
+Completa las columnas faltantes y luego calcula
+el coeficiente de correlación de Pearson.
+</p>
+
+<table id="tablaActividad2">
+
+<thead>
+
+<tr>
+
+<th>Estudiante</th>
+<th>x<br>Horas de entrenamiento</th>
+<th>y<br>Abdominales</th>
+<th>x²</th>
+<th>y²</th>
+<th>x · y</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>1</td>
+<td>1</td>
+<td>12</td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>2</td>
+<td>15</td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>3</td>
+<td>18</td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>4</td>
+<td>20</td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+</tr>
+
+<tr>
+<td>5</td>
+<td>5</td>
+<td>23</td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+</tr>
+
+<tr>
+<td>6</td>
+<td>6</td>
+<td>25</td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+</tr>
+
+</tbody>
+
+<tfoot>
+
+<tr>
+
+<th>Σ</th>
+
+<th>
+<input id="sx" placeholder="Σx">
+</th>
+
+<th>
+<input id="sy" placeholder="Σy">
+</th>
+
+<th>
+<input id="sx2" placeholder="Σx²">
+</th>
+
+<th>
+<input id="sy2" placeholder="Σy²">
+</th>
+
+<th>
+<input id="sxy" placeholder="Σx·y">
+</th>
+
+</tr>
+
+</tfoot>
+
+</table>
+
+<br>
+
+<p>
+Cantidad de datos:
+</p>
+
+<input
+id="n"
+placeholder="n"
+style="width:100px">
+
+<br><br>
+
+<p>
+<b>Coeficiente de correlación obtenido:</b>
+</p>
+
+<input
+type="number"
+step="any"
+id="coeficienteAlumno"
+placeholder="Escribe aquí el valor de r">
+
+<br><br>
+
+<button onclick="toggleCalc()">
+Calculadora de coeficiente de correlación
+</button>
+
+<div id="calcBox" style="display:none;">
+
+<hr>
+
+<h3>Calculadora de Pearson</h3>
+
+<div id="formula" class="formula">
+
+\[
+r =
+\frac{
+n\sum xy - (\sum x)(\sum y)
+}{
+\sqrt{
+(n\sum x^2 - (\sum x)^2)
+(n\sum y^2 - (\sum y)^2)
+}
+}
+\]
+
+</div>
+
+<div class="calcGrid">
+
+<input type="number" step="any" id="calc_n" placeholder="n" oninput="actualizar()">
+
+<input type="number" step="any" id="calc_sx" placeholder="Σx" oninput="actualizar()">
+
+<input type="number" step="any" id="calc_sy" placeholder="Σy" oninput="actualizar()">
+
+<input type="number" step="any" id="calc_sxy" placeholder="Σxy" oninput="actualizar()">
+
+<input type="number" step="any" id="calc_sx2" placeholder="Σx²" oninput="actualizar()">
+
+<input type="number" step="any" id="calc_sy2" placeholder="Σy²" oninput="actualizar()">
+
+</div>
+
+<div class="buttons">
+
+<button onclick="calcularPearson()">
+Calcular
+</button>
+
+<button onclick="limpiarCalc()">
+Limpiar
+</button>
+
+</div>
+
+<div class="resultado" id="resultadoCalc"></div>
+
+</div>
+
+<div class="buttons">
+
+<button onclick="back1()">
+Volver Actividad 1
+</button>
+
+<button onclick="go3()">
+Ir al resumen
+</button>
+
+</div>
+
+</div>
+
+<!-- =========================================
+RESUMEN
+========================================= -->
+
+<div class="screen" id="s3">
+
+<h3>Resumen Final</h3>
+
+<div id="summary"></div>
+
+<div
+id="correccionOculta"
+style="
+font-size:1px;
+color:white;
+height:1px;
+overflow:hidden;
+">
+
+<h4>Corrección docente</h4>
+
+<p>Σx = 21</p>
+<p>Σy = 113</p>
+<p>Σx² = 91</p>
+<p>Σy² = 2267</p>
+<p>Σxy = 463</p>
+<p>r ≈ 0.995</p>
+
+</div>
+
+<div class="buttons">
+
+<button onclick="back1()">
+Volver Actividad 1
+</button>
+
+<button onclick="back2()">
+Volver Actividad 2
+</button>
+
+<button onclick="send()">
+Enviar respuestas
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+push
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+const firebaseConfig = {
+apiKey: "AIzaSyC6CPEyPM4Za4Qqs6cmOoPZ91dEPwK31Hw",
+authDomain: "estadistica-evaluacion-3bd0b.firebaseapp.com",
+databaseURL: "https://estadistica-evaluacion-3bd0b-default-rtdb.firebaseio.com",
+projectId: "estadistica-evaluacion-3bd0b",
+storageBucket: "estadistica-evaluacion-3bd0b.firebasestorage.app",
+messagingSenderId: "273463902310",
+appId: "1:273463902310:web:5c15afe5f909840775eda7"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+let data1=[];
+let res={};
+
+const canvas1 =
+document.getElementById("canvas1");
+
+const ctx1 =
+canvas1.getContext("2d");
+
+let puntos=[];
+
+let modoExamen=false;
+let salidasPantalla=0;
+let ultimoAviso=0;
+
+window.show=function(id){
+
+document.querySelectorAll(".screen")
+.forEach(e=>e.classList.remove("active"));
+
+document.getElementById(id)
+.classList.add("active");
+
+}
+
+function generarDatos(){
+
+let arr=[];
+
+for(let i=0;i<15;i++){
+
+let x=Math.floor(Math.random()*5)+1;
+
+let y=x + Math.floor(Math.random()*4);
+
+arr.push({x,y});
+
+}
+
+return arr;
+
+}
+
+window.start=function(){
+
+let check =
+document.getElementById("modoExamCheck");
+
+if(!check.checked){
+
+alert("Debes activar el modo examen para comenzar");
+
+return;
+
+}
+
+modoExamen=true;
+
+res.nombre =
+document.getElementById("nombre").value;
+
+res.grupo =
+document.getElementById("grupo").value;
+
+data1 = generarDatos();
+
+buildActivity1();
+
+puntos=[];
+
+drawAxes();
+
+show("s1");
+
+}
+
+function buildActivity1(){
+
+document.getElementById("datos1").innerHTML =
+
+data1.map(d=>`
+
+<tr>
+<td>${d.x}</td>
+<td>${d.y}</td>
+</tr>
+
+`).join("");
+
+let xs=[...new Set(data1.map(d=>d.x))]
+.sort((a,b)=>a-b);
+
+let ys=[...new Set(data1.map(d=>d.y))]
+.sort((a,b)=>a-b);
+
+let html="<tr><th>x \\ y</th>";
+
+ys.forEach(y=>{
+html+=`<th>${y}</th>`;
+});
+
+html+="</tr>";
+
+xs.forEach(x=>{
+
+html+=`<tr><th>${x}</th>`;
+
+ys.forEach(y=>{
+
+html+=`
+
+<td>
+<input
+type="number"
+min="0"
+style="width:60px">
+</td>
+
+`;
+
+});
+
+html+="</tr>";
+
+});
+
+document.getElementById("tablaBidimensional")
+.innerHTML=html;
+
+drawAxes();
+
+}
+
+function drawAxes(){
+
+ctx1.clearRect(0,0,700,450);
+
+let ox=60;
+let oy=390;
+
+ctx1.strokeStyle="#d9d9d9";
+ctx1.lineWidth=1;
+
+for(let i=0;i<=10;i++){
+
+let x=ox+i*50;
+
+ctx1.beginPath();
+ctx1.moveTo(x,20);
+ctx1.lineTo(x,oy);
+ctx1.stroke();
+
+}
+
+for(let i=0;i<=10;i++){
+
+let y=oy-i*30;
+
+ctx1.beginPath();
+ctx1.moveTo(ox,y);
+ctx1.lineTo(650,y);
+ctx1.stroke();
+
+}
+
+ctx1.beginPath();
+
+ctx1.moveTo(ox,20);
+ctx1.lineTo(ox,oy);
+
+ctx1.lineTo(650,oy);
+
+ctx1.strokeStyle="black";
+ctx1.lineWidth=2;
+ctx1.stroke();
+
+// NUMERACIÓN X
+
+for(let i=1;i<=10;i++){
+
+let x=ox+i*50;
+
+ctx1.beginPath();
+ctx1.moveTo(x,oy-5);
+ctx1.lineTo(x,oy+5);
+ctx1.stroke();
+
+ctx1.fillStyle="black";
+ctx1.fillText(i,x-3,oy+20);
+
+}
+
+// NUMERACIÓN Y
+
+for(let i=1;i<=10;i++){
+
+let y=oy-i*30;
+
+ctx1.beginPath();
+ctx1.moveTo(ox-5,y);
+ctx1.lineTo(ox+5,y);
+ctx1.stroke();
+
+ctx1.fillText(i,ox-20,y+4);
+
+}
+
+// TÍTULOS
+
+ctx1.fillText("x",660,oy+5);
+ctx1.fillText("y",45,20);
+
+puntos.forEach(p=>{
+
+ctx1.beginPath();
+
+ctx1.arc(p.x,p.y,5,0,Math.PI*2);
+
+ctx1.fillStyle="red";
+ctx1.fill();
+
+});
+
+}
+
+canvas1.addEventListener("click",e=>{
+
+let rect =
+canvas1.getBoundingClientRect();
+
+let x =
+e.clientX-rect.left;
+
+let y =
+e.clientY-rect.top;
+
+puntos.push({x,y});
+
+drawAxes();
+
+});
+
+window.undoPoint=function(){
+
+puntos.pop();
+
+drawAxes();
+
+}
+
+window.clearCanvas1=function(){
+
+puntos=[];
+
+drawAxes();
+
+}
+// detectar cambio de pestaña
+
+function registrarSalida(){
+
+if(!modoExamen) return;
+
+let ahora = Date.now();
+
+// evita doble detección seguida
+
+if(ahora - ultimoAviso < 3000){
+return;
+}
+
+ultimoAviso = ahora;
+
+salidasPantalla++;
+
+alert(
+"No salgas de la actividad.\n\n" +
+"Intentos detectados: " +
+salidasPantalla
+);
+
+}
+
+// cambio de pestaña
+
+document.addEventListener("visibilitychange",()=>{
+
+if(document.hidden){
+
+registrarSalida();
+
+}
+
+});
+
+// pérdida de foco
+
+window.addEventListener("blur",()=>{
+
+registrarSalida();
+
+});
+
+window.go2=function(){
+show("s2");
+}
+
+window.back1=function(){
+show("s1");
+}
+
+window.back2=function(){
+show("s2");
+}
+
+window.toggleCalc=function(){
+
+let box =
+document.getElementById("calcBox");
+
+if(box.style.display==="none"){
+
+box.style.display="block";
+
+}else{
+
+box.style.display="none";
+
+}
+
+}
+
+window.actualizar=function(){
+
+let n =
+document.getElementById("calc_n").value || "n";
+
+let sx =
+document.getElementById("calc_sx").value || "\\sum x";
+
+let sy =
+document.getElementById("calc_sy").value || "\\sum y";
+
+let sxy =
+document.getElementById("calc_sxy").value || "\\sum xy";
+
+let sx2 =
+document.getElementById("calc_sx2").value || "\\sum x^2";
+
+let sy2 =
+document.getElementById("calc_sy2").value || "\\sum y^2";
+
+let formula =
+
+`
+\\[
+r =
+\\frac{
+${n}\\sum xy - (${sx})(${sy})
+}{
+\\sqrt{
+(${n}\\sum x^2 - (${sx})^2)
+(${n}\\sum y^2 - (${sy})^2)
+}
+}
+\\]
+`;
+
+document.getElementById("formula")
+.innerHTML=formula;
+
+MathJax.typesetPromise([
+document.getElementById("formula")
+]);
+
+}
+
+window.calcularPearson=function(){
+
+let n =
+parseFloat(document.getElementById("calc_n").value);
+
+let sx =
+parseFloat(document.getElementById("calc_sx").value);
+
+let sy =
+parseFloat(document.getElementById("calc_sy").value);
+
+let sxy =
+parseFloat(document.getElementById("calc_sxy").value);
+
+let sx2 =
+parseFloat(document.getElementById("calc_sx2").value);
+
+let sy2 =
+parseFloat(document.getElementById("calc_sy2").value);
+
+let r =
+
+((n*sxy) - (sx*sy))
+
+/
+
+Math.sqrt(
+(n*sx2 - sx*sx)
+*
+(n*sy2 - sy*sy)
+);
+
+document.getElementById("resultadoCalc")
+.innerHTML =
+"<b>r = " + r.toFixed(4) + "</b>";
+
+}
+
+window.limpiarCalc=function(){
+
+document.getElementById("calc_n").value="";
+document.getElementById("calc_sx").value="";
+document.getElementById("calc_sy").value="";
+document.getElementById("calc_sxy").value="";
+document.getElementById("calc_sx2").value="";
+document.getElementById("calc_sy2").value="";
+
+document.getElementById("resultadoCalc")
+.innerHTML="";
+
+actualizar();
+
+}
+
+window.go3=function(){
+
+let tabla1 =
+document.getElementById("tablaBidimensional")
+.cloneNode(true);
+
+tabla1.querySelectorAll("input")
+.forEach(input=>{
+
+let span =
+document.createElement("span");
+
+span.innerText =
+input.value || "";
+
+input.parentNode
+.replaceChild(span,input);
+
+});
+
+let tabla2 =
+document.getElementById("tablaActividad2")
+.cloneNode(true);
+
+tabla2.querySelectorAll("input")
+.forEach(input=>{
+
+let span =
+document.createElement("span");
+
+span.innerText =
+input.value || "";
+
+input.parentNode
+.replaceChild(span,input);
+
+});
+
+let grafico =
+canvas1.toDataURL();
+
+let rAlumno =
+document.getElementById("coeficienteAlumno")
+.value;
+
+document.getElementById("summary").innerHTML =
+
+`
+
+<h4>Datos del estudiante</h4>
+
+<p><b>Nombre:</b> ${res.nombre}</p>
+
+<p><b>Grupo:</b> ${res.grupo}</p>
+
+<p>
+<b>Salidas detectadas:</b>
+${salidasPantalla}
+</p>
+
+<p><b>Fecha:</b> ${new Date().toLocaleString()}</p>
+
+<hr>
+
+<h4>Actividad 1</h4>
+
+${tabla1.outerHTML}
+
+<br>
+
+<img
+src="${grafico}"
+style="
+max-width:100%;
+border:1px solid #ccc;
+">
+
+<hr>
+
+<h4>Actividad 2</h4>
+
+${tabla2.outerHTML}
+
+<br>
+
+<p>
+<b>Coeficiente:</b>
+${rAlumno}
+</p>
+`;
+
+show("s3");
+
+}
+
+window.send = async function(){
+
+try{
+
+// crear copia oculta
+
+let copia =
+document.getElementById("s3")
+.cloneNode(true);
+
+// agregar corrección SOLO en la copia
+
+let bloqueCorreccion =
+document.createElement("div");
+
+// ======================================
+// TABLA CORRECTA ACTIVIDAD 1
+// ======================================
+
+// calcular frecuencias reales
+
+let xs=[...new Set(data1.map(d=>d.x))]
+.sort((a,b)=>a-b);
+
+let ys=[...new Set(data1.map(d=>d.y))]
+.sort((a,b)=>a-b);
+
+let tablaCorrecta = `
+<h3 style="color:red;">
+Corrección Actividad 1
+</h3>
+
+<table border="1" style="
+border-collapse:collapse;
+width:100%;
+color:red;
+">
+
+<tr>
+<th>x \\ y</th>
+${ys.map(y=>`<th>${y}</th>`).join("")}
+</tr>
+`;
+
+xs.forEach(x=>{
+
+tablaCorrecta += `<tr><th>${x}</th>`;
+
+ys.forEach(y=>{
+
+let frecuencia =
+data1.filter(d=>d.x==x && d.y==y).length;
+
+tablaCorrecta += `<td>${frecuencia}</td>`;
+
+});
+
+tablaCorrecta += `</tr>`;
+
+});
+
+tablaCorrecta += `</table>`;
+
+// ======================================
+// GRAFICO CORRECTO
+// ======================================
+
+// crear canvas oculto
+
+let canvasCorrecto =
+document.createElement("canvas");
+
+canvasCorrecto.width = 700;
+canvasCorrecto.height = 450;
+
+let cctx =
+canvasCorrecto.getContext("2d");
+
+function dibujarCorrecto(){
+
+cctx.clearRect(0,0,700,450);
+
+let ox=60;
+let oy=390;
+
+cctx.strokeStyle="#d9d9d9";
+cctx.lineWidth=1;
+
+for(let i=0;i<=10;i++){
+
+let x=ox+i*50;
+
+cctx.beginPath();
+cctx.moveTo(x,20);
+cctx.lineTo(x,oy);
+cctx.stroke();
+
+}
+
+for(let i=0;i<=10;i++){
+
+let y=oy-i*30;
+
+cctx.beginPath();
+cctx.moveTo(ox,y);
+cctx.lineTo(650,y);
+cctx.stroke();
+
+}
+
+cctx.beginPath();
+
+cctx.moveTo(ox,20);
+cctx.lineTo(ox,oy);
+
+cctx.lineTo(650,oy);
+
+cctx.strokeStyle="black";
+cctx.lineWidth=2;
+cctx.stroke();
+
+// numeración
+
+for(let i=1;i<=10;i++){
+
+let x=ox+i*50;
+
+cctx.fillText(i,x-3,oy+20);
+
+}
+
+for(let i=1;i<=10;i++){
+
+let y=oy-i*30;
+
+cctx.fillText(i,ox-20,y+4);
+
+}
+
+// puntos correctos
+
+data1.forEach(d=>{
+
+let px = ox + d.x*50;
+let py = oy - d.y*30;
+
+cctx.beginPath();
+cctx.arc(px,py,5,0,Math.PI*2);
+
+cctx.fillStyle="red";
+cctx.fill();
+
+});
+
+}
+
+dibujarCorrecto();
+
+let imagenCorrecta =
+canvasCorrecto.toDataURL();
+
+// ======================================
+// TABLA CORRECTA ACTIVIDAD 2
+// ======================================
+
+let datos2 = [
+
+{x:1,y:12},
+{x:2,y:15},
+{x:3,y:18},
+{x:4,y:20},
+{x:5,y:23},
+{x:6,y:25}
+
+];
+
+let sx=0;
+let sy=0;
+let sx2=0;
+let sy2=0;
+let sxy=0;
+
+let tabla2Correcta = `
+
+<h3 style="color:red;">
+Corrección Actividad 2
+</h3>
+
+<table border="1" style="
+border-collapse:collapse;
+width:100%;
+color:red;
+">
+
+<tr>
+<th>x</th>
+<th>y</th>
+<th>x²</th>
+<th>y²</th>
+<th>x·y</th>
+</tr>
+`;
+
+datos2.forEach(d=>{
+
+let x2=d.x*d.x;
+let y2=d.y*d.y;
+let xy=d.x*d.y;
+
+sx+=d.x;
+sy+=d.y;
+sx2+=x2;
+sy2+=y2;
+sxy+=xy;
+
+tabla2Correcta += `
+
+<tr>
+<td>${d.x}</td>
+<td>${d.y}</td>
+<td>${x2}</td>
+<td>${y2}</td>
+<td>${xy}</td>
+</tr>
+
+`;
+
+});
+
+tabla2Correcta += `
+
+<tr>
+<th>${sx}</th>
+<th>${sy}</th>
+<th>${sx2}</th>
+<th>${sy2}</th>
+<th>${sxy}</th>
+</tr>
+
+</table>
+`;
+
+// coeficiente
+
+let n=6;
+
+let r =
+
+((n*sxy)-(sx*sy))
+
+/
+
+Math.sqrt(
+(n*sx2-sx*sx)
+*
+(n*sy2-sy*sy)
+);
+
+// ======================================
+// HTML FINAL CORRECCIÓN
+// ======================================
+
+bloqueCorreccion.innerHTML = `
+
+<hr>
+
+<div style="
+margin-top:20px;
+padding:15px;
+border:3px solid red;
+background:#ffeaea;
+color:red;
+">
+
+${tablaCorrecta}
+
+<br>
+
+<img
+src="${imagenCorrecta}"
+style="
+max-width:100%;
+border:2px solid red;
+">
+
+<br><br>
+
+${tabla2Correcta}
+
+<h3>
+Coeficiente correcto:
+${r.toFixed(4)}
+</h3>
+
+</div>
+`;
+
+// agregar abajo del resumen
+
+copia.appendChild(bloqueCorreccion);
+
+// ocultar copia fuera de pantalla
+
+copia.style.position = "absolute";
+copia.style.left = "-9999px";
+copia.style.top = "0";
+copia.style.display = "block";
+copia.style.background = "white";
+copia.style.width = "1000px";
+
+document.body.appendChild(copia);
+
+// capturar copia
+
+let canvas =
+await html2canvas(copia);
+
+let imagen =
+canvas.toDataURL("image/png");
+
+// eliminar copia
+
+document.body.removeChild(copia);
+
+// guardar en firebase
+
+let datos = {
+
+nombre: res.nombre,
+grupo: res.grupo,
+fecha: new Date().toLocaleString(),
+salidasPantalla: salidasPantalla,
+imagen: imagen
+
+};
+
+await push(
+ref(db,"evaluaciones"),
+datos
+);
+
+alert("Respuestas enviadas correctamente");
+
+}catch(error){
+
+alert("Error: " + error);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
