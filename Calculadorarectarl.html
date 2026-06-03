@@ -211,21 +211,21 @@ n=\bar{y}-m\bar{x}
     type="text"
     inputmode="decimal"
     id="ymedia"
-    oninput="actualizarM()">
+    oninput="actualizarN()">
 
 <label>\(\bar{x}\)</label>
 <input
     type="text"
     inputmode="decimal"
     id="xmedia"
-    oninput="actualizarM()">
+    oninput="actualizarN()">
 
 <label>\(m\)</label>
 <input
     type="text"
     inputmode="decimal"
     id="mIngresada"
-    oninput="actualizarM()">
+    oninput="actualizarN()">
 
 <button onclick="calcularN()">Calcular n</button>
 
@@ -239,6 +239,10 @@ n=\bar{y}-m\bar{x}
 
 let valorM = null;
 let valorN = null;
+
+function formatear(numero){
+    return Number(numero.toFixed(4));
+}
 
 function actualizarM(){
 
@@ -305,7 +309,7 @@ let den = parseFloat(
 
     document.getElementById("resultadoM").innerHTML =
     `\\[
-    m=${valorM.toFixed(4)}
+    m=${formatear(valorM)}
     \\]`;
 
     MathJax.typesetPromise();
@@ -334,23 +338,22 @@ let x = parseFloat(
 
     document.getElementById("resultadoN").innerHTML =
     `\\[
-    n=${valorN.toFixed(4)}
+    n=${formatear(valorN)}
     \\]`;
 
     let ecuacion;
 
-    if(valorN>=0){
-        ecuacion =
-        `\\[
-        f(x)=${m.toFixed(4)}x+${valorN.toFixed(4)}
-        \\]`;
-    }else{
-        ecuacion =
-        `\\[
-        f(x)=${m.toFixed(4)}x${valorN.toFixed(4)}
-        \\]`;
-    }
-
+if(valorN>=0){
+    ecuacion =
+    `\\[
+    f(x)=${formatear(m)}x+${formatear(valorN)}
+    \\]`;
+}else{
+    ecuacion =
+    `\\[
+    f(x)=${formatear(m)}x${formatear(valorN)}
+    \\]`;
+}
     document.getElementById("ecuacionFinal").innerHTML =
     ecuacion;
 
