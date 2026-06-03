@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Recta de Regresión</title>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'], ['$', '$']]
+  }
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f6f9;
+    max-width:900px;
+    margin:auto;
+    padding:15px;
+}
+
+h1{
+    text-align:center;
+    color:#1f4e79;
+    margin-bottom:20px;
+    font-size:2rem;
+    line-height:1.2;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+h2{
+    color:#1f4e79;
+    text-align:center;
+    margin-top:0;
+}
+
+label{
+    display:block;
+    margin-top:14px;
+    font-weight:bold;
+    font-size:1rem;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    margin-top:6px;
+    font-size:18px;
+    background:white;
+}
+
+button{
+    width:100%;
+    padding:16px;
+    margin-top:18px;
+    background:#1f4e79;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:18px;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#163a5a;
+}
+
+.formula{
+    text-align:center;
+    font-size:1.6em;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    margin:20px 0;
+    overflow-x:auto;
+    padding:10px;
+}
+
+.resultado{
+    text-align:center;
+    font-size:1.8em;
+    font-weight:bold;
+    color:#0b5e20;
+    margin-top:20px;
+    overflow-x:auto;
+}
+
+.recta{
+    text-align:center;
+    font-size:2.1em;
+    font-weight:bold;
+    color:#1f4e79;
+    margin-top:25px;
+    overflow-x:auto;
+}
+
+/* ==========================
+   MÓVIL
+========================== */
+
+@media (max-width:768px){
+
+    body{
+        padding:10px;
+    }
+
+    h1{
+        font-size:1.5rem;
+    }
+
+    h2{
+        font-size:1.2rem;
+    }
+
+    .card{
+        padding:15px;
+        border-radius:12px;
+    }
+
+    .formula{
+        font-size:1.2em;
+    }
+
+    .resultado{
+        font-size:1.5em;
+    }
+
+    .recta{
+        font-size:1.6em;
+    }
+
+    input{
+        padding:16px;
+        font-size:18px;
+    }
+
+    button{
+        padding:18px;
+        font-size:19px;
+    }
+}
+</style>
+</head>
+<body>
+
+<h1>Calculadora de la Recta de Regresión Lineal</h1>
+
+<div class="card">
+
+<h2>Pendiente \(m\)</h2>
+
+<div class="formula" id="formulaM">
+\[
+m=\frac{\sum (x-\bar{x})(y-\bar{y})}
+{\sum (x-\bar{x})^2}
+\]
+</div>
+
+<label>\(\sum (x-\bar{x})(y-\bar{y})\)</label>
+<input
+    type="number"
+    step="any"
+    inputmode="decimal"
+    id="numerador"
+    oninput="actualizarM()">
+
+<label>\(\sum (x-\bar{x})^2\)</label>
+<input
+    type="number"
+    step="any"
+    inputmode="decimal"
+    id="denominador"
+    oninput="actualizarM()">
+	
+<button onclick="calcularM()">Calcular m</button>
+
+<div class="resultado" id="resultadoM"></div>
+
+</div>
+
+<div class="card">
+
+<h2>Ordenada al origen \(n\)</h2>
+
+<div class="formula" id="formulaN">
+\[
+n=\bar{y}-m\bar{x}
+\]
+</div>
+
+<label>\(\bar{y}\)</label>
+<input
+    type="number"
+    step="any"
+    inputmode="decimal"
+    id="ymedia"
+    oninput="actualizarN()">
+
+<label>\(\bar{x}\)</label>
+<input
+    type="number"
+    step="any"
+    inputmode="decimal"
+    id="xmedia"
+    oninput="actualizarN()">
+
+<label>\(m\)</label>
+<input
+    type="number"
+    step="any"
+    inputmode="decimal"
+    id="mIngresada"
+    oninput="actualizarN()">
+
+<button onclick="calcularN()">Calcular n</button>
+
+<div class="resultado" id="resultadoN"></div>
+
+<div class="recta" id="ecuacionFinal"></div>
+
+</div>
+
+<script>
+
+let valorM = null;
+let valorN = null;
+
+function actualizarM(){
+
+    let num = document.getElementById("numerador").value;
+    let den = document.getElementById("denominador").value;
+
+    let superior =
+        num === ""
+        ? "\\sum (x-\\bar{x})(y-\\bar{y})"
+        : num;
+
+    let inferior =
+        den === ""
+        ? "\\sum (x-\\bar{x})^2"
+        : den;
+
+    document.getElementById("formulaM").innerHTML =
+    `\\[
+    m=\\frac{${superior}}{${inferior}}
+    \\]`;
+
+    MathJax.typesetPromise();
+}
+
+function actualizarN(){
+
+    let y = document.getElementById("ymedia").value;
+    let m = document.getElementById("mIngresada").value;
+    let x = document.getElementById("xmedia").value;
+
+    let ytxt = y === "" ? "\\bar{y}" : y;
+    let mtxt = m === "" ? "m" : m;
+    let xtxt = x === "" ? "\\bar{x}" : x;
+
+    document.getElementById("formulaN").innerHTML =
+    `\\[
+    n=${ytxt}-(${mtxt})(${xtxt})
+    \\]`;
+
+    MathJax.typesetPromise();
+}
+
+function calcularM(){
+
+    let num = parseFloat(document.getElementById("numerador").value);
+    let den = parseFloat(document.getElementById("denominador").value);
+
+    if(isNaN(num) || isNaN(den)){
+        alert("Complete los datos de m.");
+        return;
+    }
+
+    if(den===0){
+        alert("El denominador no puede ser cero.");
+        return;
+    }
+
+    valorM = num/den;
+
+    document.getElementById("resultadoM").innerHTML =
+    `\\[
+    m=${valorM.toFixed(4)}
+    \\]`;
+
+    MathJax.typesetPromise();
+}
+
+function calcularN(){
+
+    let y = parseFloat(document.getElementById("ymedia").value);
+    let m = parseFloat(document.getElementById("mIngresada").value);
+    let x = parseFloat(document.getElementById("xmedia").value);
+
+    if(isNaN(y) || isNaN(m) || isNaN(x)){
+        alert("Complete los datos de n.");
+        return;
+    }
+
+    valorN = y - m*x;
+
+    document.getElementById("resultadoN").innerHTML =
+    `\\[
+    n=${valorN.toFixed(4)}
+    \\]`;
+
+    let ecuacion;
+
+    if(valorN>=0){
+        ecuacion =
+        `\\[
+        f(x)=${m.toFixed(4)}x+${valorN.toFixed(4)}
+        \\]`;
+    }else{
+        ecuacion =
+        `\\[
+        f(x)=${m.toFixed(4)}x${valorN.toFixed(4)}
+        \\]`;
+    }
+
+    document.getElementById("ecuacionFinal").innerHTML =
+    ecuacion;
+
+    MathJax.typesetPromise();
+}
+
+window.onload = () =>{
+    actualizarM();
+    actualizarN();
+};
+
+</script>
+
+</body>
+</html>
