@@ -178,16 +178,16 @@ m=\frac{\sum (x-\bar{x})(y-\bar{y})}
 
 <label>\(\sum (x-\bar{x})(y-\bar{y})\)</label>
 <input
-    type="number"
-    step="any"
+<input
+    type="text"
     inputmode="decimal"
     id="numerador"
     oninput="actualizarM()">
 
 <label>\(\sum (x-\bar{x})^2\)</label>
 <input
-    type="number"
-    step="any"
+<input
+    type="text"
     inputmode="decimal"
     id="denominador"
     oninput="actualizarM()">
@@ -210,24 +210,24 @@ n=\bar{y}-m\bar{x}
 
 <label>\(\bar{y}\)</label>
 <input
-    type="number"
-    step="any"
+<input
+    type="text"
     inputmode="decimal"
     id="ymedia"
     oninput="actualizarN()">
 
 <label>\(\bar{x}\)</label>
 <input
-    type="number"
-    step="any"
+<input
+    type="text"
     inputmode="decimal"
     id="xmedia"
     oninput="actualizarN()">
 
 <label>\(m\)</label>
 <input
-    type="number"
-    step="any"
+<input
+    type="text"
     inputmode="decimal"
     id="mIngresada"
     oninput="actualizarN()">
@@ -288,8 +288,12 @@ function actualizarN(){
 
 function calcularM(){
 
-    let num = parseFloat(document.getElementById("numerador").value);
-    let den = parseFloat(document.getElementById("denominador").value);
+let num = parseFloat(
+    document.getElementById("numerador").value.replace(",", ".")
+);
+let num = parseFloat(
+    document.getElementById("denominador").value.replace(",", ".")
+);
 
     if(isNaN(num) || isNaN(den)){
         alert("Complete los datos de m.");
@@ -313,9 +317,15 @@ function calcularM(){
 
 function calcularN(){
 
-    let y = parseFloat(document.getElementById("ymedia").value);
-    let m = parseFloat(document.getElementById("mIngresada").value);
-    let x = parseFloat(document.getElementById("xmedia").value);
+let num = parseFloat(
+    document.getElementById("ymedia").value.replace(",", ".")
+);
+let num = parseFloat(
+    document.getElementById("mIngresada").value.replace(",", ".")
+);
+let num = parseFloat(
+    document.getElementById("xmedia").value.replace(",", ".")
+);
 
     if(isNaN(y) || isNaN(m) || isNaN(x)){
         alert("Complete los datos de n.");
