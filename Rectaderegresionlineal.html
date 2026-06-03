@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagramas de Dispersión y Recta de Regresión</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    background:#f4f6f9;
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    color:#1f4e79;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:30px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+h2{
+    color:#1f4e79;
+    text-align:center;
+}
+
+.chart-container{
+    position:relative;
+    width:100%;
+    height:450px;
+}
+
+@media (max-width:768px){
+
+    body{
+        padding:10px;
+    }
+
+    h1{
+        font-size:1.6rem;
+    }
+
+    h2{
+        font-size:1.2rem;
+    }
+
+    .card{
+        padding:15px;
+    }
+
+    button{
+        font-size:18px;
+        padding:16px;
+    }
+
+    .chart-container{
+        height:350px;
+    }
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    background:#1f4e79;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#163a5a;
+}
+</style>
+</head>
+<body>
+
+<h1>Diagramas de Dispersión</h1>
+
+<div class="card">
+    <h2>Diagrama 1</h2>
+<div class="chart-container">
+    <canvas id="grafico1"></canvas>
+</div>
+    <button onclick="mostrarRecta(1)">Mostrar Recta de Regresión</button>
+</div>
+
+<div class="card">
+    <h2>Diagrama 2</h2>
+<div class="chart-container">
+    <canvas id="grafico2"></canvas>
+</div>
+    <button onclick="mostrarRecta(2)">Mostrar Recta de Regresión</button>
+</div>
+
+<div class="card">
+    <h2>Diagrama 3</h2>
+<div class="chart-container">
+    <canvas id="grafico3"></canvas>
+</div>
+    <button onclick="mostrarRecta(3)">Mostrar Recta de Regresión</button>
+</div>
+
+<script>
+
+// ==========================
+// DATOS
+// ==========================
+
+const datos1 = [];
+
+for(let x=1; x<=60; x++){
+
+    const ruido = (Math.random()*12)-6;
+
+    datos1.push({
+        x:x,
+        y:0.25*x + 5 + ruido
+    });
+}
+
+const datos2 = [
+{x:1,y:3.8},{x:2,y:4.0},{x:3,y:4.5},{x:4,y:4.2},{x:5,y:5.0},
+{x:6,y:4.1},{x:7,y:4.7},{x:8,y:4.4},{x:9,y:5.3},{x:10,y:4.0},
+{x:11,y:4.8},{x:12,y:4.2},{x:13,y:3.9},{x:14,y:4.7},{x:15,y:3.8},
+{x:16,y:4.5},{x:17,y:3.6},{x:18,y:4.3},{x:19,y:3.7},{x:20,y:4.2},
+{x:21,y:3.5},{x:22,y:4.1},{x:23,y:3.4},{x:24,y:4.0},{x:25,y:3.3},
+{x:26,y:3.9},{x:27,y:3.2},{x:28,y:4.1},{x:29,y:3.0},{x:30,y:3.8},
+{x:31,y:2.9},{x:32,y:3.7},{x:33,y:2.8},{x:34,y:3.6},{x:35,y:2.7},
+{x:36,y:3.5},{x:37,y:2.6},{x:38,y:3.4},{x:39,y:2.5},{x:40,y:3.3},
+{x:41,y:2.4},{x:42,y:3.2},{x:43,y:2.3},{x:44,y:3.1},{x:45,y:2.2},
+{x:46,y:3.0},{x:47,y:2.1},{x:48,y:2.9},{x:49,y:2.0},{x:50,y:2.8}
+];
+
+const datos3 = [
+{x:1,y:4.0},
+{x:2,y:3.7},
+{x:3,y:5.1},
+{x:4,y:4.8},
+{x:5,y:6.0},
+{x:6,y:5.7},
+{x:7,y:7.2},
+{x:8,y:6.5},
+{x:9,y:8.1},
+{x:10,y:7.6},
+{x:11,y:8.9},
+{x:12,y:8.4},
+{x:13,y:9.7},
+{x:14,y:10.3},
+{x:15,y:9.8},
+{x:16,y:11.5},
+{x:17,y:10.9},
+{x:18,y:12.4},
+{x:19,y:11.8},
+{x:20,y:13.1},
+{x:21,y:12.7},
+{x:22,y:14.2},
+{x:23,y:13.6},
+{x:24,y:15.0},
+{x:25,y:14.5}
+];
+
+// ==========================
+// REGRESIÓN LINEAL
+// ==========================
+
+function calcularRecta(datos){
+
+    const n = datos.length;
+
+    let sumX = 0;
+    let sumY = 0;
+    let sumXY = 0;
+    let sumX2 = 0;
+
+    datos.forEach(p => {
+        sumX += p.x;
+        sumY += p.y;
+        sumXY += p.x * p.y;
+        sumX2 += p.x * p.x;
+    });
+
+    const m =
+    (n * sumXY - sumX * sumY) /
+    (n * sumX2 - sumX * sumX);
+
+    const b =
+    (sumY - m * sumX) / n;
+
+    const minX = Math.min(...datos.map(p => p.x));
+    const maxX = Math.max(...datos.map(p => p.x));
+
+    return [
+        {x:minX, y:m*minX+b},
+        {x:maxX, y:m*maxX+b}
+    ];
+}
+
+// ==========================
+// CREAR GRÁFICOS
+// ==========================
+
+function crearGrafico(id, datos){
+
+    return new Chart(document.getElementById(id), {
+
+        type: 'scatter',
+
+        data: {
+            datasets: [
+                {
+                    label: 'Datos',
+                    data: datos,
+                    pointRadius: 5
+                }
+            ]
+        },
+
+options: {
+
+    responsive: true,
+    maintainAspectRatio: false,
+
+    plugins:{
+        legend:{
+            display:false
+        }
+    },
+
+    scales: {
+
+                x: {
+                    type: 'linear',
+                    title:{
+                        display:true,
+                        text:'Variable X'
+                    }
+                },
+
+                y: {
+                    title:{
+                        display:true,
+                        text:'Variable Y'
+                    }
+                }
+            }
+        }
+    });
+}
+
+const g1 = crearGrafico("grafico1", datos3);
+const g2 = crearGrafico("grafico2", datos1);
+const g3 = crearGrafico("grafico3", datos2);
+
+// ==========================
+// MOSTRAR RECTA
+// ==========================
+
+function mostrarRecta(numero){
+
+    let grafico;
+    let datos;
+
+   if(numero === 1){
+    grafico = g1;
+    datos = datos3;
+}
+
+if(numero === 2){
+    grafico = g2;
+    datos = datos1;
+}
+
+if(numero === 3){
+    grafico = g3;
+    datos = datos2;
+}
+
+    if(grafico.data.datasets.length > 1){
+        return;
+    }
+
+    const recta = calcularRecta(datos);
+
+    grafico.data.datasets.push({
+        label:'Recta de regresión',
+        type:'line',
+        data:recta,
+        borderWidth:3,
+        pointRadius:0,
+        tension:0,
+        fill:false
+    });
+
+    grafico.update();
+}
+
+</script>
+
+</body>
+</html>
