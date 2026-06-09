@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regresión lineal y residuos</title>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+    }
+
+    h2{
+        margin-bottom: 20px;
+    }
+
+    .botones{
+        margin-bottom: 15px;
+    }
+
+    button{
+        padding: 12px 18px;
+        margin: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    button:hover{
+        background-color: #45a049;
+    }
+
+    #grafico{
+        width: 100%;
+        max-width: 900px;
+        height: 70vh;
+        min-height: 350px;
+        margin: auto;
+    }
+
+    @media (max-width: 600px){
+
+        body{
+            margin: 10px;
+        }
+
+        button{
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+        }
+
+        #grafico{
+            height: 60vh;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+<h2>Empleados y productos fabricados</h2>
+
+<div class="botones">
+    <button onclick="mostrarRecta()">
+        Mostrar recta de regresión
+    </button>
+
+    <button onclick="mostrarResiduos()">
+        Mostrar residuos
+    </button>
+
+    <button onclick="reiniciar()">
+        Reiniciar gráfico
+    </button>
+</div>
+
+<div id="grafico"></div>
+
+<script>
+
+// Datos originales
+const x = [5, 7, 8, 10, 12, 14, 15];
+const y = [120, 155, 170, 210, 245, 280, 295];
+
+// Recta de regresión: ŷ = 36.39 + 17.67x
+const a = 36.39;
+const b = 17.67;
+
+// Valores estimados
+const yEst = x.map(valor => a + b * valor);
+
+// Nube de puntos
+const dispersion = {
+    x: x,
+    y: y,
+    mode: 'markers',
+    type: 'scatter',
+    name: 'Datos observados',
+    marker: {
+        size: 10,
+        color: 'blue'
+    }
+};
+
+// Recta de regresión
+const recta = {
+    x: [Math.min(...x), Math.max(...x)],
+    y: [
+        a + b * Math.min(...x),
+        a + b * Math.max(...x)
+    ],
+    mode: 'lines',
+    type: 'scatter',
+    name: 'Recta de regresión',
+    line: {
+        color: 'green',
+        width: 3
+    }
+};
+
+// Arreglo con los datos que se muestran
+let datos = [dispersion];
+
+const layout = {
+    title: 'Diagrama de dispersión',
+    xaxis: {
+        title: 'Cantidad de empleados'
+    },
+    yaxis: {
+        title: 'Productos fabricados'
+    },
+    legend: {
+        orientation: 'h',
+        y: -0.2
+    }
+};
+
+// Gráfico inicial
+Plotly.newPlot(
+    'grafico',
+    datos,
+    layout,
+    { responsive: true }
+);
+
+
+// Mostrar recta
+function mostrarRecta(){
+
+    const existeRecta = datos.some(
+        elemento => elemento.name === 'Recta de regresión'
+    );
+
+    if(!existeRecta){
+
+        datos.push(recta);
+
+        Plotly.react(
+            'grafico',
+            datos,
+            {
+                ...layout,
+                title: 'Diagrama de dispersión y recta de regresión'
+            },
+            { responsive: true }
+        );
+    }
+}
+
+
+// Mostrar residuos
+function mostrarResiduos(){
+
+    mostrarRecta();
+
+    const existenResiduos = datos.some(
+        elemento => elemento.name === 'Residuo'
+    );
+
+    if(existenResiduos) return;
+
+
+    for(let i = 0; i < x.length; i++){
+
+        datos.push({
+
+            x: [x[i], x[i]],
+
+            y: [y[i], yEst[i]],
+
+            mode: 'lines',
+
+            type: 'scatter',
+
+            name: 'Residuo',
+
+            showlegend: i === 0,
+
+            line: {
+                color: 'red',
+                width: 2,
+                dash: 'dot'
+            }
+
+        });
+
+    }
+
+
+    Plotly.react(
+        'grafico',
+        datos,
+        {
+            ...layout,
+            title: 'Recta de regresión y residuos'
+        },
+        { responsive: true }
+    );
+
+}
+
+
+// Reiniciar
+function reiniciar(){
+
+    datos = [dispersion];
+
+    Plotly.react(
+        'grafico',
+        datos,
+        {
+            ...layout,
+            title: 'Diagrama de dispersión'
+        },
+        { responsive: true }
+    );
+
+}
+
+</script>
+
+</body>
+</html>
