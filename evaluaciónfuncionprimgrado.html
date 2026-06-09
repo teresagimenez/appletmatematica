@@ -25,6 +25,7 @@ body{
     border-radius:25px;
     padding:18px;
     box-shadow:0 0 20px rgba(0,0,0,0.2);
+	overflow: visible;
 }
 
 h1,h2,h3{
@@ -569,14 +570,16 @@ function mostrarResumenYEnviar(){
 
     showScreen();
 
-    setTimeout(async ()=>{
+setTimeout(async ()=>{
 
-        copiarCanvas("canvas2","canvasResumen1");
-        copiarCanvas("canvas22","canvasResumen2");
+    copiarCanvas("canvas2","canvasResumen1");
+    copiarCanvas("canvas22","canvasResumen2");
 
-        await enviarFirebase();
+    await new Promise(r=>setTimeout(r,1000));
 
-    },500);
+    await enviarFirebase();
+
+},1000);
 
 }
 
@@ -938,14 +941,64 @@ advertencias;
 
 async function enviarFirebase(){
 
-    const resumen=
-    document.getElementById("pantallaResumen");
+const resumen=
+document.getElementById("pantallaResumen");
 
-    const canvas=
-    await html2canvas(resumen);
+await new Promise(r => setTimeout(r,1500));
+
+resumen.style.height = "auto";
+resumen.style.maxHeight = "none";
+resumen.style.overflow = "visible";
+
+document.body.style.height = "auto";
+
+await new Promise(resolve =>
+requestAnimationFrame(resolve));
+
+await new Promise(resolve =>
+setTimeout(resolve,500));
+
+resumen.style.display = "block";
+
+await new Promise(resolve =>
+requestAnimationFrame(resolve));
+
+await new Promise(resolve =>
+requestAnimationFrame(resolve));
+
+await new Promise(resolve =>
+setTimeout(resolve,1000));
+
+console.log(
+"scrollHeight:", resumen.scrollHeight,
+"offsetHeight:", resumen.offsetHeight
+);
+
+const canvas =
+await html2canvas(resumen,{
+    scale:2,
+    useCORS:true,
+    scrollY:0,
+    width: resumen.scrollWidth,
+    height: resumen.scrollHeight,
+    windowWidth: resumen.scrollWidth,
+    windowHeight: resumen.scrollHeight
+});
+
+console.log(
+"canvas width:", canvas.width,
+"canvas height:", canvas.height
+);
 
     const imagen=
     canvas.toDataURL("image/png");
+	
+console.log(
+"Alto capturado:",
+canvas.height,
+"Ancho:",
+canvas.width
+);
 
     const datos={
 
@@ -959,19 +1012,19 @@ async function enviarFirebase(){
 
     };
 
-    fetch(
-    "https://estadistica-evaluacion-3bd0b-default-rtdb.firebaseio.com/evaluaciones.json",
-    {
+const respuesta = await fetch(
+"https://estadistica-evaluacion-3bd0b-default-rtdb.firebaseio.com/evaluaciones.json",
+{
+    method:"POST",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body:JSON.stringify(datos)
+});
 
-        method:"POST",
-
-        headers:{
-            "Content-Type":"application/json"
-        },
-
-        body:JSON.stringify(datos)
-
-    });
+if(!respuesta.ok){
+    alert("Error al enviar la evaluación");
+}
 
 }
 
