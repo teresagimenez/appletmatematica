@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Elementos de la Parábola</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 20px;
+    background:#f4f4f4;
+}
+
+h1{
+    text-align:center;
+}
+
+.contenedor{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+input{
+    width:90px;
+    padding:8px;
+    margin:5px;
+    text-align:center;
+    font-size:16px;
+}
+
+.bloque{
+    margin-top:20px;
+    padding:15px;
+    background:#fafafa;
+    border-left:5px solid #2196F3;
+}
+
+button{
+    padding:10px 15px;
+    margin-top:15px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.math{
+    font-size:1.15em;
+    overflow-x:auto;
+}
+</style>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)']],
+    displayMath: [['\\[','\\]']]
+  }
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+<body>
+
+<div class="contenedor">
+
+<h1>Calculadora de Elementos de la Parábola</h1>
+
+<label>a = </label>
+<input type="number" id="a" step="any">
+
+<label>b = </label>
+<input type="number" id="b" step="any">
+
+<label>c = </label>
+<input type="number" id="c" step="any">
+
+<div class="bloque">
+<h3>Función cuadrática</h3>
+<div id="funcion" class="math"></div>
+</div>
+
+<div class="bloque">
+<h3>Raíces</h3>
+<div id="raices" class="math"></div>
+</div>
+
+<div class="bloque">
+<h3>Ordenada en el origen</h3>
+<div id="ordenada" class="math"></div>
+</div>
+
+<div class="bloque">
+<h3>Eje de simetría</h3>
+<div id="eje" class="math"></div>
+</div>
+
+<div class="bloque">
+<h3>Vértice</h3>
+<div id="vertice" class="math"></div>
+</div>
+
+<div class="bloque">
+<h3>Concavidad</h3>
+<div id="concavidad" class="math"></div>
+</div>
+
+
+<script>
+
+document.querySelectorAll("input").forEach(input=>{
+    input.addEventListener("input", calcular);
+});
+
+function redondear(n){
+    return Number(n.toFixed(4));
+}
+
+function calcular(){
+
+    const a = parseFloat(document.getElementById("a").value);
+    const b = parseFloat(document.getElementById("b").value);
+    const c = parseFloat(document.getElementById("c").value);
+
+    if(isNaN(a) || isNaN(b) || isNaN(c)){
+        return;
+    }
+
+    if(a === 0){
+
+        document.getElementById("funcion").innerHTML =
+        "\\[a\\neq0\\]";
+
+        MathJax.typesetPromise();
+        return;
+    }
+
+    // Función
+
+    document.getElementById("funcion").innerHTML = `
+    \\[
+    f(x)=${a}x^2+(${b})x+(${c})
+    \\]
+    `;
+
+    // Raíces
+
+    const delta = b*b - 4*a*c;
+
+    if(delta >= 0){
+
+        const x1 = (-b + Math.sqrt(delta))/(2*a);
+        const x2 = (-b - Math.sqrt(delta))/(2*a);
+
+        document.getElementById("raices").innerHTML = `
+        \\[
+        x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}
+        \\]
+
+        \\[
+        x=\\frac{-(${b})\\pm\\sqrt{(${b})^2-4\\cdot${a}\\cdot${c}}}{2\\cdot${a}}
+        \\]
+
+        \\[
+        x_1=${redondear(x1)}
+        \\]
+
+        \\[
+        x_2=${redondear(x2)}
+        \\]
+        `;
+
+    }else{
+
+        document.getElementById("raices").innerHTML = `
+        \\[
+        x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}
+        \\]
+
+        \\[
+        (${b})^2-4\\cdot${a}\\cdot${c}<0
+        \\]
+
+        \\[
+        \\text{No posee raíces reales}
+        \\]
+        `;
+    }
+
+    // Ordenada
+
+    document.getElementById("ordenada").innerHTML = `
+    \\[
+    f(0)=c
+    \\]
+
+    \\[
+    f(0)=${c}
+    \\]
+    `;
+
+    // Eje
+
+    const eje = -b/(2*a);
+
+    document.getElementById("eje").innerHTML = `
+    \\[
+    x=\\frac{-b}{2a}
+    \\]
+
+    \\[
+    x=\\frac{-(${b})}{2\\cdot${a}}
+    \\]
+
+    \\[
+    x=${redondear(eje)}
+    \\]
+    `;
+
+    // Vértice
+
+    const xv = eje;
+    const yv = a*xv*xv + b*xv + c;
+
+    document.getElementById("vertice").innerHTML = `
+    \\[
+    x_v=${redondear(xv)}
+    \\]
+
+    \\[
+    y_v=${a}\\left(${redondear(xv)}\\right)^2+(${b})\\left(${redondear(xv)}\\right)+(${c})
+    \\]
+
+    \\[
+    y_v=${redondear(yv)}
+    \\]
+
+    \\[
+    V\\left(${redondear(xv)},${redondear(yv)}\\right)
+    \\]
+    `;
+
+    // Concavidad
+
+    document.getElementById("concavidad").innerHTML = a > 0
+    ? `
+    \\[
+    a=${a}>0
+    \\]
+
+    \\[
+    \\text{Cóncava hacia arriba}
+    \\]
+    `
+    : `
+    \\[
+    a=${a}<0
+    \\]
+
+    \\[
+    \\text{Cóncava hacia abajo}
+    \\]
+    `;
+
+    MathJax.typesetPromise();
+}
+
+function copiarTodo(){
+
+    const texto = document.body.innerText;
+
+    navigator.clipboard.writeText(texto);
+
+    alert("Resultados copiados.");
+}
+
+</script>
+
+</body>
+</html>
