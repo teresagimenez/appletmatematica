@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semiplanos y Recta</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    text-align:center;
+    margin:20px;
+}
+
+canvas{
+    border:1px solid black;
+}
+
+button{
+    padding:10px 15px;
+    margin:5px;
+    cursor:pointer;
+}
+
+.activo{
+    background:#ffd54f;
+}
+
+#estado{
+    margin:10px;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h2>Recta y = x</h2>
+
+<button id="btnZona1">Zona 1</button>
+<button id="btnZona2">Zona 2</button>
+<button id="btnPunto1">Punto Zona 1</button>
+<button id="btnPunto2">Punto Zona 2</button>
+<button id="btnLimpiar">Limpiar</button>
+
+<div id="estado">Seleccione una opción</div>
+
+<canvas id="canvas" width="900" height="600"></canvas>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const W = canvas.width;
+const H = canvas.height;
+
+let modo = "";
+let colorearZona1 = false;
+let colorearZona2 = false;
+
+const puntosAzules = [];
+const puntosRojos = [];
+
+function activar(id){
+
+    document.querySelectorAll("button").forEach(b=>{
+        b.classList.remove("activo");
+    });
+
+    if(id){
+        document.getElementById(id).classList.add("activo");
+    }
+}
+
+document.getElementById("btnZona1").onclick=()=>{
+    activar("btnZona1");
+    colorearZona1=true;
+    colorearZona2=false;
+    modo="";
+    dibujar();
+};
+
+document.getElementById("btnZona2").onclick=()=>{
+    activar("btnZona2");
+    colorearZona1=false;
+    colorearZona2=true;
+    modo="";
+    dibujar();
+};
+
+document.getElementById("btnPunto1").onclick=()=>{
+
+    activar("btnPunto1");
+
+    puntosAzules.length = 0;
+    puntosRojos.length = 0;
+
+    puntosAzules.push({
+        x: W/2 + 6*30,
+        y: H/2 - 2*30
+    });
+
+    dibujar();
+};
+
+document.getElementById("btnPunto2").onclick=()=>{
+
+    activar("btnPunto2");
+
+    puntosAzules.length = 0;
+    puntosRojos.length = 0;
+
+    puntosRojos.push({
+        x: W/2 - 2*30,
+        y: H/2 - 2*30
+    });
+
+    dibujar();
+};
+
+document.getElementById("btnLimpiar").onclick=()=>{
+    activar();
+    colorearZona1=false;
+    colorearZona2=false;
+    puntosAzules.length=0;
+    puntosRojos.length=0;
+    modo="";
+    dibujar();
+};
+
+function dibujar(){
+
+    ctx.clearRect(0,0,W,H);
+
+    // Zona 1 (encima de la recta)
+  if(colorearZona1){
+
+    ctx.fillStyle="rgba(0,0,255,0.2)";
+
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(750,0);
+    ctx.lineTo(150,600);
+    ctx.lineTo(0,600);
+    ctx.closePath();
+    ctx.fill();
+}
+
+    // Zona 2 (debajo de la recta)
+if(colorearZona2){
+
+    ctx.fillStyle="rgba(255,0,0,0.2)";
+
+    ctx.beginPath();
+    ctx.moveTo(750,0);
+    ctx.lineTo(900,0);
+    ctx.lineTo(900,600);
+    ctx.lineTo(150,600);
+    ctx.closePath();
+    ctx.fill();
+}
+
+    // Cuadrícula
+    ctx.strokeStyle="#dddddd";
+    ctx.lineWidth=1;
+
+    for(let x=0;x<W;x+=30){
+        ctx.beginPath();
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,H);
+        ctx.stroke();
+    }
+
+    for(let y=0;y<H;y+=30){
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(W,y);
+        ctx.stroke();
+    }
+
+    // Ejes
+    ctx.strokeStyle="black";
+    ctx.lineWidth=2;
+
+    ctx.beginPath();
+    ctx.moveTo(0,H/2);
+    ctx.lineTo(W,H/2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(W/2,0);
+    ctx.lineTo(W/2,H);
+    ctx.stroke();
+
+    // Recta y=x
+    ctx.strokeStyle="black";
+    ctx.lineWidth=3;
+
+    ctx.beginPath();
+    ctx.moveTo(150,H);
+    ctx.lineTo(750,0);
+    ctx.stroke();
+
+    // Puntos azules
+    puntosAzules.forEach(p=>{
+        ctx.fillStyle="blue";
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,7,0,2*Math.PI);
+        ctx.fill();
+    });
+
+    // Puntos rojos
+    puntosRojos.forEach(p=>{
+        ctx.fillStyle="red";
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,7,0,2*Math.PI);
+        ctx.fill();
+    });
+
+}
+
+canvas.addEventListener("click",(e)=>{
+
+    const rect = canvas.getBoundingClientRect();
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if(modo==="punto1"){
+
+        puntosAzules.push({
+            x:x,
+            y:y
+        });
+
+        dibujar();
+    }
+
+    if(modo==="punto2"){
+
+        puntosRojos.push({
+            x:x,
+            y:y
+        });
+
+        dibujar();
+    }
+
+});
+
+dibujar();
+
+</script>
+
+</body>
+</html>
