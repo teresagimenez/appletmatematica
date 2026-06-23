@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Primer Parcial</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 16px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+
+    h1, h2, h3 { color: #1f4e79; }
+
+    h1 { font-size: 28px; }
+    h2 { font-size: 23px; }
+    h3 { font-size: 18px; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .progress {
+      background: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #1f4e79;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .step-label {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .student-data {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .activity {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 25px;
+      background: #fafafa;
+    }
+
+    .statement-box {
+      background: #fff;
+      border-left: 5px solid #1f4e79;
+      padding: 14px;
+      margin: 12px 0;
+      border-radius: 6px;
+      line-height: 1.5;
+    }
+
+    .data-box {
+      background: #eef6ff;
+      border: 1px solid #b9d7f0;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      font-weight: bold;
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #d9eaf7;
+      white-space: nowrap;
+      font-weight: bold;
+    }
+
+    .sum-row th,
+    .sum-row td {
+      background: #edf5fb;
+      font-weight: bold;
+    }
+
+    .math {
+      font-family: "Times New Roman", Georgia, serif;
+      font-size: 1.08em;
+      font-style: italic;
+    }
+
+    .sigma {
+      font-family: "Times New Roman", Georgia, serif;
+      font-size: 1.25em;
+      font-weight: bold;
+      font-style: normal;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    table input {
+      min-width: 80px;
+      padding: 8px;
+      margin-bottom: 0;
+      text-align: center;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    iframe {
+      width: 100%;
+      height: 420px;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      margin-top: 10px;
+      background: white;
+    }
+
+    button {
+      background: #1f4e79;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 8px 5px 8px 0;
+      min-height: 48px;
+    }
+
+    button:hover { background: #163b5c; }
+
+    .secondary { background: #6c757d; }
+    .secondary:hover { background: #565e64; }
+
+    .success {
+      background: #d4edda;
+      border-left: 6px solid #28a745;
+      padding: 12px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .screen-final {
+      background: white;
+      padding: 20px;
+      border: 3px solid #1f4e79;
+      border-radius: 12px;
+      overflow-wrap: break-word;
+    }
+
+    .summary-table {
+      margin-bottom: 18px;
+    }
+
+    .summary-table table {
+      min-width: 620px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .nav-buttons {
+      margin-top: 20px;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-buttons button {
+      flex: 1;
+      min-width: 190px;
+    }
+
+
+    .security-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.94);
+      color: white;
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .security-overlay.active {
+      display: flex;
+    }
+
+    .security-box {
+      max-width: 640px;
+      background: #1f1f1f;
+      border: 2px solid #ffcc00;
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .security-box h2 {
+      color: #ffcc00;
+      margin-top: 0;
+    }
+
+    .security-box button {
+      background: #ffcc00;
+      color: #111;
+      font-weight: bold;
+    }
+
+    .security-alert {
+      display: none;
+      background: #fff3cd;
+      color: #222;
+      border-left: 6px solid #ffc107;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+    }
+
+    .security-alert.active {
+      display: block;
+    }
+
+    .capture-clone {
+      position: absolute;
+      left: -100000px;
+      top: 0;
+      width: 1200px;
+      background: white;
+      padding: 20px;
+      z-index: -1;
+    }
+
+    .capture-clone .table-wrapper {
+      overflow: visible !important;
+      width: auto !important;
+    }
+
+    .capture-clone table {
+      min-width: 620px;
+    }
+
+
+    @media (max-width: 600px) {
+      body {
+        padding: 8px;
+        background: white;
+      }
+
+      .container {
+        padding: 14px;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      h1 { font-size: 23px; }
+      h2 { font-size: 20px; }
+      h3 { font-size: 17px; }
+
+      .activity { padding: 12px; }
+      .statement-box { padding: 12px; }
+
+      table {
+        min-width: 620px;
+        font-size: 14px;
+      }
+
+      th, td { padding: 6px; }
+
+      table input {
+        min-width: 72px;
+        font-size: 15px;
+      }
+
+      iframe { height: 340px; }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-buttons button,
+      button {
+        width: 100%;
+        margin: 6px 0;
+      }
+
+      .student-data {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      button, iframe, .no-print, .progress, .step-label {
+        display: none;
+      }
+
+      body { background: white; }
+      .container { box-shadow: none; }
+      .screen { display: block; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="step-label" id="stepLabel">Pantalla inicial</div>
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div id="securityAlert" class="security-alert">
+      Se registró una salida de la pantalla de evaluación.
+    </div>
+
+    <div id="securityOverlay" class="security-overlay">
+      <div class="security-box">
+        <h2>Evaluación pausada</h2>
+        <p>Se detectó que saliste de pantalla completa o de la evaluación.</p>
+        <p>Este evento fue registrado. Para continuar, volvé a pantalla completa.</p>
+        <button onclick="returnToEvaluation()">Volver a pantalla completa</button>
+      </div>
+    </div>
+
+
+    <!-- PANTALLA 0 -->
+    <section class="screen active" id="screen0">
+      <h1>Primer Parcial</h1>
+
+      <div class="student-data">
+        <div>
+          <label>Nombre y apellido:</label>
+          <input type="text" id="studentName" placeholder="Escribí tu nombre" />
+        </div>
+
+        <div>
+          <label>Grupo:</label>
+          <input type="text" id="studentGroup" placeholder="Ej: 3°" />
+        </div>
+
+        <div>
+          <label>Fecha:</label>
+          <input type="date" id="date" />
+        </div>
+      </div>
+
+      <button onclick="startEvaluation()">Comenzar evaluación</button>
+    </section>
+
+    <!-- ACTIVIDAD 1 -->
+    <section class="screen" id="screen1">
+      <div class="activity">
+        <h2>Actividad 1 - Estadística descriptiva con datos agrupados</h2>
+
+        <div class="statement-box">
+          <p id="act1Statement"></p>
+
+          <p><strong>Datos obtenidos:</strong></p>
+          <div class="data-box" id="act1RawData"></div>
+
+          <p>
+            <strong>Aclaración:</strong> en los intervalos, el corchete <strong>[</strong>
+            indica que el límite se incluye y el paréntesis <strong>)</strong>
+            indica que el límite no se incluye. Por ejemplo: <strong>[10,20)</strong>
+            incluye 10, pero no incluye 20.
+          </p>
+        </div>
+
+        <div class="table-wrapper">
+          <table id="table1">
+            <thead>
+              <tr>
+                <th>Intervalo</th>
+                <th><span class="math">xᵢ</span></th>
+                <th><span class="math">fᵢ</span></th>
+                <th><span class="math">Fᵢ</span></th>
+                <th><span class="math">xᵢ · fᵢ</span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <label>Media:</label>
+        <input type="text" id="meanAnswer" />
+
+        <label>Mediana:</label>
+        <input type="text" id="medianAnswer" />
+
+        <label>Moda:</label>
+        <input type="text" id="modeAnswer" />
+
+        <h3>Calculadora de apoyo</h3>
+        <iframe src="https://teresagimenez.github.io/appletmatematica/calculadoraxmemo.html"></iframe>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="secondary" onclick="showScreen(0)">Volver a datos iniciales</button>
+        <button onclick="showScreen(2)">Siguiente: Actividad 2</button>
+      </div>
+    </section>
+
+    <!-- ACTIVIDAD 2 -->
+    <section class="screen" id="screen2">
+      <div class="activity">
+        <h2>Actividad 2 - Distribución bidimensional: coeficiente de correlación</h2>
+
+        <div class="statement-box">
+          <p id="act2Statement"></p>
+
+        </div>
+
+        <div class="table-wrapper">
+          <table id="table2">
+            <thead>
+              <tr>
+                <th><span class="math">x</span></th>
+                <th><span class="math">y</span></th>
+                <th><span class="math">x²</span></th>
+                <th><span class="math">y²</span></th>
+                <th><span class="math">x · y</span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <label>Coeficiente de correlación r:</label>
+        <input type="text" id="correlationAnswer" />
+
+        <label>Interpretación del resultado:</label>
+        <textarea id="act2Interpretation" placeholder="Ej: correlación positiva fuerte, negativa débil, etc."></textarea>
+
+        <h3>Calculadora de apoyo</h3>
+        <iframe src="https://teresagimenez.github.io/appletmatematica/coeficientedecorrelacion.html"></iframe>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="secondary" onclick="showScreen(1)">Volver: Actividad 1</button>
+        <button onclick="showScreen(3)">Siguiente: Actividad 3</button>
+      </div>
+    </section>
+
+    <!-- ACTIVIDAD 3 -->
+    <section class="screen" id="screen3">
+      <div class="activity">
+        <h2>Actividad 3 - Distribución bidimensional: recta de regresión lineal</h2>
+
+        <div class="statement-box">
+          <p id="act3Statement"></p>
+
+        </div>
+
+        <label>x̄:</label>
+        <input type="text" id="meanXAnswer" />
+
+        <label>ȳ:</label>
+        <input type="text" id="meanYAnswer" />
+
+        <div class="table-wrapper">
+          <table id="table3">
+            <thead>
+              <tr>
+                <th><span class="math">x</span></th>
+                <th><span class="math">y</span></th>
+                <th><span class="math">x − x̄</span></th>
+                <th><span class="math">y − ȳ</span></th>
+                <th><span class="math">(x − x̄)(y − ȳ)</span></th>
+                <th><span class="math">(x − x̄)²</span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <label>Pendiente m:</label>
+        <input type="text" id="slopeAnswer" />
+
+        <label>Ordenada en el origen n:</label>
+        <input type="text" id="interceptAnswer" />
+
+        <label>Recta de regresión y = mx + n:</label>
+        <input type="text" id="regressionAnswer" />
+
+        <h3>Calculadora de apoyo</h3>
+        <iframe src="https://teresagimenez.github.io/appletmatematica/Calculadorarectarl.html"></iframe>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="secondary" onclick="showScreen(2)">Volver: Actividad 2</button>
+        <button onclick="generateSummaryAndShow()">Generar resumen final</button>
+      </div>
+    </section>
+
+    <!-- RESUMEN FINAL -->
+    <section class="screen" id="screen4">
+      <div id="finalScreen" class="screen-final">
+        <h2>Pantalla final - Resumen de la evaluación</h2>
+        <div id="summaryContent"></div>
+      </div>
+
+      <div class="nav-buttons no-print">
+        <button class="secondary" onclick="showScreen(3)">Volver: Actividad 3</button>
+        <button onclick="sendToFirebase()">Enviar resumen a Firebase</button>
+      </div>
+
+      <div id="firebaseMessage" class="success">
+        Resumen enviado a Firebase correctamente.
+      </div>
+    </section>
+
+  </div>
+<script>
+    const DATABASE_URL = "https://estadistica-evaluacion-3bd0b-default-rtdb.firebaseio.com";
+    const CAPTURAS_PATH = "capturas_png";
+    const EVENTOS_PATH = "eventos_seguridad";
+
+    let examStarted = false;
+    let examFinished = false;
+    let sessionId = "sesion_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+    let securityEvents = [];
+    let suppressNextBlur = false;
+
+    function safeKey(text) {
+      return String(text || "")
+        .trim()
+        .replace(/[.#$/\[\]]/g, "_")
+        .replace(/\s+/g, "_")
+        .slice(0, 80);
+    }
+
+    function getStudentInfo() {
+      return {
+        nombre: document.getElementById("studentName")?.value || "",
+        grupo: document.getElementById("studentGroup")?.value || "",
+        fecha: document.getElementById("date")?.value || "",
+        sessionId: sessionId
+      };
+    }
+
+    function getCaptureId() {
+      const info = getStudentInfo();
+      const nombre = safeKey(info.nombre || "sin_nombre");
+      const grupo = safeKey(info.grupo || "sin_grupo");
+      return `${grupo}_${nombre}_${sessionId}`;
+    }
+
+    async function putToRealtimeDB(path, data) {
+      const response = await fetch(`${DATABASE_URL}/${path}.json`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al guardar en Realtime Database");
+      }
+
+      return await response.json();
+    }
+
+    async function patchToRealtimeDB(path, data) {
+      const response = await fetch(`${DATABASE_URL}/${path}.json`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar en Realtime Database");
+      }
+
+      return await response.json();
+    }
+
+    async function postToRealtimeDB(path, data) {
+      const response = await fetch(`${DATABASE_URL}/${path}.json`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al guardar evento");
+      }
+
+      return await response.json();
+    }
+
+    function splitText(text, chunkSize = 350000) {
+      const chunks = [];
+      for (let i = 0; i < text.length; i += chunkSize) {
+        chunks.push(text.slice(i, i + chunkSize));
+      }
+      return chunks;
+    }
+
+    async function captureFinalScreenAsPNG() {
+      generateSummary();
+      showScreen(4);
+
+      await new Promise(resolve => setTimeout(resolve, 700));
+
+      const finalScreen = document.getElementById("finalScreen");
+      const clone = finalScreen.cloneNode(true);
+      clone.classList.add("capture-clone");
+      clone.style.width = Math.max(1200, finalScreen.scrollWidth) + "px";
+      document.body.appendChild(clone);
+
+      await new Promise(resolve => setTimeout(resolve, 250));
+
+      const canvas = await html2canvas(clone, {
+        backgroundColor: "#ffffff",
+        scale: 1,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        width: clone.scrollWidth,
+        height: clone.scrollHeight,
+        windowWidth: clone.scrollWidth,
+        windowHeight: clone.scrollHeight,
+        scrollX: 0,
+        scrollY: 0
+      });
+
+      document.body.removeChild(clone);
+
+      return canvas.toDataURL("image/png");
+    }
+
+    async function logSecurityEvent(tipo, detalles = {}) {
+      if (!examStarted || examFinished) return;
+
+      const evento = {
+        ...getStudentInfo(),
+        tipo,
+        detalles,
+        pantalla: currentScreen,
+        timestampLocal: new Date().toISOString()
+      };
+
+      securityEvents.push(evento);
+
+      try {
+        await postToRealtimeDB(EVENTOS_PATH, evento);
+      } catch (error) {
+        console.warn("No se pudo registrar evento de seguridad:", error);
+      }
+    }
+
+    async function requestFullScreen() {
+      const element = document.documentElement;
+
+      try {
+        suppressNextBlur = true;
+        if (element.requestFullscreen) {
+          await element.requestFullscreen();
+        } else if (element.webkitRequestFullscreen) {
+          await element.webkitRequestFullscreen();
+        }
+        setTimeout(() => suppressNextBlur = false, 1000);
+      } catch (error) {
+        suppressNextBlur = false;
+        console.warn("Pantalla completa no disponible:", error);
+      }
+    }
+
+    function isFullScreenActive() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    function showSecurityBlock() {
+      if (!examStarted || examFinished) return;
+      document.getElementById("securityOverlay")?.classList.add("active");
+      document.getElementById("securityAlert")?.classList.add("active");
+    }
+
+    function hideSecurityBlock() {
+      document.getElementById("securityOverlay")?.classList.remove("active");
+    }
+
+    async function returnToEvaluation() {
+      await requestFullScreen();
+      hideSecurityBlock();
+    }
+
+    document.addEventListener("visibilitychange", async () => {
+      if (!examStarted || examFinished) return;
+
+      if (document.hidden) {
+        await logSecurityEvent("salio_de_pestana_o_app");
+      } else {
+        showSecurityBlock();
+      }
+    });
+
+    window.addEventListener("blur", async () => {
+      if (!examStarted || examFinished || suppressNextBlur) return;
+      await logSecurityEvent("ventana_perdio_foco");
+    });
+
+    document.addEventListener("fullscreenchange", async () => {
+      if (!examStarted || examFinished) return;
+
+      if (!isFullScreenActive()) {
+        await logSecurityEvent("salio_de_pantalla_completa");
+        showSecurityBlock();
+      }
+    });
+
+    document.addEventListener("webkitfullscreenchange", async () => {
+      if (!examStarted || examFinished) return;
+
+      if (!isFullScreenActive()) {
+        await logSecurityEvent("salio_de_pantalla_completa");
+        showSecurityBlock();
+      }
+    });
+
+    document.addEventListener("contextmenu", async (event) => {
+      if (!examStarted || examFinished) return;
+      event.preventDefault();
+      await logSecurityEvent("click_derecho_bloqueado");
+    });
+
+    document.addEventListener("keydown", async (event) => {
+      if (!examStarted || examFinished) return;
+
+      const k = event.key.toLowerCase();
+      const blocked =
+        k === "f12" ||
+        (event.ctrlKey && event.shiftKey && ["i", "j", "c"].includes(k)) ||
+        (event.ctrlKey && ["u", "p", "s"].includes(k));
+
+      if (blocked) {
+        event.preventDefault();
+        await logSecurityEvent("atajo_bloqueado", { key: event.key });
+      }
+    });
+
+    window.addEventListener("beforeunload", (event) => {
+      if (!examStarted || examFinished) return;
+      event.preventDefault();
+      event.returnValue = "La evaluación está en curso.";
+    });
+
+    const activity1Options = [
+      {
+        statement: "En un grupo de estudiantes se registró la cantidad de minutos diarios que usan el celular para estudiar, comunicarse o entretenerse.",
+        intervals: ["[0,10)", "[10,20)", "[20,30)", "[30,40)", "[40,50]"],
+        rawData: [6, 8, 12, 13, 15, 17, 18, 21, 22, 24, 25, 26, 27, 28, 30, 31, 33, 35, 38, 42]
+      },
+      {
+        statement: "En una prueba de Matemática se registraron los puntajes obtenidos por varios estudiantes.",
+        intervals: ["[1,3)", "[3,5)", "[5,7)", "[7,9)", "[9,11]"],
+        rawData: [2, 2, 3, 4, 4, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 10, 6, 5]
+      },
+      {
+        statement: "Se consultó a un grupo de estudiantes cuánto tiempo tardan en llegar al centro educativo, expresado en minutos.",
+        intervals: ["[0,5)", "[5,10)", "[10,15)", "[15,20)", "[20,25]"],
+        rawData: [3, 4, 6, 7, 8, 9, 10, 11, 11, 12, 13, 14, 16, 17, 18, 20, 21, 9, 12, 13]
+      },
+      {
+        statement: "Una profesora registró la cantidad de tareas entregadas por estudiantes durante un mes.",
+        intervals: ["[0,2)", "[2,4)", "[4,6)", "[6,8)", "[8,10]"],
+        rawData: [1, 2, 2, 3, 4, 4, 5, 5, 5, 6, 6, 7, 7, 8, 8, 9, 3, 4, 6, 7]
+      }
+    ];
+
+    const activity2Options = [
+      {
+        statement: "Se quiere analizar si existe relación entre las horas de estudio semanal, representadas por x, y la calificación obtenida, representada por y.",
+        x: [1, 2, 3, 4, 5, 6],
+        y: [4, 5, 6, 7, 8, 9]
+      },
+      {
+        statement: "Se estudia si existe relación entre la cantidad de horas frente a pantallas, representadas por x, y las horas de sueño, representadas por y.",
+        x: [1, 2, 3, 4, 5, 6],
+        y: [9, 8, 7, 6, 6, 5]
+      },
+      {
+        statement: "Se analiza la relación entre la cantidad de ejercicios realizados, representada por x, y el puntaje obtenido en una actividad, representado por y.",
+        x: [2, 4, 6, 8, 10, 12],
+        y: [5, 6, 7, 8, 10, 11]
+      },
+      {
+        statement: "Se observa la relación entre la cantidad de horas de práctica deportiva semanal, representadas por x, y el rendimiento físico obtenido en una prueba, representado por y.",
+        x: [1, 3, 4, 5, 7, 8],
+        y: [3, 4, 6, 7, 8, 10]
+      }
+    ];
+
+    const activity3Options = [
+      {
+        statement: "Una empresa registra la cantidad de productos vendidos, representada por x, y la ganancia obtenida, representada por y, en miles de pesos.",
+        x: [1, 2, 3, 4, 5],
+        y: [3, 5, 6, 8, 11]
+      },
+      {
+        statement: "Se registra la cantidad de horas de práctica, representadas por x, y el puntaje obtenido por estudiantes en una evaluación, representado por y.",
+        x: [2, 3, 5, 6, 8],
+        y: [4, 5, 7, 9, 10]
+      },
+      {
+        statement: "Se estudia la relación entre la cantidad de publicaciones realizadas en una red social, representada por x, y el número de interacciones recibidas, representado por y.",
+        x: [1, 3, 4, 6, 7],
+        y: [2, 5, 6, 9, 10]
+      },
+      {
+        statement: "Un comercio analiza la relación entre el dinero invertido en publicidad, representado por x, y la cantidad de ventas obtenidas, representada por y.",
+        x: [2, 4, 5, 7, 9],
+        y: [6, 8, 9, 12, 15]
+      }
+    ];
+
+    let selectedActivities = {};
+    let currentScreen = 0;
+
+    document.getElementById("date").valueAsDate = new Date();
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function randomItem(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    async function startEvaluation() {
+      const name = document.getElementById("studentName").value.trim();
+      const group = document.getElementById("studentGroup").value.trim();
+
+      if (!name || !group) {
+        alert("Completá nombre, apellido y grupo antes de comenzar.");
+        return;
+      }
+
+      examStarted = true;
+      examFinished = false;
+
+      await requestFullScreen();
+
+      await logSecurityEvent("inicio_evaluacion", {
+        pantallaCompleta: isFullScreenActive()
+      });
+
+      examStarted = true;
+      examFinished = false;
+
+      await requestFullScreen();
+
+      await logSecurityEvent("inicio_evaluacion", {
+        pantallaCompleta: isFullScreenActive()
+      });
+
+      if (!selectedActivities.act1) {
+        generateActivities();
+      }
+
+      showScreen(1);
+}
+
+    function generateActivities() {
+      selectedActivities.act1 = randomItem(activity1Options);
+      selectedActivities.act2 = randomItem(activity2Options);
+      selectedActivities.act3 = randomItem(activity3Options);
+
+      renderActivity1();
+      renderActivity2();
+      renderActivity3();
+
+      document.getElementById("firebaseMessage").style.display = "none";
+    }
+
+    function showScreen(number) {
+      document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
+      document.getElementById("screen" + number).classList.add("active");
+      currentScreen = number;
+      updateProgress();
+      window.scrollTo(0, 0);
+    }
+
+    function updateProgress() {
+      const labels = [
+        "Pantalla inicial",
+        "Actividad 1 de 3",
+        "Actividad 2 de 3",
+        "Actividad 3 de 3",
+        "Resumen final"
+      ];
+
+      const progress = [0, 25, 50, 75, 100];
+
+      document.getElementById("stepLabel").innerText = labels[currentScreen];
+      document.getElementById("progressBar").style.width = progress[currentScreen] + "%";
+    }
+
+    function getInputsByClass(className) {
+      return Array.from(document.querySelectorAll("." + className)).map(input => input.value);
+    }
+
+    function renderActivity1() {
+      const act = selectedActivities.act1;
+      document.getElementById("act1Statement").innerText = act.statement;
+      document.getElementById("act1RawData").innerText = act.rawData.join(" - ");
+
+      const tbody = document.querySelector("#table1 tbody");
+      tbody.innerHTML = "";
+
+      act.intervals.forEach(interval => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${interval}</td>
+          <td><input type="text" class="act1-xi"></td>
+          <td><input type="text" class="act1-fi"></td>
+          <td><input type="text" class="act1-Fi"></td>
+          <td><input type="text" class="act1-xifi"></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function renderActivity2() {
+      const act = selectedActivities.act2;
+      document.getElementById("act2Statement").innerText = act.statement;
+
+      const tbody = document.querySelector("#table2 tbody");
+      tbody.innerHTML = "";
+
+      act.x.forEach((xValue, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${xValue}</td>
+          <td>${act.y[index]}</td>
+          <td><input type="text" class="act2-x2"></td>
+          <td><input type="text" class="act2-y2"></td>
+          <td><input type="text" class="act2-xy"></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      const totalLabelRow = document.createElement("tr");
+      totalLabelRow.className = "sum-row";
+      totalLabelRow.innerHTML = `
+        <th><span class="sigma">Σ</span><span class="math">x</span></th>
+        <th><span class="sigma">Σ</span><span class="math">y</span></th>
+        <th><span class="sigma">Σ</span><span class="math">x²</span></th>
+        <th><span class="sigma">Σ</span><span class="math">y²</span></th>
+        <th><span class="sigma">Σ</span><span class="math">xy</span></th>
+      `;
+      tbody.appendChild(totalLabelRow);
+
+      const totalInputRow = document.createElement("tr");
+      totalInputRow.className = "sum-row";
+      totalInputRow.innerHTML = `
+        <td><input type="text" id="act2-sumX"></td>
+        <td><input type="text" id="act2-sumY"></td>
+        <td><input type="text" id="act2-sumX2"></td>
+        <td><input type="text" id="act2-sumY2"></td>
+        <td><input type="text" id="act2-sumXY"></td>
+      `;
+      tbody.appendChild(totalInputRow);
+    }
+
+    function renderActivity3() {
+      const act = selectedActivities.act3;
+      document.getElementById("act3Statement").innerText = act.statement;
+
+      const tbody = document.querySelector("#table3 tbody");
+      tbody.innerHTML = "";
+
+      act.x.forEach((xValue, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${xValue}</td>
+          <td>${act.y[index]}</td>
+          <td><input type="text" class="act3-xminusmean"></td>
+          <td><input type="text" class="act3-yminusmean"></td>
+          <td><input type="text" class="act3-product-deviation"></td>
+          <td><input type="text" class="act3-squared-deviation"></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      const totalLabelRow = document.createElement("tr");
+      totalLabelRow.className = "sum-row";
+      totalLabelRow.innerHTML = `
+        <th colspan="4"></th>
+        <th><span class="sigma">Σ</span><span class="math">(x − x̄)(y − ȳ)</span></th>
+        <th><span class="sigma">Σ</span><span class="math">(x − x̄)²</span></th>
+      `;
+      tbody.appendChild(totalLabelRow);
+
+      const totalInputRow = document.createElement("tr");
+      totalInputRow.className = "sum-row";
+      totalInputRow.innerHTML = `
+        <td colspan="4"></td>
+        <td><input type="text" id="act3-sumProductDeviation"></td>
+        <td><input type="text" id="act3-sumSquaredDeviation"></td>
+      `;
+      tbody.appendChild(totalInputRow);
+    }
+
+    function buildSummaryTable1() {
+      const act = selectedActivities.act1;
+      const xi = getInputsByClass("act1-xi");
+      const fi = getInputsByClass("act1-fi");
+      const Fi = getInputsByClass("act1-Fi");
+      const xifi = getInputsByClass("act1-xifi");
+
+      let rows = act.intervals.map((interval, i) => `
+        <tr>
+          <td>${escapeHTML(interval)}</td>
+          <td>${escapeHTML(xi[i])}</td>
+          <td>${escapeHTML(fi[i])}</td>
+          <td>${escapeHTML(Fi[i])}</td>
+          <td>${escapeHTML(xifi[i])}</td>
+        </tr>
+      `).join("");
+
+      return `
+        <div class="table-wrapper summary-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Intervalo</th>
+                <th><span class="math">xᵢ</span></th>
+                <th><span class="math">fᵢ</span></th>
+                <th><span class="math">Fᵢ</span></th>
+                <th><span class="math">xᵢ · fᵢ</span></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function buildSummaryTable2() {
+      const act = selectedActivities.act2;
+      const x2 = getInputsByClass("act2-x2");
+      const y2 = getInputsByClass("act2-y2");
+      const xy = getInputsByClass("act2-xy");
+
+      let rows = act.x.map((xValue, i) => `
+        <tr>
+          <td>${escapeHTML(xValue)}</td>
+          <td>${escapeHTML(act.y[i])}</td>
+          <td>${escapeHTML(x2[i])}</td>
+          <td>${escapeHTML(y2[i])}</td>
+          <td>${escapeHTML(xy[i])}</td>
+        </tr>
+      `).join("");
+
+      rows += `
+        <tr class="sum-row">
+          <th><span class="sigma">Σ</span><span class="math">x</span></th>
+          <th><span class="sigma">Σ</span><span class="math">y</span></th>
+          <th><span class="sigma">Σ</span><span class="math">x²</span></th>
+          <th><span class="sigma">Σ</span><span class="math">y²</span></th>
+          <th><span class="sigma">Σ</span><span class="math">xy</span></th>
+        </tr>
+        <tr class="sum-row">
+          <td>${escapeHTML(document.getElementById("act2-sumX").value)}</td>
+          <td>${escapeHTML(document.getElementById("act2-sumY").value)}</td>
+          <td>${escapeHTML(document.getElementById("act2-sumX2").value)}</td>
+          <td>${escapeHTML(document.getElementById("act2-sumY2").value)}</td>
+          <td>${escapeHTML(document.getElementById("act2-sumXY").value)}</td>
+        </tr>
+      `;
+
+      return `
+        <div class="table-wrapper summary-table">
+          <table>
+            <thead>
+              <tr>
+                <th><span class="math">x</span></th>
+                <th><span class="math">y</span></th>
+                <th><span class="math">x²</span></th>
+                <th><span class="math">y²</span></th>
+                <th><span class="math">x · y</span></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function buildSummaryTable3() {
+      const act = selectedActivities.act3;
+      const xm = getInputsByClass("act3-xminusmean");
+      const ym = getInputsByClass("act3-yminusmean");
+      const prod = getInputsByClass("act3-product-deviation");
+      const sq = getInputsByClass("act3-squared-deviation");
+
+      let rows = act.x.map((xValue, i) => `
+        <tr>
+          <td>${escapeHTML(xValue)}</td>
+          <td>${escapeHTML(act.y[i])}</td>
+          <td>${escapeHTML(xm[i])}</td>
+          <td>${escapeHTML(ym[i])}</td>
+          <td>${escapeHTML(prod[i])}</td>
+          <td>${escapeHTML(sq[i])}</td>
+        </tr>
+      `).join("");
+
+      rows += `
+        <tr class="sum-row">
+          <th colspan="4">Sumatorias</th>
+          <th><span class="sigma">Σ</span><span class="math">(x − x̄)(y − ȳ)</span></th>
+          <th><span class="sigma">Σ</span><span class="math">(x − x̄)²</span></th>
+        </tr>
+        <tr class="sum-row">
+          <td colspan="4"></td>
+          <td>${escapeHTML(document.getElementById("act3-sumProductDeviation").value)}</td>
+          <td>${escapeHTML(document.getElementById("act3-sumSquaredDeviation").value)}</td>
+        </tr>
+      `;
+
+      return `
+        <div class="table-wrapper summary-table">
+          <table>
+            <thead>
+              <tr>
+                <th><span class="math">x</span></th>
+                <th><span class="math">y</span></th>
+                <th><span class="math">x − x̄</span></th>
+                <th><span class="math">y − ȳ</span></th>
+                <th><span class="math">(x − x̄)(y − ȳ)</span></th>
+                <th><span class="math">(x − x̄)²</span></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function generateSummaryAndShow() {
+      generateSummary();
+      showScreen(4);
+    }
+
+    function generateSummary() {
+      const name = document.getElementById("studentName").value;
+      const group = document.getElementById("studentGroup").value;
+      const date = document.getElementById("date").value;
+
+      const summary = `
+        <h3>Datos del estudiante</h3>
+        <p><strong>Nombre:</strong> ${escapeHTML(name)}</p>
+        <p><strong>Grupo:</strong> ${escapeHTML(group)}</p>
+        <p><strong>Fecha:</strong> ${escapeHTML(date)}</p>
+
+        <h3>Actividad 1</h3>
+        <p><strong>Enunciado:</strong> ${escapeHTML(selectedActivities.act1?.statement || "")}</p>
+        <p><strong>Datos:</strong> ${escapeHTML(selectedActivities.act1?.rawData?.join(" - ") || "")}</p>
+        ${buildSummaryTable1()}
+        <p><strong>Media:</strong> ${escapeHTML(document.getElementById("meanAnswer").value)}</p>
+        <p><strong>Mediana:</strong> ${escapeHTML(document.getElementById("medianAnswer").value)}</p>
+        <p><strong>Moda:</strong> ${escapeHTML(document.getElementById("modeAnswer").value)}</p>
+
+        <h3>Actividad 2</h3>
+        <p><strong>Enunciado:</strong> ${escapeHTML(selectedActivities.act2?.statement || "")}</p>
+        ${buildSummaryTable2()}
+        <p><strong>Coeficiente de correlación r:</strong> ${escapeHTML(document.getElementById("correlationAnswer").value)}</p>
+        <p><strong>Interpretación:</strong> ${escapeHTML(document.getElementById("act2Interpretation").value)}</p>
+
+        <h3>Actividad 3</h3>
+        <p><strong>Enunciado:</strong> ${escapeHTML(selectedActivities.act3?.statement || "")}</p>
+        <p><strong>x̄:</strong> ${escapeHTML(document.getElementById("meanXAnswer").value)}</p>
+        <p><strong>ȳ:</strong> ${escapeHTML(document.getElementById("meanYAnswer").value)}</p>
+        ${buildSummaryTable3()}
+        <p><strong>Pendiente m:</strong> ${escapeHTML(document.getElementById("slopeAnswer").value)}</p>
+        <p><strong>Ordenada n:</strong> ${escapeHTML(document.getElementById("interceptAnswer").value)}</p>
+        <p><strong>Recta:</strong> ${escapeHTML(document.getElementById("regressionAnswer").value)}</p>
+      `;
+
+      document.getElementById("summaryContent").innerHTML = summary;
+    }
+
+    async function sendToFirebase() {
+      const sendButton = event?.target;
+
+      if (sendButton) {
+        sendButton.disabled = true;
+        sendButton.innerText = "Generando PNG...";
+      }
+
+      try {
+        const pngBase64 = await captureFinalScreenAsPNG();
+        const chunks = splitText(pngBase64, 350000);
+
+        const student = getStudentInfo();
+        const captureId = getCaptureId();
+
+        const metadata = {
+          ...student,
+          captureId,
+          tipoArchivo: "image/png",
+          formatoGuardado: "base64_fragmentado",
+          ruta: `${CAPTURAS_PATH}/${captureId}`,
+          cantidadFragmentos: chunks.length,
+          largoTotalBase64: pngBase64.length,
+          estado: "enviando",
+          eventosSeguridad: securityEvents,
+          cantidadEventosSeguridad: securityEvents.length,
+          timestampLocal: new Date().toISOString()
+        };
+
+        await putToRealtimeDB(`${CAPTURAS_PATH}/${captureId}/metadata`, metadata);
+
+        for (let i = 0; i < chunks.length; i++) {
+          const index = String(i).padStart(5, "0");
+          await putToRealtimeDB(`${CAPTURAS_PATH}/${captureId}/chunks/${index}`, chunks[i]);
+        }
+
+        await patchToRealtimeDB(`${CAPTURAS_PATH}/${captureId}/metadata`, {
+          estado: "enviado",
+          enviadoCorrectamente: true,
+          timestampEnvioFinalizado: new Date().toISOString()
+        });
+
+        examFinished = true;
+
+        document.getElementById("firebaseMessage").style.display = "block";
+        alert("Trabajo enviado correctamente.");
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo enviar la captura PNG. Revisá conexión y reglas de Realtime Database.");
+      } finally {
+        if (sendButton) {
+          sendButton.disabled = false;
+          sendButton.innerText = "Enviar resumen a Firebase";
+        }
+      }
+    }
+
+    updateProgress();
+  </script>
+</body>
+</html>
