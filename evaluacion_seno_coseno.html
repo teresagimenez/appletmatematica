@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Evaluación interactiva - Teorema del Seno y del Coseno</title>
+<style>
+:root{
+  --blue:#2563eb; --blue2:#1e40af; --green:#16a34a; --red:#dc2626;
+  --bg:#eef4ff; --card:#ffffff; --line:#d7deea; --text:#172033; --muted:#64748b;
+  --soft:#f8fbff; --yellow:#fef3c7; --orange:#fb923c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:linear-gradient(135deg,#eaf1ff,#f8fafc);
+  color:var(--text);
+}
+header{
+  position:sticky; top:0; z-index:10;
+  background:linear-gradient(90deg,#172554,#2563eb);
+  color:#fff; padding:14px 18px; box-shadow:0 4px 14px rgba(0,0,0,.22);
+}
+header h1{font-size:21px;margin:0;line-height:1.2}
+header p{margin:4px 0 0;font-size:14px;opacity:.92}
+main{max-width:1120px;margin:18px auto;padding:0 10px}
+.card{
+  background:var(--card); border:1px solid rgba(255,255,255,.9);
+  border-radius:18px; box-shadow:0 10px 28px rgba(15,23,42,.12);
+  padding:20px; margin-bottom:16px;
+}
+.hidden{display:none!important}
+h2{color:#1e3a8a;margin:0 0 10px}
+h3{margin:14px 0 8px;color:#243b68}
+p{line-height:1.45}
+label{display:block;font-weight:700;margin:12px 0 5px}
+input, textarea{
+  width:100%; border:1px solid var(--line); border-radius:12px;
+  padding:12px; font-size:16px; background:#fff;
+}
+textarea{min-height:70px;resize:vertical}
+button{
+  width:auto; border:0; border-radius:14px; background:var(--blue);
+  color:#fff; font-size:17px; padding:13px 20px; margin-top:16px; cursor:pointer;
+  box-shadow:0 4px 10px rgba(37,99,235,.25);
+}
+button:hover{background:var(--blue2)}
+button.success{background:var(--green)}
+button.secondary{background:#475569}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid2{display:grid;grid-template-columns:1.07fr .93fr;gap:18px;align-items:start}
+.imagebox{
+  background:#f8fafc; border:1px solid var(--line); border-radius:16px;
+  padding:10px; overflow:hidden;
+}
+svg{width:100%; height:auto; display:block}
+.muted{color:var(--muted)}
+.msg{padding:12px;border-radius:12px;margin-top:12px}
+.bad{background:#fee2e2;color:#991b1b}
+.good{background:#dcfce7;color:#166534}
+.checkline{
+  display:flex; gap:10px; align-items:center; margin-top:14px;
+  background:#f1f5f9; border:1px solid #cbd5e1; padding:12px; border-radius:14px;
+}
+.checkline input{width:22px;height:22px;margin:0;accent-color:var(--blue)}
+.progress{height:12px;background:#dbeafe;border-radius:999px;overflow:hidden;margin-top:8px}
+.progress > div{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#2563eb);transition:.25s}
+.step{
+  background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;
+  padding:12px; margin:10px 0;
+}
+.formulaBox{
+  background:#eff6ff; border:1px solid #bfdbfe; border-left:6px solid var(--blue);
+  border-radius:14px; padding:12px; margin:12px 0; overflow-x:auto;
+}
+.fracLine{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  flex-wrap:wrap; font-size:20px; margin:8px 0;
+}
+.frac{display:inline-flex; flex-direction:column; align-items:center; min-width:86px; text-align:center}
+.frac .top{border-bottom:2px solid #111; width:100%; padding:0 8px 4px}
+.frac .bottom{padding:4px 8px 0}
+.mini{
+  width:78px; max-width:95px; display:inline-block; padding:8px; text-align:center;
+  border-radius:10px; font-size:16px;
+}
+.bigInput{max-width:160px; display:inline-block}
+.clickable{cursor:pointer; transition:.15s}
+.clickable:hover{filter:drop-shadow(0 0 6px rgba(37,99,235,.45))}
+.selected{filter:drop-shadow(0 0 8px #f97316)!important}
+.badge{
+  display:inline-block; padding:5px 10px; border-radius:999px; background:#dbeafe;
+  color:#1d4ed8; font-size:13px; margin:3px 3px 3px 0;
+}
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th,td{border:1px solid #cbd5e1;padding:9px;text-align:left;vertical-align:top}
+th{background:#eaf1fb}
+.summary-title{background:#172554;color:white;padding:10px 12px;border-radius:10px;margin-top:18px}
+.mobileHint{font-size:13px;color:#64748b;margin-top:6px}
+@media(max-width:850px){
+  #resumen .noPrint[style*="grid-template-columns"]{grid-template-columns:1fr!important}
+
+  header{padding:12px 10px}
+  header h1{font-size:18px}
+  header p{font-size:12px}
+  main{margin:10px auto;padding:0 7px}
+  .card{padding:14px;border-radius:14px}
+  .row,.grid2{grid-template-columns:1fr;gap:12px}
+  h2{font-size:20px}
+  input,textarea{font-size:16px;padding:12px}
+  button{width:100%;padding:14px;font-size:17px}
+  .formulaBox{padding:10px}
+  .fracLine{font-size:17px;gap:6px}
+  .frac{min-width:70px}
+  .mini{width:64px;padding:7px}
+  th,td{font-size:14px;padding:7px}
+}
+@media print{
+  header,.noPrint,button{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none;border:1px solid #ccc}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>Evaluación interactiva: Teorema del Seno y Teorema del Coseno</h1>
+  <p>Completa los datos, resuelve las actividades y al final realiza la captura de la pantalla resumen.</p>
+</header>
+
+<main>
+<div class="card noPrint">
+  <strong>Progreso</strong>
+  <div class="progress"><div id="bar"></div></div>
+  <span id="progressText" class="muted">Pantalla inicial</span>
+</div>
+
+<section id="s0" class="card">
+  <h2>Ingreso</h2>
+  <p class="muted">Para comenzar, completa tus datos y marca la casilla de modo evaluación.</p>
+  <div class="row">
+    <div><label>Nombre y apellido</label><input id="nombre" placeholder="Ej.: María Pérez"></div>
+    <div><label>Grupo</label><input id="grupo" placeholder="Ej.: 3°"></div>
+  </div>
+  <label class="checkline"><input type="checkbox" id="modoEvaluacion"> <span>Modo evaluación</span></label>
+  <button type="button" onclick="iniciar()">Comenzar evaluación</button>
+  <div id="msgInicio"></div>
+</section>
+
+<section id="s1" class="card hidden">
+  <h2>Actividad 1: Relación entre lados y ángulos opuestos</h2>
+  <p>Observa la imagen. Los vértices se llaman A, B y C, pero los ángulos tienen medidas. Relaciona cada lado con el ángulo opuesto.</p>
+  <p class="mobileHint">En celular podés tocar los datos de la imagen para resaltarlos.</p>
+  <div class="grid2">
+    <div class="imagebox">
+      <svg viewBox="0 0 650 460" aria-label="Triángulo con medidas de lados y ángulos">
+        <rect width="650" height="460" fill="#e0f2fe"/>
+        <path d="M0 370 Q150 335 270 360 T650 340 L650 460 L0 460 Z" fill="#bbf7d0"/>
+        <rect x="65" y="312" width="38" height="56" fill="#92400e"/><polygon points="84,250 40,315 128,315" fill="#166534"/>
+        <rect x="530" y="310" width="38" height="58" fill="#92400e"/><polygon points="549,244 504,312 594,312" fill="#166534"/>
+        <circle cx="125" cy="342" r="8" fill="#111"/><circle cx="525" cy="342" r="8" fill="#111"/><circle cx="320" cy="88" r="8" fill="#111"/>
+        <line x1="125" y1="342" x2="525" y2="342" stroke="#111827" stroke-width="4"/>
+        <line x1="125" y1="342" x2="320" y2="88" stroke="#111827" stroke-width="4"/>
+        <line x1="525" y1="342" x2="320" y2="88" stroke="#111827" stroke-width="4"/>
+        <text x="100" y="376" font-size="23" font-weight="bold">A</text>
+        <text x="535" y="376" font-size="23" font-weight="bold">B</text>
+        <text x="333" y="84" font-size="23" font-weight="bold">C</text>
+
+        <text id="dato120" class="clickable" onclick="sel('dato120')" x="298" y="375" font-size="23" fill="#be123c">120 m</text>
+        <text id="dato90" class="clickable" onclick="sel('dato90')" x="188" y="210" font-size="23" fill="#be123c">90 m</text>
+        <text id="dato105" class="clickable" onclick="sel('dato105')" x="440" y="212" font-size="23" fill="#be123c">105 m</text>
+
+        <path d="M164 342 A47 47 0 0 1 152 304" fill="none" stroke="#2563eb" stroke-width="5"/>
+        <text id="ang40" class="clickable" onclick="sel('ang40')" x="160" y="315" font-size="21" fill="#1d4ed8">40°</text>
+        <path d="M488 342 A47 47 0 0 0 490 304" fill="none" stroke="#2563eb" stroke-width="5"/>
+        <text id="ang60" class="clickable" onclick="sel('ang60')" x="462" y="315" font-size="21" fill="#1d4ed8">60°</text>
+        <path d="M298 112 A45 45 0 0 0 343 112" fill="none" stroke="#2563eb" stroke-width="5"/>
+        <text id="ang80" class="clickable" onclick="sel('ang80')" x="306" y="138" font-size="21" fill="#1d4ed8">80°</text>
+
+        <text x="135" y="425" font-size="18" fill="#334155">Dos árboles y una antena forman un triángulo con lados y ángulos.</text>
+      </svg>
+    </div>
+    <div>
+      <div class="step">
+        <label>1) La medida 120 m está opuesta al ángulo de:</label>
+        <input id="a1_1" placeholder="40°, 60° u 80°">
+      </div>
+      <div class="step">
+        <label>2) La medida 105 m está opuesta al ángulo de:</label>
+        <input id="a1_2" placeholder="40°, 60° u 80°">
+      </div>
+      <div class="step">
+        <label>3) La medida 90 m está opuesta al ángulo de:</label>
+        <input id="a1_3" placeholder="40°, 60° u 80°">
+      </div>
+      <label>4) Explica brevemente cómo lo reconociste:</label>
+      <textarea id="a1_4" placeholder="Respuesta..."></textarea>
+      <button type="button" onclick="ir(1,2)">Siguiente</button>
+    </div>
+  </div>
+</section>
+
+<section id="s2" class="card hidden">
+  <h2>Actividad 2: Aplicación del Teorema del Seno</h2>
+  <p>Dos estudiantes observan un dron desde dos puntos del patio. Calcula la distancia desde A hasta el dron.</p>
+  <div class="grid2">
+    <div class="imagebox">
+      <svg viewBox="0 0 650 450">
+        <rect width="650" height="450" fill="#e0f7ff"/><circle cx="90" cy="70" r="32" fill="#fde047"/>
+        <path d="M0 340 Q160 310 300 335 T650 320 L650 450 L0 450 Z" fill="#dcfce7"/>
+        <line x1="105" y1="330" x2="535" y2="330" stroke="#111" stroke-width="4"/>
+        <line x1="105" y1="330" x2="345" y2="92" stroke="#111" stroke-width="4"/>
+        <line x1="535" y1="330" x2="345" y2="92" stroke="#111" stroke-width="4"/>
+        <circle cx="105" cy="330" r="8" fill="#111"/><circle cx="535" cy="330" r="8" fill="#111"/><circle cx="345" cy="92" r="8" fill="#111"/>
+        <text x="84" y="365" font-size="22" font-weight="bold">A</text><text x="546" y="365" font-size="22" font-weight="bold">B</text><text x="357" y="89" font-size="22" font-weight="bold">C</text>
+        <text id="seno120" class="clickable" onclick="sel('seno120')" x="295" y="360" font-size="22" fill="#be123c">120 m</text>
+        <text id="seno45" class="clickable" onclick="sel('seno45')" x="135" y="310" font-size="22" fill="#1d4ed8">45°</text>
+        <text id="seno65" class="clickable" onclick="sel('seno65')" x="490" y="310" font-size="22" fill="#1d4ed8">65°</text>
+        <text id="senox" class="clickable" onclick="sel('senox')" x="205" y="190" font-size="22" fill="#be123c">x</text>
+        <g transform="translate(345 72)"><ellipse cx="0" cy="0" rx="35" ry="11" fill="#64748b"/><circle cx="-40" cy="0" r="7" fill="#334155"/><circle cx="40" cy="0" r="7" fill="#334155"/><circle cx="0" cy="-17" r="8" fill="#f97316"/></g>
+        <rect x="50" y="300" width="38" height="30" rx="5" fill="#60a5fa"/><rect x="550" y="300" width="38" height="30" rx="5" fill="#60a5fa"/>
+        <text x="144" y="415" font-size="18" fill="#334155">Patio escolar: medición de distancia a un dron.</text>
+      </svg>
+    </div>
+    <div>
+      <div class="formulaBox">
+        <strong>Teorema del seno</strong>
+        <div class="fracLine">
+          <span class="frac"><span class="top">a</span><span class="bottom">sen(A)</span></span>
+          <span>=</span>
+          <span class="frac"><span class="top">b</span><span class="bottom">sen(B)</span></span>
+          <span>=</span>
+          <span class="frac"><span class="top">c</span><span class="bottom">sen(C)</span></span>
+        </div>
+      </div>
+
+      <div class="step">
+        <label>1) Calcula el ángulo C:</label>
+        <div class="fracLine" style="justify-content:flex-start">
+          <span>C =</span>
+          <input class="mini" id="a2_1" placeholder=""> <span>°</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <label>2) Completa el planteo con fracciones:</label>
+        <div class="fracLine">
+          <span class="frac">
+            <span class="top"><input class="mini" id="a2_2a" placeholder=""></span>
+            <span class="bottom">sen(<input class="mini" id="a2_2b" placeholder="">°)</span>
+          </span>
+          <span>=</span>
+          <span class="frac">
+            <span class="top"><input class="mini" id="a2_2c" placeholder=""></span>
+            <span class="bottom">sen(<input class="mini" id="a2_2d" placeholder="">°)</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="step">
+        <label>3) Despeja x:</label>
+        <div>x = <input id="a2_3" class="bigInput" placeholder="..."></div>
+      </div>
+
+      <div class="step">
+        <label>4) Resultado aproximado:</label>
+        <div>x ≈ <input id="a2_4" class="bigInput" placeholder="..."> m</div>
+      </div>
+
+      <button type="button" onclick="ir(2,3)">Siguiente</button>
+    </div>
+  </div>
+</section>
+
+<section id="s3" class="card hidden">
+  <h2>Actividad 3: Aplicación del Teorema del Coseno</h2>
+  <p>Desde una plaza salen dos caminos hacia una tienda y un taller. Calcula la distancia directa entre ambos puntos.</p>
+  <div class="grid2">
+    <div class="imagebox">
+      <svg viewBox="0 0 650 450">
+        <rect width="650" height="450" fill="#fff7ed"/>
+        <path d="M0 340 Q160 315 320 338 T650 325 L650 450 L0 450 Z" fill="#bbf7d0"/>
+        <circle cx="132" cy="315" r="10" fill="#111"/><circle cx="450" cy="120" r="10" fill="#111"/><circle cx="505" cy="315" r="10" fill="#111"/>
+        <line x1="132" y1="315" x2="450" y2="120" stroke="#92400e" stroke-width="9" stroke-linecap="round"/>
+        <line x1="132" y1="315" x2="505" y2="315" stroke="#92400e" stroke-width="9" stroke-linecap="round"/>
+        <line x1="450" y1="120" x2="505" y2="315" stroke="#111827" stroke-width="4" stroke-dasharray="9 7"/>
+        <text x="95" y="350" font-size="21" font-weight="bold">Plaza A</text><text x="462" y="116" font-size="21" font-weight="bold">B</text><text x="516" y="350" font-size="21" font-weight="bold">C</text>
+        <text id="cos85" class="clickable" onclick="sel('cos85')" x="250" y="205" font-size="22" fill="#be123c">85 m</text>
+        <text id="cos100" class="clickable" onclick="sel('cos100')" x="300" y="347" font-size="22" fill="#be123c">100 m</text>
+        <text id="cos52" class="clickable" onclick="sel('cos52')" x="164" y="296" font-size="22" fill="#1d4ed8">52°</text>
+        <text id="cosx" class="clickable" onclick="sel('cosx')" x="505" y="210" font-size="22" fill="#be123c">x</text>
+        <path d="M180 315 A50 50 0 0 0 175 286" fill="none" stroke="#2563eb" stroke-width="5"/>
+        <rect x="380" y="90" width="72" height="36" rx="5" fill="#fde68a" stroke="#b45309"/><text x="391" y="114" font-size="15">Tienda</text>
+        <rect x="510" y="285" width="72" height="36" rx="5" fill="#bfdbfe" stroke="#1d4ed8"/><text x="522" y="308" font-size="15">Taller</text>
+      </svg>
+    </div>
+    <div>
+      <div class="formulaBox">
+        <strong>Teorema del coseno</strong>
+        <div style="font-size:21px;text-align:center;margin-top:8px;">
+          x² = a² + b² - 2ab · cos(C)
+        </div>
+      </div>
+      <div class="step">
+        <label>1) Escribe los dos lados conocidos:</label>
+        <input id="a3_1" placeholder="">
+      </div>
+      <div class="step">
+        <label>2) Escribe el ángulo comprendido entre esos lados:</label>
+        <input id="a3_2" placeholder="">
+      </div>
+      <div class="step">
+        <label>3) Completa la fórmula con los valores:</label>
+        <div style="line-height:2;font-size:18px">
+          x² =
+          <input class="mini" id="a3_3a" placeholder="">² +
+          <input class="mini" id="a3_3b" placeholder="">² -
+          2 · <input class="mini" id="a3_3c" placeholder=""> ·
+          <input class="mini" id="a3_3d" placeholder=""> ·
+          cos(<input class="mini" id="a3_3e" placeholder="">°)
+        </div>
+      </div>
+      <div class="step">
+        <label>4) Realiza el cálculo:</label>
+        <div>x² ≈ <input id="a3_4" class="bigInput" placeholder="..."></div>
+      </div>
+      <div class="step">
+        <label>5) Resultado aproximado:</label>
+        <div>x ≈ <input id="a3_5" class="bigInput" placeholder="..."> m</div>
+      </div>
+      <button type="button" onclick="ir(3,4)">Siguiente</button>
+    </div>
+  </div>
+</section>
+
+<section id="s4" class="card hidden">
+  <h2>Actividad 4: Elegir el teorema adecuado</h2>
+  <p>Indica qué teorema usarías y justifica brevemente.</p>
+  <div class="grid2">
+    <div class="imagebox">
+      <svg viewBox="0 0 650 520">
+        <rect width="650" height="520" fill="#f8fafc"/>
+        <text x="25" y="35" font-size="22" font-weight="bold" fill="#1e3a8a">Situación A: Mirador</text>
+        <line x1="90" y1="220" x2="320" y2="70" stroke="#111" stroke-width="4"/><line x1="320" y1="70" x2="540" y2="220" stroke="#111" stroke-width="4"/><line x1="90" y1="220" x2="540" y2="220" stroke="#111" stroke-width="4"/>
+        <text x="290" y="247" font-size="20" fill="#be123c">150 m</text><text x="125" y="202" font-size="20" fill="#1d4ed8">38°</text><text x="492" y="202" font-size="20" fill="#1d4ed8">72°</text>
+        <rect x="285" y="48" width="82" height="30" rx="5" fill="#fde68a" stroke="#b45309"/><text x="297" y="69" font-size="14">Mirador</text>
+        <text x="25" y="300" font-size="22" font-weight="bold" fill="#1e3a8a">Situación B: Rutas</text>
+        <line x1="100" y1="465" x2="300" y2="325" stroke="#92400e" stroke-width="8" stroke-linecap="round"/><line x1="100" y1="465" x2="540" y2="465" stroke="#92400e" stroke-width="8" stroke-linecap="round"/><line x1="300" y1="325" x2="540" y2="465" stroke="#111" stroke-width="4" stroke-dasharray="8 6"/>
+        <text x="175" y="382" font-size="20" fill="#be123c">60 km</text><text x="315" y="492" font-size="20" fill="#be123c">95 km</text><text x="133" y="446" font-size="20" fill="#1d4ed8">64°</text><text x="425" y="385" font-size="20" fill="#be123c">x</text>
+      </svg>
+    </div>
+    <div>
+      <label>1) Situación A: ¿usarías teorema del seno o del coseno?</label><input id="a4_1">
+      <label>2) Justificación de la situación A:</label><textarea id="a4_2"></textarea>
+      <label>3) Situación B: ¿usarías teorema del seno o del coseno?</label><input id="a4_3">
+      <label>4) Justificación de la situación B:</label><textarea id="a4_4"></textarea>
+      <button type="button" class="success" onclick="finalizar()">Finalizar evaluación</button>
+    </div>
+  </div>
+</section>
+
+<section id="resumen" class="card hidden">
+  <h2>Pantalla resumen para captura docente</h2>
+  <p><span class="badge">No muestra base de datos</span><span class="badge">Lista para captura</span></p>
+  <div id="resumenContenido"></div>
+  <div class="noPrint" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px">
+    <button type="button" class="secondary" onclick="volverActividad(1)">Volver a actividad 1</button>
+    <button type="button" class="secondary" onclick="volverActividad(2)">Volver a actividad 2</button>
+    <button type="button" class="secondary" onclick="volverActividad(3)">Volver a actividad 3</button>
+    <button type="button" class="secondary" onclick="volverActividad(4)">Volver a actividad 4</button>
+  </div>
+  <button type="button" class="success noPrint" onclick="enviarRespuestas()">Enviar respuestas</button>
+  <p id="firebaseEstado" class="muted noPrint"></p>
+</section>
+
+</main>
+
+<script>
+const firebaseConfig = {
+  // Pega acá la URL de tu Realtime Database.
+  // Ejemplo: "https://nombre-del-proyecto-default-rtdb.firebaseio.com"
+  databaseURL: "https://estadistica-evaluacion-3bd0b-default-rtdb.firebaseio.com"
+};
+let respuestas = {};
+let inicioTiempo = null;
+
+function el(id){return document.getElementById(id)}
+function valor(id){return el(id).value.trim()}
+function setProgress(num){
+  const percent = Math.round((num/5)*100);
+  el("bar").style.width = percent + "%";
+  el("progressText").textContent = num === 0 ? "Pantalla inicial" : (num === 5 ? "Resumen final" : "Actividad " + num + " de 4");
+}
+function mostrar(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
+  el(id).classList.remove("hidden"); window.scrollTo(0,0);
+}
+function sel(id){ el(id).classList.toggle("selected"); }
+function iniciar(){
+  const nombre=valor("nombre"), grupo=valor("grupo"), ok=el("modoEvaluacion").checked;
+  if(!nombre || !grupo || !ok){
+    el("msgInicio").innerHTML='<div class="msg bad">Completa nombre, grupo y marca “Modo evaluación”.</div>';
+    return;
+  }
+  inicioTiempo=new Date();
+  respuestas={nombre,grupo,modo:"Modo evaluación",inicio:inicioTiempo.toLocaleString()};
+  setProgress(1); mostrar("s1");
+}
+function ir(actual,siguiente){
+  if(actual===1){
+    respuestas.actividad1={
+      medida_120_opuesta_al_angulo_de:valor("a1_1"),
+      medida_105_opuesta_al_angulo_de:valor("a1_2"),
+      medida_90_opuesta_al_angulo_de:valor("a1_3"),
+      explicacion:valor("a1_4")
+    };
+  }
+  if(actual===2){
+    respuestas.actividad2={
+      angulo_C:valor("a2_1"),
+      fraccion_izq_numerador:valor("a2_2a"),
+      fraccion_izq_denominador:valor("a2_2b"),
+      fraccion_der_numerador:valor("a2_2c"),
+      fraccion_der_denominador:valor("a2_2d"),
+      despeje:valor("a2_3"),
+      resultado:valor("a2_4")
+    };
+  }
+  if(actual===3){
+    respuestas.actividad3={
+      lados_conocidos:valor("a3_1"),
+      angulo_comprendido:valor("a3_2"),
+      formula_valor1:valor("a3_3a"),
+      formula_valor2:valor("a3_3b"),
+      formula_valor3:valor("a3_3c"),
+      formula_valor4:valor("a3_3d"),
+      formula_angulo:valor("a3_3e"),
+      calculo_x2:valor("a3_4"),
+      resultado:valor("a3_5")
+    };
+  }
+  setProgress(siguiente); mostrar("s"+siguiente);
+}
+function finalizar(){
+  respuestas.actividad4={
+    situacion_A_teorema:valor("a4_1"),
+    situacion_A_justificacion:valor("a4_2"),
+    situacion_B_teorema:valor("a4_3"),
+    situacion_B_justificacion:valor("a4_4")
+  };
+  const fin=new Date();
+  respuestas.fin=fin.toLocaleString();
+  respuestas.tiempo_empleado_minutos=Math.round((fin-inicioTiempo)/60000);
+  renderResumen(); setProgress(5); mostrar("resumen");
+}
+function safe(v){return v?String(v).replaceAll("<","&lt;").replaceAll(">","&gt;"):""}
+function fila(k,v){return "<tr><th>"+k+"</th><td>"+safe(v)+"</td></tr>"}
+function renderResumen(){
+  const r=respuestas; let html="";
+  html+='<div class="summary-title">Datos del estudiante</div><table>'+fila("Nombre",r.nombre)+fila("Grupo",r.grupo)+fila("Inicio",r.inicio)+fila("Fin",r.fin)+fila("Tiempo empleado",r.tiempo_empleado_minutos+" minutos")+"</table>";
+  html+='<div class="summary-title">Actividad 1</div><table>'+fila("120 m opuesto al ángulo de",r.actividad1.medida_120_opuesta_al_angulo_de)+fila("105 m opuesto al ángulo de",r.actividad1.medida_105_opuesta_al_angulo_de)+fila("90 m opuesto al ángulo de",r.actividad1.medida_90_opuesta_al_angulo_de)+fila("Explicación",r.actividad1.explicacion)+"</table>";
+  html+='<div class="summary-title">Actividad 2: Teorema del Seno</div><table>'+fila("Ángulo C",r.actividad2.angulo_C)+fila("Fracción izquierda",r.actividad2.fraccion_izq_numerador+" / sen("+r.actividad2.fraccion_izq_denominador+"°)")+fila("Fracción derecha",r.actividad2.fraccion_der_numerador+" / sen("+r.actividad2.fraccion_der_denominador+"°)")+fila("Despeje",r.actividad2.despeje)+fila("Resultado",r.actividad2.resultado)+"</table>";
+  html+='<div class="summary-title">Actividad 3: Teorema del Coseno</div><table>'+fila("Lados conocidos",r.actividad3.lados_conocidos)+fila("Ángulo comprendido",r.actividad3.angulo_comprendido)+fila("Fórmula completada","x² = "+r.actividad3.formula_valor1+"² + "+r.actividad3.formula_valor2+"² - 2·"+r.actividad3.formula_valor3+"·"+r.actividad3.formula_valor4+"·cos("+r.actividad3.formula_angulo+"°)")+fila("Cálculo x²",r.actividad3.calculo_x2)+fila("Resultado",r.actividad3.resultado)+"</table>";
+  html+='<div class="summary-title">Actividad 4</div><table>'+fila("Situación A",r.actividad4.situacion_A_teorema)+fila("Justificación A",r.actividad4.situacion_A_justificacion)+fila("Situación B",r.actividad4.situacion_B_teorema)+fila("Justificación B",r.actividad4.situacion_B_justificacion)+"</table>";
+  el("resumenContenido").innerHTML=html;
+}
+
+function capturarActividad(num){
+  if(num===1){
+    respuestas.actividad1={
+      medida_120_opuesta_al_angulo_de:valor("a1_1"),
+      medida_105_opuesta_al_angulo_de:valor("a1_2"),
+      medida_90_opuesta_al_angulo_de:valor("a1_3"),
+      explicacion:valor("a1_4")
+    };
+  }
+  if(num===2){
+    respuestas.actividad2={
+      angulo_C:valor("a2_1"),
+      fraccion_izq_numerador:valor("a2_2a"),
+      fraccion_izq_denominador:valor("a2_2b"),
+      fraccion_der_numerador:valor("a2_2c"),
+      fraccion_der_denominador:valor("a2_2d"),
+      despeje:valor("a2_3"),
+      resultado:valor("a2_4")
+    };
+  }
+  if(num===3){
+    respuestas.actividad3={
+      lados_conocidos:valor("a3_1"),
+      angulo_comprendido:valor("a3_2"),
+      formula_valor1:valor("a3_3a"),
+      formula_valor2:valor("a3_3b"),
+      formula_valor3:valor("a3_3c"),
+      formula_valor4:valor("a3_3d"),
+      formula_angulo:valor("a3_3e"),
+      calculo_x2:valor("a3_4"),
+      resultado:valor("a3_5")
+    };
+  }
+  if(num===4){
+    respuestas.actividad4={
+      situacion_A_teorema:valor("a4_1"),
+      situacion_A_justificacion:valor("a4_2"),
+      situacion_B_teorema:valor("a4_3"),
+      situacion_B_justificacion:valor("a4_4")
+    };
+  }
+}
+
+function volverActividad(num){
+  mostrar("s"+num);
+  setProgress(num);
+}
+
+function enviarRespuestas(){
+  capturarActividad(1);
+  capturarActividad(2);
+  capturarActividad(3);
+  capturarActividad(4);
+  const fin=new Date();
+  respuestas.fin=fin.toLocaleString();
+  if(inicioTiempo){
+    respuestas.tiempo_empleado_minutos=Math.round((fin-inicioTiempo)/60000);
+  }
+  renderResumen();
+  guardarFirebase();
+}
+
+
+function normalizarTexto(value){
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = String(text || "").split(" ");
+  let line = "";
+  for(let n = 0; n < words.length; n++){
+    const testLine = line + words[n] + " ";
+    const metrics = ctx.measureText(testLine);
+    if(metrics.width > maxWidth && n > 0){
+      ctx.fillText(line, x, y);
+      line = words[n] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+  return y + lineHeight;
+}
+
+function crearCapturaPNG(){
+  const lineas = [];
+  lineas.push(["Evaluación interactiva: Teorema del Seno y del Coseno", "titulo"]);
+  lineas.push(["Nombre: " + (respuestas.nombre || ""), "normal"]);
+  lineas.push(["Grupo: " + (respuestas.grupo || ""), "normal"]);
+  lineas.push(["Inicio: " + (respuestas.inicio || ""), "normal"]);
+  lineas.push(["Fin: " + (respuestas.fin || ""), "normal"]);
+  lineas.push(["Tiempo empleado: " + (respuestas.tiempo_empleado_minutos || 0) + " minutos", "normal"]);
+  lineas.push(["", "normal"]);
+
+  lineas.push(["Actividad 1 - Reconocimiento con medidas", "subtitulo"]);
+  lineas.push(["120 m opuesto al ángulo de: " + normalizarTexto(respuestas.actividad1?.medida_120_opuesta_al_angulo_de || respuestas.actividad1?.medida_120_opuesta_a), "normal"]);
+  lineas.push(["105 m opuesto al ángulo de: " + normalizarTexto(respuestas.actividad1?.medida_105_opuesta_al_angulo_de || respuestas.actividad1?.medida_105_opuesta_a), "normal"]);
+  lineas.push(["90 m opuesto al ángulo de: " + normalizarTexto(respuestas.actividad1?.medida_90_opuesta_al_angulo_de || respuestas.actividad1?.medida_90_opuesta_a), "normal"]);
+  lineas.push(["Explicación: " + normalizarTexto(respuestas.actividad1?.explicacion), "normal"]);
+  lineas.push(["", "normal"]);
+
+  lineas.push(["Actividad 2 - Teorema del Seno", "subtitulo"]);
+  lineas.push(["Ángulo C: " + normalizarTexto(respuestas.actividad2?.angulo_C), "normal"]);
+  if(respuestas.actividad2?.fraccion_izq_numerador !== undefined){
+    lineas.push(["Fracción izquierda: " + normalizarTexto(respuestas.actividad2.fraccion_izq_numerador) + " / sen(" + normalizarTexto(respuestas.actividad2.fraccion_izq_denominador) + "°)", "normal"]);
+    lineas.push(["Fracción derecha: " + normalizarTexto(respuestas.actividad2.fraccion_der_numerador) + " / sen(" + normalizarTexto(respuestas.actividad2.fraccion_der_denominador) + "°)", "normal"]);
+  }else{
+    lineas.push(["Lado conocido: " + normalizarTexto(respuestas.actividad2?.lado_conocido), "normal"]);
+    lineas.push(["Planteo: " + normalizarTexto(respuestas.actividad2?.planteo), "normal"]);
+  }
+  lineas.push(["Despeje: " + normalizarTexto(respuestas.actividad2?.despeje), "normal"]);
+  lineas.push(["Resultado: " + normalizarTexto(respuestas.actividad2?.resultado), "normal"]);
+  lineas.push(["", "normal"]);
+
+  lineas.push(["Actividad 3 - Teorema del Coseno", "subtitulo"]);
+  lineas.push(["Lados conocidos: " + normalizarTexto(respuestas.actividad3?.lados_conocidos), "normal"]);
+  lineas.push(["Ángulo comprendido: " + normalizarTexto(respuestas.actividad3?.angulo_comprendido), "normal"]);
+  if(respuestas.actividad3?.formula_valor1 !== undefined){
+    lineas.push(["Fórmula: x² = " + normalizarTexto(respuestas.actividad3.formula_valor1) + "² + " + normalizarTexto(respuestas.actividad3.formula_valor2) + "² - 2·" + normalizarTexto(respuestas.actividad3.formula_valor3) + "·" + normalizarTexto(respuestas.actividad3.formula_valor4) + "·cos(" + normalizarTexto(respuestas.actividad3.formula_angulo) + "°)", "normal"]);
+  }else{
+    lineas.push(["Fórmula: " + normalizarTexto(respuestas.actividad3?.sustitucion_formula), "normal"]);
+  }
+  lineas.push(["Cálculo de x²: " + normalizarTexto(respuestas.actividad3?.calculo_x2), "normal"]);
+  lineas.push(["Resultado: " + normalizarTexto(respuestas.actividad3?.resultado), "normal"]);
+  lineas.push(["", "normal"]);
+
+  lineas.push(["Actividad 4 - Elección de teorema", "subtitulo"]);
+  lineas.push(["Situación A: " + normalizarTexto(respuestas.actividad4?.situacion_A_teorema), "normal"]);
+  lineas.push(["Justificación A: " + normalizarTexto(respuestas.actividad4?.situacion_A_justificacion), "normal"]);
+  lineas.push(["Situación B: " + normalizarTexto(respuestas.actividad4?.situacion_B_teorema), "normal"]);
+  lineas.push(["Justificación B: " + normalizarTexto(respuestas.actividad4?.situacion_B_justificacion), "normal"]);
+
+  const width = 1200;
+  const margin = 54;
+  const lineHeight = 32;
+
+  // Primera pasada para calcular altura aproximada
+  const tmp = document.createElement("canvas");
+  const tctx = tmp.getContext("2d");
+  tctx.font = "24px Arial";
+  let y = margin;
+  lineas.forEach(([texto,tipo]) => {
+    if(tipo === "titulo") y += 48;
+    else if(tipo === "subtitulo") y += 42;
+    else {
+      const words = String(texto).split(" ");
+      let line = "";
+      let lines = 1;
+      words.forEach(w => {
+        const test = line + w + " ";
+        if(tctx.measureText(test).width > width - margin*2 && line) {
+          lines++;
+          line = w + " ";
+        } else line = test;
+      });
+      y += Math.max(lineHeight, lines * lineHeight);
+    }
+  });
+  const height = Math.max(900, y + margin);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0,0,width,height);
+
+  ctx.fillStyle = "#1e3a8a";
+  ctx.fillRect(0,0,width,92);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 34px Arial";
+  ctx.fillText("Evaluación interactiva", margin, 42);
+  ctx.font = "24px Arial";
+  ctx.fillText("Teorema del Seno y Teorema del Coseno", margin, 74);
+
+  y = 130;
+  lineas.forEach(([texto,tipo]) => {
+    if(texto === ""){
+      y += 12;
+      return;
+    }
+    if(tipo === "titulo"){
+      return;
+    }
+    if(tipo === "subtitulo"){
+      ctx.fillStyle = "#dbeafe";
+      ctx.fillRect(margin-10, y-26, width-margin*2+20, 38);
+      ctx.fillStyle = "#1e3a8a";
+      ctx.font = "bold 24px Arial";
+      ctx.fillText(texto, margin, y);
+      y += 48;
+    } else {
+      ctx.fillStyle = "#111827";
+      ctx.font = "22px Arial";
+      y = wrapText(ctx, texto, margin, y, width - margin*2, lineHeight);
+    }
+  });
+
+  ctx.fillStyle = "#64748b";
+  ctx.font = "16px Arial";
+  ctx.fillText("Captura generada automáticamente para visor docente.", margin, height - 28);
+
+  return canvas.toDataURL("image/png");
+}
+
+function dividirEnChunks(texto, tam=90000){
+  const chunks = {};
+  for(let i=0; i<texto.length; i+=tam){
+    const key = String(Math.floor(i/tam)).padStart(4,"0");
+    chunks[key] = texto.slice(i, i+tam);
+  }
+  return chunks;
+}
+
+async function guardarCapturaPNGEnFirebase(){
+  const dataURL = crearCapturaPNG();
+  const fecha = new Date();
+  const idSeguro = ((respuestas.grupo || "grupo") + "_" + (respuestas.nombre || "alumno") + "_" + Date.now())
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^\w-]+/g,"_");
+
+  const payload = {
+    metadata: {
+      nombre: respuestas.nombre || "",
+      grupo: respuestas.grupo || "",
+      fecha: fecha.toLocaleString(),
+      timestampLocal: fecha.toISOString(),
+      estado: "Enviado",
+      cantidadEventosSeguridad: 0,
+      tipoEvaluacion: "Teorema del Seno y Coseno"
+    },
+    chunks: dividirEnChunks(dataURL),
+    respuestas: respuestas
+  };
+
+  const url = (firebaseConfig.databaseURL.endsWith("/") ? firebaseConfig.databaseURL.slice(0,-1) : firebaseConfig.databaseURL) + "/capturas_png/" + idSeguro + ".json";
+  const resp = await fetch(url,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  });
+  if(!resp.ok) throw new Error("No se pudo guardar la captura PNG");
+  return idSeguro;
+}
+
+
+async function guardarFirebase(){
+  const estado=el("firebaseEstado");
+  estado.textContent="Enviando respuestas y generando captura...";
+  if(!firebaseConfig.databaseURL){
+    estado.textContent="Firebase no está configurado. No se pudieron enviar las respuestas.";
+    return;
+  }
+  try{
+    const capturaId = await guardarCapturaPNGEnFirebase();
+
+    // También guarda una copia liviana de las respuestas por separado.
+    const urlRespuestas = (firebaseConfig.databaseURL.endsWith("/") ? firebaseConfig.databaseURL.slice(0,-1) : firebaseConfig.databaseURL) + "/evaluacion_seno_coseno/" + capturaId + ".json";
+    await fetch(urlRespuestas,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(respuestas)
+    });
+
+    estado.textContent="Respuestas enviadas correctamente. Ya pueden verse en el visor docente.";
+  }catch(e){
+    console.error(e);
+    estado.textContent="Error al enviar. Revisá la conexión o las reglas de Firebase.";
+  }
+}
+function descargarJSON(){
+  const blob=new Blob([JSON.stringify(respuestas,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="evaluacion_seno_coseno_"+respuestas.nombre.replaceAll(" ","_")+".json";
+  a.click();
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  try { setProgress(0); } catch(e) { console.log(e); }
+});
+</script>
+</body>
+</html>
