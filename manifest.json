@@ -1,0 +1,28 @@
+{
+  "name": "Math Race",
+  "short_name": "Math Race",
+  "description": "Juego matemático de carreras con niveles, autos, música, motor, ranking y controles para celular.",
+  "id": "./MathRace.html",
+  "start_url": "./MathRace.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#072b61",
+  "theme_color": "#072b61",
+  "lang": "es-UY",
+  "categories": ["education", "games"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
