@@ -1,0 +1,3989 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+      maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<title>Math Race</title>
+
+<meta name="theme-color" content="#072b61">
+<meta name="application-name" content="Math Race">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Math Race">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+
+/* =====================================================
+   CONFIGURACIÓN GENERAL
+===================================================== */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --azul-1: #072b61;
+    --azul-2: #0c4da2;
+    --cielo: #78c8ed;
+    --verde: #65b95c;
+    --amarillo: #ffd84d;
+    --naranja: #ff9f1c;
+    --rojo: #ff5b5b;
+    --blanco: #ffffff;
+    --sombra: 0 18px 45px rgba(0,0,0,.25);
+    --glass: rgba(255,255,255,.14);
+    --glass-border: rgba(255,255,255,.28);
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background:
+        radial-gradient(circle at top, #8fe0ff 0%, #5fb7f2 35%, #2a79da 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overscroll-behavior: none;
+    color: #fff;
+}
+
+#app {
+    width: 980px;
+    height: 720px;
+    max-width: 100vw;
+    max-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, #87d7f6 0%, #62b85d 100%);
+    border: 6px solid rgba(255,255,255,.55);
+    border-radius: 28px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.35);
+}
+
+/* =====================================================
+   MENÚ
+===================================================== */
+
+#menu {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    overflow: hidden;
+    color: white;
+    background:
+        linear-gradient(90deg, rgba(4, 14, 37, .18) 0%, rgba(4, 14, 37, .06) 24%, rgba(4, 14, 37, 0) 48%),
+        url("menu-bg.png");
+    background-size: cover;
+    background-position: 74% center;
+    touch-action: manipulation;
+}
+
+#menu::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 84% 18%, rgba(255,255,255,.12), transparent 16%),
+        radial-gradient(circle at 92% 78%, rgba(255,216,77,.08), transparent 14%);
+    pointer-events: none;
+}
+
+#sidebarMenu {
+    position: absolute;
+    top: 148px;
+    left: 18px;
+    bottom: 18px;
+    width: 235px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 24px;
+    background: rgba(5, 20, 54, .70);
+    border: 1px solid rgba(255,255,255,.16);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 18px 36px rgba(0,0,0,.26);
+    z-index: 2;
+}
+
+#encabezadoMenu {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    z-index: 2;
+    text-align: left;
+    margin: 0;
+    padding: 14px 18px 12px;
+    border-radius: 22px;
+    background: linear-gradient(90deg, rgba(5, 20, 54, .74), rgba(5, 20, 54, .48), rgba(5, 20, 54, .22));
+    border: 1px solid rgba(255,255,255,.14);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 26px rgba(0,0,0,.18);
+}
+
+#tituloMenu {
+    margin: 0;
+    text-align: left;
+    font-size: 34px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .3px;
+    text-shadow: 0 3px 0 rgba(5,20,58,.42), 0 8px 18px rgba(0,0,0,.20);
+}
+
+#subtitulo {
+    display: block;
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.32;
+    font-weight: bold;
+    opacity: .96;
+}
+
+#miniBadges {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.miniBadge {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.16);
+    font-size: 11px;
+    font-weight: bold;
+}
+
+#menuContenido {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: block;
+}
+
+#panelJuego,
+#rankingPanel {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+#panelJuego {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+    z-index: 110;
+}
+
+#panelJuego::before {
+    content: none;
+}
+
+#panelJuego h2 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    text-align: left;
+    line-height: 1.1;
+}
+
+#nombre {
+    width: 100%;
+    height: 40px;
+    border: 2px solid rgba(255,255,255,.42);
+    border-radius: 12px;
+    background: rgba(255,255,255,.97);
+    color: #111;
+    font-size: 14px;
+    text-align: center;
+    padding: 8px 10px;
+    outline: none;
+    position: relative;
+    z-index: 120;
+    touch-action: manipulation;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.08);
+}
+
+#nombre::placeholder {
+    color: #5a6371;
+}
+
+#nombre:focus {
+    border-color: var(--amarillo);
+    box-shadow: 0 0 0 4px rgba(255,216,77,.22);
+}
+
+#tituloNivel {
+    margin: 11px 0 7px;
+    font-size: 13px;
+}
+
+#niveles {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    z-index: 120;
+}
+
+.nivel {
+    width: 100%;
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 2px solid rgba(255,255,255,.28);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(235,244,255,.92));
+    font-weight: 800;
+    font-size: 11px;
+    line-height: 1.15;
+    text-align: left;
+    cursor: pointer;
+    color: #163252;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+    z-index: 121;
+    box-shadow: 0 8px 14px rgba(0,0,0,.14);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.nivel small {
+    display: inline;
+    margin-top: 0;
+    font-size: 10px;
+    font-weight: bold;
+    opacity: .82;
+}
+
+.nivel:active {
+    transform: scale(.97);
+}
+
+.nivel.activo {
+    background: linear-gradient(180deg, #ffe675 0%, #ffd43b 100%);
+    border-color: #fff5b5;
+    box-shadow: 0 0 0 2px rgba(255,216,77,.24), 0 12px 20px rgba(0,0,0,.18);
+}
+
+#botonesMenu {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    margin-top: 11px;
+    position: relative;
+    z-index: 120;
+}
+
+.botonMenu {
+    min-height: 36px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(229,239,253,.96));
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    color: #132741;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+    z-index: 121;
+    box-shadow: 0 8px 14px rgba(0,0,0,.16);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.botonMenu:hover,
+.nivel:hover,
+.control:hover,
+.botonFinal:hover {
+    filter: brightness(1.02);
+}
+
+.botonMenu:active,
+.control:active,
+.botonFinal:active {
+    transform: scale(.97);
+}
+
+#jugar {
+    color: #11213a;
+    background: linear-gradient(180deg, #ffe675 0%, #ffd43b 100%);
+}
+
+#abrirInstrucciones,
+#abrirRanking {
+    background: linear-gradient(180deg, #ffffff 0%, #e6f0ff 100%);
+}
+
+#tipsMenu {
+    display: none !important;
+}
+
+#menuFraseVisual {
+    display: none !important;
+}
+
+#rankingModal {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    z-index: 260;
+    background: rgba(4, 12, 34, .55);
+    backdrop-filter: blur(8px);
+}
+
+#rankingPanel {
+    width: min(460px, 100%);
+    max-height: min(80vh, 620px);
+    padding: 18px;
+    overflow-y: auto;
+}
+
+#rankingCabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+#rankingCabecera h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+#cerrarRanking {
+    min-width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #ffe675 0%, #ffd43b 100%);
+    color: #132741;
+    font-size: 20px;
+    font-weight: 900;
+    box-shadow: 0 10px 18px rgba(0,0,0,.20);
+}
+
+#tipsMenu {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.tipCard {
+    padding: 7px 9px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.12);
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.22;
+}
+
+.tipCard strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 12px;
+}
+
+#rankingPanel {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    position: relative;
+    z-index: 110;
+}
+
+
+.rankingNivel {
+    margin-bottom: 12px;
+    background: rgba(255,255,255,.10);
+    border-radius: 16px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.10);
+}
+
+.rankingNivel h3 {
+    margin: 3px 0 8px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.rankingNivel ol {
+    margin: 0;
+    padding-left: 22px;
+    font-size: 14px;
+}
+
+.rankingNivel li {
+    padding: 6px 2px;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+}
+
+
+
+#panelJuego {
+    box-shadow: 0 18px 45px rgba(0,0,0,.24);
+}
+
+
+/* =====================================================
+   JUEGO
+===================================================== */
+
+#juego {
+    position: absolute;
+    inset: 0;
+    display: none;
+    background: #65b95c;
+    z-index: 150;
+    touch-action: manipulation;
+}
+
+#tituloJuego {
+    position: absolute;
+    top: 5px;
+    width: 100%;
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    z-index: 20;
+}
+
+#pregunta {
+    position: absolute;
+    top: 38px;
+    width: 100%;
+    padding: 7px;
+    background: white;
+    color: #111;
+    text-align: center;
+    font-size: 29px;
+    font-weight: bold;
+    z-index: 20;
+}
+
+#info {
+    position: absolute;
+    top: 88px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 20;
+    padding-right: 110px;
+}
+
+#velocimetro {
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    z-index: 25;
+    width: 116px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+#velocimetroMarco {
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    padding: 6px;
+    background: linear-gradient(145deg, #f6f8fb 0%, #8a96a4 26%, #dce4eb 52%, #555f69 78%, #ffffff 100%);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,.65), inset 0 -4px 6px rgba(0,0,0,.22), 0 10px 22px rgba(0,0,0,.22);
+}
+
+#velocimetroDial {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 38%, #37404c 0%, #121820 55%, #05070a 100%);
+    border: 2px solid rgba(255,255,255,.10);
+}
+
+.marcaVelocimetro {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2px;
+    height: 10px;
+    margin-left: -1px;
+    margin-top: -43px;
+    transform-origin: center 43px;
+    background: linear-gradient(180deg, #e9eef5 0%, #c9d3dd 100%);
+    border-radius: 999px;
+    opacity: .95;
+}
+
+.marcaVelocimetro.mediana {
+    width: 3px;
+    height: 13px;
+    margin-left: -1.5px;
+    margin-top: -46px;
+    transform-origin: center 46px;
+}
+
+.marcaVelocimetro.grande {
+    width: 4px;
+    height: 18px;
+    margin-left: -2px;
+    margin-top: -49px;
+    transform-origin: center 49px;
+    background: linear-gradient(180deg, #ffd84d 0%, #fff0ad 100%);
+}
+
+#agujaVelocimetro {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 37px;
+    margin-left: -2px;
+    margin-top: -33px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ff7272 0%, #ff1f1f 100%);
+    box-shadow: 0 0 8px rgba(255,90,90,.55);
+    transform-origin: center 33px;
+    transform: rotate(-120deg);
+    z-index: 4;
+}
+
+#agujaVelocimetro::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 13px;
+    height: 13px;
+    margin-left: -6.5px;
+    border-radius: 50%;
+    background: #d6dee6;
+    border: 2px solid #121922;
+    box-shadow: 0 0 0 2px rgba(255,255,255,.12);
+}
+
+#velocimetroCentro {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2d3440 0%, #181d25 62%, #0c1015 100%);
+    border: 2px solid rgba(255,255,255,.14);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 3;
+}
+
+#velocimetroValor {
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+#velocimetroUnidad {
+    font-size: 8px;
+    font-weight: bold;
+    opacity: .82;
+    letter-spacing: .5px;
+}
+
+#velocimetroEtiquetas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.etiquetaVelocimetro {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 900;
+    color: #ffe891;
+    text-shadow: 0 1px 4px rgba(0,0,0,.55);
+}
+
+.etiquetaVelocimetro.e0 { left: 12px; top: 67px; }
+.etiquetaVelocimetro.e1 { left: 12px; top: 30px; }
+.etiquetaVelocimetro.e2 { left: 44px; top: 12px; }
+.etiquetaVelocimetro.e3 { right: 12px; top: 30px; }
+.etiquetaVelocimetro.e4 { right: 8px; top: 67px; }
+
+#velocimetroPanelInferior {
+    width: 100%;
+    padding: 6px 8px 7px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(12,19,28,.96) 0%, rgba(27,38,52,.96) 100%);
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 8px 16px rgba(0,0,0,.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+#velocimetroTexto {
+    color: #d7e3ef;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+#velocimetroDigital {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    color: #9dff9d;
+    text-shadow: 0 0 8px rgba(114,255,114,.28);
+}
+
+#velocimetroValorMini {
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+#velocimetroUnidadMini {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .4px;
+}
+
+#carretera {
+    position: absolute;
+    top: 120px;
+    left: 10%;
+    width: 80%;
+    bottom: 0;
+    background: #444;
+    border-left: 8px solid white;
+    border-right: 8px solid white;
+    overflow: hidden;
+    z-index: 5;
+}
+
+.linea {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            white 0px,
+            white 60px,
+            transparent 60px,
+            transparent 120px
+        );
+    animation: moverLinea .6s linear infinite;
+    pointer-events: none;
+}
+
+#linea1 { left: 33.33%; }
+#linea2 { left: 66.66%; }
+
+@keyframes moverLinea {
+    from { background-position-y: 0; }
+    to { background-position-y: 120px; }
+}
+
+.respuesta {
+    position: absolute;
+    top: 12px;
+    width: 27%;
+    height: 65px;
+    background: white;
+    border: 4px solid #222;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #111;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#respuesta1 { left: 3%; }
+#respuesta2 { left: 36.5%; }
+#respuesta3 { left: 70%; }
+
+#auto {
+    position: absolute;
+    width: 72px;
+    height: 122px;
+    transform: translateX(-50%);
+    z-index: 15;
+    transition: left .12s, top .05s linear;
+    pointer-events: none;
+}
+
+#autoSprite {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 8px 10px rgba(0,0,0,.22));
+}
+
+
+#controles {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 30;
+}
+
+.control {
+    width: 80px;
+    height: 55px;
+    border: 3px solid #222;
+    border-radius: 12px;
+    background: white;
+    color: #111;
+    font-size: 27px;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#menuJuego {
+    width: 105px;
+    font-size: 14px;
+}
+
+#izquierda,
+#derecha,
+#frenar {
+    touch-action: manipulation;
+}
+
+#frenar {
+    background: linear-gradient(180deg, #d8f0ff 0%, #ffffff 100%);
+}
+
+#final {
+    position: absolute;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255,255,255,.97);
+    text-align: center;
+    color: #111;
+    padding: 20px;
+}
+
+#resultadoTitulo {
+    font-size: 45px;
+    margin: 10px;
+}
+
+#resultadoTexto {
+    font-size: 22px;
+}
+
+.botonFinal {
+    width: 240px;
+    height: 52px;
+    margin: 6px;
+    border: none;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+#otroJugador {
+    background: #222;
+    color: white;
+}
+
+#volverMenu {
+    background: #65b95c;
+    color: white;
+}
+
+#configuracion {
+    position: absolute;
+    inset: 0;
+    z-index: 300;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 25px;
+    background:
+        linear-gradient(
+            #87ceeb,
+            #65b95c
+        );
+    color: #111;
+    overflow-y: auto;
+    touch-action: manipulation;
+}
+
+#configuracion p {
+    max-width: 700px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#configPreviewWrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 14px 0 18px;
+}
+
+#autoPreview {
+    width: 96px;
+    height: 156px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#autoPreviewSprite {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 8px 10px rgba(0,0,0,.22));
+}
+
+.configBloque {
+    width: min(760px, 100%);
+    margin-top: 8px;
+}
+
+.configBloque h3 {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+.configOpciones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.botonAutoReal {
+    min-height: 170px;
+    padding: 10px;
+    border: 2px solid #c8d2e3;
+    border-radius: 16px;
+    background: rgba(255,255,255,.95);
+    color: #132741;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.botonAutoReal img {
+    width: 72px;
+    height: 118px;
+    object-fit: contain;
+    display: block;
+}
+
+.botonAutoReal.activo {
+    background: #ffe675;
+    border-color: #f0c933;
+    box-shadow: 0 0 0 3px rgba(255,216,77,.25);
+}
+
+.botonAutoReal small {
+    display: block;
+    font-size: 12px;
+    opacity: .86;
+}
+
+#cerrarConfiguracion {
+    margin-top: 16px;
+}
+
+.configAudio {
+    width: min(560px, 100%);
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.22);
+    border: 1px solid rgba(255,255,255,.30);
+    backdrop-filter: blur(8px);
+}
+
+.configAudio h3 {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+.audioAyuda {
+    margin: -3px 0 10px;
+    font-size: 12px;
+    font-weight: 700;
+    opacity: .75;
+}
+
+.audioOpciones {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.audioToggle {
+    min-height: 48px;
+    border: 2px solid rgba(23,50,82,.20);
+    border-radius: 14px;
+    background: rgba(255,255,255,.95);
+    color: #173252;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    box-shadow: 0 8px 14px rgba(0,0,0,.10);
+}
+
+.audioToggle .estadoAudio {
+    min-width: 48px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #43a047;
+    color: white;
+    font-size: 11px;
+    letter-spacing: .4px;
+}
+
+.audioToggle.apagado .estadoAudio {
+    background: #9aa4b2;
+}
+
+.audioToggle:active {
+    transform: scale(.98);
+}
+
+
+
+/* =====================================================
+   CELULAR
+===================================================== */
+
+@media (max-width: 700px) {
+    body {
+        align-items: stretch;
+    }
+
+    #app {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    #menu {
+        padding: 0;
+        background-position: 70% center;
+    }
+
+    #encabezadoMenu {
+        top: max(10px, env(safe-area-inset-top));
+        left: 10px;
+        right: 10px;
+        padding: 12px;
+        text-align: center;
+        border-radius: 18px;
+        background: linear-gradient(90deg, rgba(5, 20, 54, .78), rgba(5, 20, 54, .52));
+    }
+
+    #sidebarMenu {
+        top: calc(max(10px, env(safe-area-inset-top)) + 132px);
+        left: 10px;
+        width: 210px;
+        right: auto;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        gap: 10px;
+        padding: 12px;
+        border-radius: 18px;
+    }
+
+    #tituloMenu {
+        text-align: center;
+        font-size: 28px;
+        line-height: 1.04;
+    }
+
+    #subtitulo {
+        margin-top: 8px;
+        font-size: 12px;
+    }
+
+    #miniBadges {
+        justify-content: center;
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .miniBadge {
+        padding: 6px 9px;
+        font-size: 11px;
+    }
+
+    #menuContenido {
+        width: 100%;
+        max-width: 100%;
+        display: block;
+        flex: 1;
+    }
+
+    #panelJuego {
+        width: 100%;
+        height: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    #panelJuego h2 {
+        text-align: center;
+        font-size: 18px;
+        margin: 0 0 10px;
+    }
+
+    #nombre {
+        width: 100%;
+        height: 48px;
+        font-size: 17px;
+    }
+
+    #tituloNivel {
+        font-size: 15px;
+        margin: 10px 0 6px;
+    }
+
+    #niveles {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .nivel {
+        min-height: 38px;
+        font-size: 10px;
+        border-width: 2px;
+        padding: 6px 8px;
+        border-radius: 14px;
+        justify-content: flex-start;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .nivel small {
+        display: inline;
+        font-size: 10px;
+        margin-top: 0;
+    }
+
+    #botonesMenu {
+        grid-template-columns: 1fr;
+        margin-top: 10px;
+        gap: 8px;
+    }
+
+    .botonMenu {
+        min-height: 46px;
+        font-size: 13px;
+        border-radius: 14px;
+    }
+
+    #tipsMenu {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    #menuFraseVisual {
+        display: none;
+    }
+
+    .tipCard {
+        padding: 8px 6px;
+        font-size: 10px;
+        border-radius: 12px;
+    }
+
+    .tipCard strong {
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    #ranking {
+        border-radius: 18px;
+        padding: 8px;
+    }
+
+    #rankingPanel h2 {
+        font-size: 18px;
+        margin-bottom: 6px;
+        padding-bottom: 6px;
+    }
+
+    .rankingNivel {
+        margin-bottom: 6px;
+        padding: 6px;
+        border-radius: 12px;
+    }
+
+    .rankingNivel h3 {
+        font-size: 12px;
+        margin: 2px;
+    }
+
+    .rankingNivel ol {
+        font-size: 10px;
+        padding-left: 20px;
+    }
+
+    .rankingNivel li {
+        padding: 2px 1px;
+    }
+
+    #tituloJuego {
+        font-size: 19px;
+        top: 4px;
+    }
+
+    #pregunta {
+        top: 29px;
+        font-size: 22px;
+        padding: 5px;
+    }
+
+    #info {
+        top: 64px;
+        font-size: 13px;
+        padding-right: 88px;
+    }
+
+    #velocimetro {
+        top: 50px;
+        right: 4px;
+        width: 86px;
+        gap: 4px;
+    }
+
+    #velocimetroMarco {
+        width: 78px;
+        height: 78px;
+        padding: 5px;
+    }
+
+    .marcaVelocimetro {
+        height: 7px;
+        margin-top: -31px;
+        transform-origin: center 31px;
+    }
+
+    .marcaVelocimetro.mediana {
+        height: 9px;
+        margin-top: -33px;
+        transform-origin: center 33px;
+    }
+
+    .marcaVelocimetro.grande {
+        height: 12px;
+        margin-top: -35px;
+        transform-origin: center 35px;
+    }
+
+    #agujaVelocimetro {
+        width: 3px;
+        height: 27px;
+        margin-left: -1.5px;
+        margin-top: -24px;
+        transform-origin: center 24px;
+    }
+
+    #agujaVelocimetro::after {
+        width: 10px;
+        height: 10px;
+        margin-left: -5px;
+    }
+
+    #velocimetroCentro {
+        width: 34px;
+        height: 34px;
+        border-width: 2px;
+    }
+
+    #velocimetroValor {
+        font-size: 11px;
+    }
+
+    #velocimetroUnidad {
+        font-size: 6px;
+    }
+
+    .etiquetaVelocimetro {
+        font-size: 7px;
+    }
+
+    .etiquetaVelocimetro.e0 { left: 8px; top: 49px; }
+    .etiquetaVelocimetro.e1 { left: 8px; top: 22px; }
+    .etiquetaVelocimetro.e2 { left: 31px; top: 8px; }
+    .etiquetaVelocimetro.e3 { right: 8px; top: 22px; }
+    .etiquetaVelocimetro.e4 { right: 5px; top: 49px; }
+
+    #velocimetroPanelInferior {
+        padding: 4px 6px 5px;
+        border-radius: 10px;
+    }
+
+    #velocimetroTexto {
+        font-size: 7px;
+    }
+
+    #velocimetroValorMini {
+        font-size: 12px;
+    }
+
+    #velocimetroUnidadMini {
+        font-size: 6px;
+    }
+
+    #carretera {
+        top: 90px;
+        left: 3%;
+        width: 94%;
+        border-left-width: 5px;
+        border-right-width: 5px;
+    }
+
+    .respuesta {
+        height: 53px;
+        font-size: 22px;
+        border-width: 3px;
+    }
+
+    #auto {
+        transform: translateX(-50%) scale(.75);
+    }
+
+    #controles {
+        left: 0;
+        right: 0;
+        bottom: max(8px, env(safe-area-inset-bottom));
+        width: 100%;
+        height: 112px;
+        pointer-events: none;
+    }
+
+    .control {
+        width: 78px;
+        height: 54px;
+        font-size: 25px;
+        pointer-events: auto;
+    }
+
+    #izquierda {
+        position: absolute;
+        left: 10px;
+        bottom: 0;
+    }
+
+    #derecha {
+        position: absolute;
+        right: 10px;
+        bottom: 0;
+    }
+
+    #frenar {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 58px;
+        width: 70px;
+        height: 46px;
+        font-size: 22px;
+    }
+
+    #menuJuego {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        width: 92px;
+        font-size: 12px;
+        pointer-events: auto;
+    }
+
+    body.juego-horizontal-movil #app {
+        width: 100vw;
+        height: 100dvh;
+        overflow: visible;
+    }
+
+    body.juego-horizontal-movil #juego {
+        position: fixed !important;
+        top: 50%;
+        left: 50%;
+        width: 100dvh;
+        height: 100vw;
+        transform: translate(-50%, -50%) rotate(90deg);
+        transform-origin: center center;
+        z-index: 500;
+    }
+
+    body.juego-horizontal-movil #final {
+        z-index: 600;
+    }
+
+    #resultadoTitulo {
+        font-size: 35px;
+    }
+
+    #resultadoTexto {
+        font-size: 19px;
+    }
+
+    .configBloque h3 {
+        font-size: 17px;
+    }
+
+    .configOpciones {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .botonAutoReal {
+        min-height: 110px;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        text-align: left;
+    }
+
+    .botonAutoReal img {
+        width: 54px;
+        height: 86px;
+        flex: 0 0 auto;
+    }
+
+    #autoPreview {
+        width: 82px;
+        height: 132px;
+    }
+
+    .configAudio {
+        padding: 10px;
+    }
+
+    .configAudio h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .audioOpciones {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .audioToggle {
+        min-height: 42px;
+        font-size: 13px;
+    }
+}
+
+
+
+@media (orientation: landscape) and (max-height: 500px) {
+    body {
+        align-items: stretch;
+    }
+
+    #app {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* menú compacto lateral para horizontal en celular */
+    #menu {
+        background-position: 72% center;
+    }
+
+    #encabezadoMenu {
+        top: max(6px, env(safe-area-inset-top));
+        left: 8px;
+        right: 8px;
+        padding: 9px 12px 8px;
+        border-radius: 14px;
+    }
+
+    #tituloMenu {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    #subtitulo {
+        display: none;
+    }
+
+    #miniBadges {
+        justify-content: center;
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .miniBadge {
+        padding: 4px 7px;
+        font-size: 9px;
+    }
+
+    #sidebarMenu {
+        top: calc(max(6px, env(safe-area-inset-top)) + 82px);
+        left: 8px;
+        bottom: max(6px, env(safe-area-inset-bottom));
+        width: 188px;
+        gap: 7px;
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    #panelJuego h2 {
+        font-size: 16px;
+        margin: 0 0 8px;
+        text-align: center;
+    }
+
+    #nombre {
+        height: 36px;
+        font-size: 13px;
+    }
+
+    #tituloNivel {
+        margin: 6px 0;
+        font-size: 12px;
+    }
+
+    #niveles {
+        gap: 5px;
+    }
+
+    .nivel {
+        min-height: 32px;
+        padding: 4px 8px;
+        font-size: 10px;
+        border-radius: 10px;
+    }
+
+    .nivel small {
+        font-size: 9px;
+    }
+
+    #botonesMenu {
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .botonMenu {
+        min-height: 33px;
+        font-size: 11px;
+        border-radius: 10px;
+    }
+
+    /* juego compacto en horizontal */
+    #tituloJuego {
+        top: 2px;
+        font-size: 16px;
+    }
+
+    #pregunta {
+        top: 20px;
+        padding: 4px;
+        font-size: 21px;
+    }
+
+    #info {
+        top: 50px;
+        font-size: 11px;
+        padding-right: 82px;
+    }
+
+    #velocimetro {
+        top: 40px;
+        right: 4px;
+        width: 78px;
+        gap: 4px;
+    }
+
+    #velocimetroMarco {
+        width: 72px;
+        height: 72px;
+        padding: 4px;
+    }
+
+    .marcaVelocimetro {
+        height: 7px;
+        margin-top: -29px;
+        transform-origin: center 29px;
+    }
+
+    .marcaVelocimetro.mediana {
+        height: 9px;
+        margin-top: -31px;
+        transform-origin: center 31px;
+    }
+
+    .marcaVelocimetro.grande {
+        height: 11px;
+        margin-top: -33px;
+        transform-origin: center 33px;
+    }
+
+    #agujaVelocimetro {
+        width: 3px;
+        height: 24px;
+        margin-left: -1.5px;
+        margin-top: -21px;
+        transform-origin: center 21px;
+    }
+
+    #agujaVelocimetro::after {
+        width: 9px;
+        height: 9px;
+        margin-left: -4.5px;
+    }
+
+    #velocimetroCentro {
+        width: 31px;
+        height: 31px;
+    }
+
+    #velocimetroValor {
+        font-size: 10px;
+    }
+
+    #velocimetroUnidad {
+        font-size: 5px;
+    }
+
+    .etiquetaVelocimetro {
+        font-size: 6px;
+    }
+
+    .etiquetaVelocimetro.e0 { left: 8px; top: 45px; }
+    .etiquetaVelocimetro.e1 { left: 8px; top: 20px; }
+    .etiquetaVelocimetro.e2 { left: 28px; top: 8px; }
+    .etiquetaVelocimetro.e3 { right: 8px; top: 20px; }
+    .etiquetaVelocimetro.e4 { right: 5px; top: 45px; }
+
+    #velocimetroPanelInferior {
+        padding: 3px 5px 4px;
+        border-radius: 9px;
+    }
+
+    #velocimetroTexto {
+        font-size: 6px;
+    }
+
+    #velocimetroValorMini {
+        font-size: 11px;
+    }
+
+    #velocimetroUnidadMini {
+        font-size: 5px;
+    }
+
+    #carretera {
+        top: 72px;
+        left: 2%;
+        width: 96%;
+        border-left-width: 4px;
+        border-right-width: 4px;
+    }
+
+    .respuesta {
+        height: 45px;
+        font-size: 18px;
+        border-width: 3px;
+    }
+
+    #auto {
+        transform: translateX(-50%) scale(.68);
+    }
+
+    #controles {
+        left: 50%;
+        right: auto;
+        bottom: max(6px, env(safe-area-inset-bottom));
+        width: auto;
+        height: auto;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        pointer-events: none;
+    }
+
+    .control {
+        width: 62px;
+        height: 40px;
+        font-size: 20px;
+        pointer-events: auto;
+    }
+
+    #izquierda,
+    #derecha,
+    #frenar,
+    #menuJuego {
+        position: static;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        transform: none;
+    }
+
+    #menuJuego {
+        width: 76px;
+        font-size: 10px;
+        line-height: 1.05;
+    }
+
+    #frenar {
+        width: 56px;
+        font-size: 18px;
+    }
+
+    #resultadoTitulo {
+        font-size: 28px;
+    }
+
+    #resultadoTexto {
+        font-size: 15px;
+    }
+
+    .botonFinal {
+        min-width: 0;
+        width: 90%;
+        max-width: 260px;
+        min-height: 46px;
+        font-size: 16px;
+    }
+}
+
+@media (max-height: 600px) and (max-width: 700px) {
+    #tituloMenu {
+        font-size: 24px;
+    }
+
+    #encabezadoMenu {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    #subtitulo {
+        display: none;
+    }
+
+    #miniBadges {
+        margin-top: 4px;
+    }
+
+    #panelJuego h2 {
+        font-size: 17px;
+    }
+
+    #nombre {
+        height: 42px;
+    }
+
+    #tituloNivel {
+        margin: 6px 0;
+    }
+
+    .nivel {
+        min-height: 42px;
+    }
+
+    #tipsMenu {
+        display: none;
+    }
+
+    #botonesMenu {
+        margin-top: 7px;
+    }
+
+    .botonMenu {
+        min-height: 40px;
+    }
+}
+
+button {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+    cursor: pointer;
+}
+
+button,
+input {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+
+<div id="app">
+
+
+<!-- ==================================================
+     MENU PRINCIPAL
+================================================== -->
+
+
+<section id="menu">
+
+    <div id="encabezadoMenu">
+        <h1 id="tituloMenu">
+            🏁 MATH RACE 🏁
+        </h1>
+
+        <div id="subtitulo">
+            ¡Resolvé las cuentas y llegá primero a la meta!
+        </div>
+
+        <div id="miniBadges">
+            <span class="miniBadge">🚗 Velocidad + cálculo</span>
+            <span class="miniBadge">⭐ 3 niveles</span>
+            <span class="miniBadge">🏆 Ranking guardado</span>
+        </div>
+    </div>
+
+    <div id="sidebarMenu">
+
+    <div id="menuContenido">
+
+        <div id="panelJuego">
+
+            <h2>
+                🚦 Prepará tu carrera
+            </h2>
+
+            <input
+                id="nombre"
+                type="text"
+                maxlength="15"
+                placeholder="✏️ Escribí tu nombre"
+                autocomplete="off"
+                autocapitalize="words"
+                spellcheck="false"
+            >
+
+            <h3 id="tituloNivel">
+                🎯 Elegí el nivel
+            </h3>
+
+            <div id="niveles">
+
+                <button
+                    class="nivel activo"
+                    data-nivel="1"
+                    type="button"
+                    onclick="seleccionarNivel(1, this)">
+
+                    NIVEL 1 - <small>Fácil</small>
+
+                </button>
+
+                <button
+                    class="nivel"
+                    data-nivel="2"
+                    type="button"
+                    onclick="seleccionarNivel(2, this)">
+
+                    NIVEL 2 - <small>Medio</small>
+
+                </button>
+
+                <button
+                    class="nivel"
+                    data-nivel="3"
+                    type="button"
+                    onclick="seleccionarNivel(3, this)">
+
+                    NIVEL 3 - <small>Difícil</small>
+
+                </button>
+
+            </div>
+
+            <div id="botonesMenu">
+
+                <button
+                    id="jugar"
+                    class="botonMenu"
+                    type="button"
+                    onclick="comenzarJuego()">
+
+                    🚗 JUGAR
+
+                </button>
+
+                <button
+                    id="abrirConfiguracion"
+                    class="botonMenu"
+                    type="button"
+                    onclick="abrirConfiguracion()">
+
+                    ⚙️ CONFIGURACIÓN
+
+                </button>
+
+                <button
+                    id="abrirRanking"
+                    class="botonMenu"
+                    type="button"
+                    onclick="abrirRanking()">
+
+                    🏆 RANKING
+
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+</section>
+
+<section id="rankingModal">
+    <div id="rankingPanel">
+
+        <div id="rankingCabecera">
+            <h2>🏆 Rankings</h2>
+            <button id="cerrarRanking" type="button" onclick="cerrarRanking()">✕</button>
+        </div>
+
+        <div class="rankingNivel">
+            <h3>🥇 NIVEL 1</h3>
+            <ol id="ranking1"></ol>
+        </div>
+
+        <div class="rankingNivel">
+            <h3>🥈 NIVEL 2</h3>
+            <ol id="ranking2"></ol>
+        </div>
+
+        <div class="rankingNivel">
+            <h3>🥉 NIVEL 3</h3>
+            <ol id="ranking3"></ol>
+        </div>
+
+    </div>
+</section>
+
+
+
+<!-- ==================================================
+     CONFIGURACIÓN
+================================================== -->
+
+<section id="configuracion">
+
+    <h2>
+        ⚙️ CONFIGURACIÓN DEL AUTO
+    </h2>
+
+    <p>
+        Elegí uno de estos autos animados para usar en la carrera.
+    </p>
+
+    <div id="configPreviewWrap">
+        <div id="autoPreview">
+            <img id="autoPreviewSprite" src="car-classic.png" alt="Vista previa del auto seleccionado">
+        </div>
+    </div>
+
+    <div class="configBloque">
+        <h3>🚘 Elegí tu auto</h3>
+        <div class="configOpciones" id="opcionesAutos">
+            <button class="botonAutoReal activo" type="button" data-auto="clasico" onclick="seleccionarAuto('clasico', this)">
+                <img src="car-classic.png" alt="Auto clásico rojo">
+                <span>Clásico</span>
+                <small>Rojo</small>
+            </button>
+            <button class="botonAutoReal" type="button" data-auto="deportivo" onclick="seleccionarAuto('deportivo', this)">
+                <img src="car-sport.png" alt="Auto deportivo azul">
+                <span>Deportivo</span>
+                <small>Azul</small>
+            </button>
+            <button class="botonAutoReal" type="button" data-auto="pickup" onclick="seleccionarAuto('pickup', this)">
+                <img src="car-pickup.png" alt="Camioneta pickup verde">
+                <span>Pickup</span>
+                <small>Verde</small>
+            </button>
+        </div>
+    </div>
+
+
+
+    <div class="configAudio">
+        <h3>🎧 Audio</h3>
+        <div class="audioAyuda">La música cambia entre el menú y la carrera.</div>
+        <div class="audioOpciones">
+            <button id="toggleMusica" class="audioToggle" type="button" onclick="alternarMusica()">
+                <span>🎵 Música</span>
+                <span class="estadoAudio">ON</span>
+            </button>
+
+            <button id="toggleSonidos" class="audioToggle" type="button" onclick="alternarSonidos()">
+                <span>🔊 Sonidos + motor</span>
+                <span class="estadoAudio">ON</span>
+            </button>
+        </div>
+    </div>
+
+    <button
+        id="cerrarConfiguracion"
+        class="botonFinal"
+        type="button"
+        onclick="cerrarConfiguracion()">
+
+        ✅ GUARDAR
+
+    </button>
+
+</section>
+
+
+<!-- ==================================================
+     JUEGO
+================================================== -->
+
+<section id="juego">
+
+    <div id="tituloJuego">
+        🚗 MATH RACE 🏁
+    </div>
+
+
+    <div id="pregunta">
+        Preparados...
+    </div>
+
+
+    <div id="info">
+
+        <span>
+            ⭐ <span id="puntos">0</span>
+        </span>
+
+        <span>
+            ❤️ <span id="vidas">3</span>
+        </span>
+
+        <span>
+            🏆 Nivel
+            <span id="nivelActual">1</span>
+        </span>
+
+    </div>
+
+    <div id="velocimetro">
+        <div id="velocimetroMarco">
+            <div id="velocimetroDial">
+                <div class="marcaVelocimetro grande" style="transform: rotate(-120deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(-105deg);"></div>
+                <div class="marcaVelocimetro mediana" style="transform: rotate(-90deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(-75deg);"></div>
+                <div class="marcaVelocimetro grande" style="transform: rotate(-60deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(-45deg);"></div>
+                <div class="marcaVelocimetro mediana" style="transform: rotate(-30deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(-15deg);"></div>
+                <div class="marcaVelocimetro grande" style="transform: rotate(0deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(15deg);"></div>
+                <div class="marcaVelocimetro mediana" style="transform: rotate(30deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(45deg);"></div>
+                <div class="marcaVelocimetro grande" style="transform: rotate(60deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(75deg);"></div>
+                <div class="marcaVelocimetro mediana" style="transform: rotate(90deg);"></div>
+                <div class="marcaVelocimetro" style="transform: rotate(105deg);"></div>
+                <div class="marcaVelocimetro grande" style="transform: rotate(120deg);"></div>
+
+                <div id="velocimetroEtiquetas">
+                    <span class="etiquetaVelocimetro e0">0</span>
+                    <span class="etiquetaVelocimetro e1">30</span>
+                    <span class="etiquetaVelocimetro e2">60</span>
+                    <span class="etiquetaVelocimetro e3">90</span>
+                    <span class="etiquetaVelocimetro e4">120</span>
+                </div>
+
+                <div id="agujaVelocimetro"></div>
+
+                <div id="velocimetroCentro">
+                    <div id="velocimetroValor">90</div>
+                    <div id="velocimetroUnidad">KM/H</div>
+                </div>
+            </div>
+        </div>
+        <div id="velocimetroPanelInferior">
+            <div id="velocimetroTexto">VELOCIDAD</div>
+            <div id="velocimetroDigital">
+                <span id="velocimetroValorMini">90</span>
+                <span id="velocimetroUnidadMini">km/h</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="carretera">
+
+        <div
+            class="linea"
+            id="linea1">
+        </div>
+
+        <div
+            class="linea"
+            id="linea2">
+        </div>
+
+
+        <div
+            class="respuesta"
+            id="respuesta1">
+            0
+        </div>
+
+
+        <div
+            class="respuesta"
+            id="respuesta2">
+            0
+        </div>
+
+
+        <div
+            class="respuesta"
+            id="respuesta3">
+            0
+        </div>
+
+
+        <div id="auto">
+            <img id="autoSprite" src="car-classic.png" alt="Auto del jugador">
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLES -->
+
+    <div id="controles">
+
+        <button
+            id="izquierda"
+            class="control"
+            type="button"
+            onclick="moverIzquierda()">
+
+            ⬅️
+
+        </button>
+
+
+        <button
+            id="derecha"
+            class="control"
+            type="button"
+            onclick="moverDerecha()">
+
+            ➡️
+
+        </button>
+
+
+        <button
+            id="frenar"
+            class="control"
+            type="button"
+            onmousedown="empezarFrenar()"
+            onmouseup="dejarFrenar()"
+            onmouseleave="dejarFrenar()"
+            ontouchstart="empezarFrenar()"
+            ontouchend="dejarFrenar()"
+            ontouchcancel="dejarFrenar()">
+
+            ⬇️
+
+        </button>
+
+
+        <button
+            id="menuJuego"
+            class="control"
+            type="button"
+            onclick="volverMenuPrincipal()">
+
+            🏠 Menú
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     PANTALLA FINAL
+================================================== -->
+
+<section id="final">
+
+    <h2 id="resultadoTitulo">
+        🏆 ¡GANASTE!
+    </h2>
+
+
+    <p id="resultadoTexto">
+        Jugador
+    </p>
+
+
+    <p>
+
+        ⭐ Puntos:
+
+        <strong id="puntosFinales">
+            0
+        </strong>
+
+    </p>
+
+
+    <button
+        id="otroJugador"
+        class="botonFinal"
+        type="button"
+        onclick="otroJugador()">
+
+        👤 OTRO JUGADOR
+
+    </button>
+
+
+    <button
+        id="volverMenu"
+        class="botonFinal"
+        type="button"
+        onclick="volverMenuPrincipal()">
+
+        🏠 MENÚ
+
+    </button>
+
+</section>
+
+
+</div>
+
+
+<script>
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let nombreJugador = "";
+
+let nivel = 1;
+
+let puntos = 0;
+
+let vidas = 3;
+
+let posicion = 2;
+
+let posicionY = 300;
+
+let jugando = false;
+
+let animacion = null;
+
+let respuestaCorrecta = 0;
+
+let respuestas = [0, 0, 0];
+
+let autoSeleccionado = "clasico";
+
+let frenando = false;
+
+let velocidadBase = 1.8;
+
+let velocidadActual = 1.8;
+
+let musicaActiva = true;
+let sonidosActivos = true;
+let audioContexto = null;
+let musicaIntervalo = null;
+let pasoMusica = 0;
+let modoMusica = null;
+let audioDesbloqueado = false;
+
+let motorOscilador1 = null;
+let motorOscilador2 = null;
+let motorOscilador3 = null;
+let motorGanancia = null;
+let motorFiltro = null;
+let motorLfo = null;
+let motorLfoGanancia = null;
+
+const autosDisponibles = {
+    clasico: "car-classic.png",
+    deportivo: "car-sport.png",
+    pickup: "car-pickup.png"
+};
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const menu =
+    document.getElementById("menu");
+
+const juego =
+    document.getElementById("juego");
+
+const final =
+    document.getElementById("final");
+
+const rankingModal =
+    document.getElementById("rankingModal");
+
+const configuracion =
+    document.getElementById("configuracion");
+
+const toggleMusica =
+    document.getElementById("toggleMusica");
+
+const toggleSonidos =
+    document.getElementById("toggleSonidos");
+
+const nombre =
+    document.getElementById("nombre");
+
+const auto =
+    document.getElementById("auto");
+
+const autoSprite =
+    document.getElementById("autoSprite");
+
+const autoPreview =
+    document.getElementById("autoPreview");
+
+const autoPreviewSprite =
+    document.getElementById("autoPreviewSprite");
+
+const velocimetro =
+    document.getElementById("velocimetro");
+
+const velocimetroValor =
+    document.getElementById("velocimetroValor");
+
+const velocimetroValorMini =
+    document.getElementById("velocimetroValorMini");
+
+const agujaVelocimetro =
+    document.getElementById("agujaVelocimetro");
+
+const pregunta =
+    document.getElementById("pregunta");
+
+const puntosTexto =
+    document.getElementById("puntos");
+
+const vidasTexto =
+    document.getElementById("vidas");
+
+const nivelTexto =
+    document.getElementById("nivelActual");
+
+const puntosFinales =
+    document.getElementById("puntosFinales");
+
+const resultadoTitulo =
+    document.getElementById("resultadoTitulo");
+
+const resultadoTexto =
+    document.getElementById("resultadoTexto");
+
+const ranking1 =
+    document.getElementById("ranking1");
+
+const ranking2 =
+    document.getElementById("ranking2");
+
+const ranking3 =
+    document.getElementById("ranking3");
+
+
+/* =====================================================
+   CARRILES
+===================================================== */
+
+const carriles = {
+
+    1: 17,
+
+    2: 50,
+
+    3: 83
+
+};
+
+
+/* =====================================================
+   AUDIO
+===================================================== */
+
+function cargarPreferenciasAudio() {
+    try {
+        const musicaGuardada = localStorage.getItem("mathRaceMusica");
+        const sonidosGuardados = localStorage.getItem("mathRaceSonidos");
+
+        if (musicaGuardada !== null) {
+            musicaActiva = musicaGuardada === "true";
+        }
+
+        if (sonidosGuardados !== null) {
+            sonidosActivos = sonidosGuardados === "true";
+        }
+    }
+    catch (error) {
+        // Si localStorage no está disponible, se usan los valores por defecto.
+    }
+
+    actualizarBotonesAudio();
+}
+
+function guardarPreferenciasAudio() {
+    try {
+        localStorage.setItem("mathRaceMusica", String(musicaActiva));
+        localStorage.setItem("mathRaceSonidos", String(sonidosActivos));
+    }
+    catch (error) {
+        // No es crítico si el navegador bloquea el almacenamiento.
+    }
+}
+
+function actualizarBotonesAudio() {
+    if (toggleMusica) {
+        toggleMusica.classList.toggle("apagado", !musicaActiva);
+        const estado = toggleMusica.querySelector(".estadoAudio");
+        if (estado) estado.textContent = musicaActiva ? "ON" : "OFF";
+    }
+
+    if (toggleSonidos) {
+        toggleSonidos.classList.toggle("apagado", !sonidosActivos);
+        const estado = toggleSonidos.querySelector(".estadoAudio");
+        if (estado) estado.textContent = sonidosActivos ? "ON" : "OFF";
+    }
+}
+
+function obtenerAudioContexto() {
+    if (!audioContexto) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        audioContexto = new AudioCtx();
+    }
+
+    if (audioContexto.state === "suspended") {
+        audioContexto.resume().catch(function() {});
+    }
+
+    return audioContexto;
+}
+
+function tocarNota(frecuencia, duracion, volumen, tipo, retraso) {
+    const ctx = obtenerAudioContexto();
+    if (!ctx) return;
+
+    const inicio = ctx.currentTime + (retraso || 0);
+    const fin = inicio + duracion;
+    const oscilador = ctx.createOscillator();
+    const ganancia = ctx.createGain();
+
+    oscilador.type = tipo || "sine";
+    oscilador.frequency.setValueAtTime(frecuencia, inicio);
+
+    ganancia.gain.setValueAtTime(0.0001, inicio);
+    ganancia.gain.exponentialRampToValueAtTime(Math.max(0.0001, volumen), inicio + 0.02);
+    ganancia.gain.exponentialRampToValueAtTime(0.0001, fin);
+
+    oscilador.connect(ganancia);
+    ganancia.connect(ctx.destination);
+
+    oscilador.start(inicio);
+    oscilador.stop(fin + 0.03);
+}
+
+function tocarPasoMusical() {
+    if (!musicaActiva || !audioDesbloqueado) return;
+
+    if (modoMusica === "menu") {
+        // Melodía más tranquila y alegre para el menú.
+        const notasMenu = [
+            523.25, 659.25, 783.99, 659.25,
+            587.33, 698.46, 880.00, 698.46,
+            523.25, 659.25, 783.99, 987.77,
+            880.00, 783.99, 698.46, 659.25
+        ];
+
+        const bajosMenu = [130.81, 146.83, 164.81, 174.61];
+
+        const nota = notasMenu[pasoMusica % notasMenu.length];
+        const bajo = bajosMenu[Math.floor(pasoMusica / 4) % bajosMenu.length];
+
+        tocarNota(nota, 0.34, 0.026, "sine", 0);
+        tocarNota(nota / 2, 0.32, 0.013, "triangle", 0.02);
+
+        if (pasoMusica % 4 === 0) {
+            tocarNota(bajo, 0.55, 0.018, "sine", 0);
+        }
+
+        pasoMusica++;
+        return;
+    }
+
+    if (modoMusica === "juego" && jugando) {
+        const notas = [261.63, 329.63, 392.00, 329.63, 293.66, 349.23, 440.00, 349.23];
+        const bajos = [130.81, 146.83, 164.81, 146.83];
+
+        const nota = notas[pasoMusica % notas.length];
+        const bajo = bajos[Math.floor(pasoMusica / 2) % bajos.length];
+
+        tocarNota(nota, 0.18, 0.045, "triangle", 0);
+
+        if (pasoMusica % 2 === 0) {
+            tocarNota(bajo, 0.25, 0.025, "sine", 0);
+        }
+
+        pasoMusica++;
+    }
+}
+
+function iniciarMusicaMenu() {
+    detenerMusica();
+
+    if (!musicaActiva || !audioDesbloqueado || jugando) return;
+
+    modoMusica = "menu";
+    obtenerAudioContexto();
+    pasoMusica = 0;
+    tocarPasoMusical();
+
+    musicaIntervalo = setInterval(
+        tocarPasoMusical,
+        390
+    );
+}
+
+function iniciarMusica() {
+    detenerMusica();
+
+    if (!musicaActiva || !jugando) return;
+
+    audioDesbloqueado = true;
+    modoMusica = "juego";
+    obtenerAudioContexto();
+    pasoMusica = 0;
+    tocarPasoMusical();
+
+    musicaIntervalo = setInterval(
+        tocarPasoMusical,
+        260
+    );
+}
+
+function detenerMusica() {
+    if (musicaIntervalo !== null) {
+        clearInterval(musicaIntervalo);
+        musicaIntervalo = null;
+    }
+
+    modoMusica = null;
+}
+
+function iniciarMotor() {
+    detenerMotor();
+
+    if (!sonidosActivos || !jugando) return;
+
+    const ctx = obtenerAudioContexto();
+    if (!ctx) return;
+
+    const ahora = ctx.currentTime;
+
+    motorGanancia = ctx.createGain();
+    motorFiltro = ctx.createBiquadFilter();
+
+    motorOscilador1 = ctx.createOscillator();
+    motorOscilador2 = ctx.createOscillator();
+    motorOscilador3 = ctx.createOscillator();
+
+    motorLfo = ctx.createOscillator();
+    motorLfoGanancia = ctx.createGain();
+
+    motorOscilador1.type = "sawtooth";
+    motorOscilador2.type = "triangle";
+    motorOscilador3.type = "sine";
+
+    motorFiltro.type = "lowpass";
+    motorFiltro.Q.setValueAtTime(2.2, ahora);
+    motorFiltro.frequency.setValueAtTime(780, ahora);
+
+    motorGanancia.gain.setValueAtTime(0.0001, ahora);
+    motorGanancia.gain.exponentialRampToValueAtTime(0.032, ahora + 0.18);
+
+    // Pequeña vibración para que no suene como un tono electrónico puro.
+    motorLfo.type = "sine";
+    motorLfo.frequency.setValueAtTime(7.5, ahora);
+    motorLfoGanancia.gain.setValueAtTime(2.4, ahora);
+
+    motorLfo.connect(motorLfoGanancia);
+    motorLfoGanancia.connect(motorOscilador1.frequency);
+    motorLfoGanancia.connect(motorOscilador2.frequency);
+
+    motorOscilador1.connect(motorFiltro);
+    motorOscilador2.connect(motorFiltro);
+    motorOscilador3.connect(motorFiltro);
+    motorFiltro.connect(motorGanancia);
+    motorGanancia.connect(ctx.destination);
+
+    actualizarSonidoMotor(true);
+
+    motorOscilador1.start(ahora);
+    motorOscilador2.start(ahora);
+    motorOscilador3.start(ahora);
+    motorLfo.start(ahora);
+}
+
+function actualizarSonidoMotor(inmediato) {
+    if (
+        !motorOscilador1 ||
+        !motorOscilador2 ||
+        !motorOscilador3 ||
+        !motorFiltro ||
+        !motorGanancia ||
+        !audioContexto
+    ) {
+        return;
+    }
+
+    const ahora = audioContexto.currentTime;
+    const tiempo = inmediato ? 0.01 : 0.12;
+
+    // Frecuencia base aproximada de las revoluciones del motor.
+    const base = 48 + (velocidadActual * 34);
+    const armonico = base * 1.92;
+    const grave = base * 0.52;
+    const filtro = 560 + (velocidadActual * 170);
+    const volumen = frenando ? 0.022 : 0.032;
+
+    motorOscilador1.frequency.cancelScheduledValues(ahora);
+    motorOscilador2.frequency.cancelScheduledValues(ahora);
+    motorOscilador3.frequency.cancelScheduledValues(ahora);
+    motorFiltro.frequency.cancelScheduledValues(ahora);
+    motorGanancia.gain.cancelScheduledValues(ahora);
+
+    motorOscilador1.frequency.linearRampToValueAtTime(base, ahora + tiempo);
+    motorOscilador2.frequency.linearRampToValueAtTime(armonico, ahora + tiempo);
+    motorOscilador3.frequency.linearRampToValueAtTime(grave, ahora + tiempo);
+    motorFiltro.frequency.linearRampToValueAtTime(filtro, ahora + tiempo);
+    motorGanancia.gain.linearRampToValueAtTime(volumen, ahora + tiempo);
+}
+
+function detenerMotor() {
+    if (!audioContexto) {
+        motorOscilador1 = null;
+        motorOscilador2 = null;
+        motorOscilador3 = null;
+        motorGanancia = null;
+        motorFiltro = null;
+        motorLfo = null;
+        motorLfoGanancia = null;
+        return;
+    }
+
+    const ahora = audioContexto.currentTime;
+
+    if (motorGanancia) {
+        try {
+            motorGanancia.gain.cancelScheduledValues(ahora);
+            motorGanancia.gain.setValueAtTime(
+                Math.max(0.0001, motorGanancia.gain.value),
+                ahora
+            );
+            motorGanancia.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.12);
+        }
+        catch (error) {}
+    }
+
+    const nodos = [
+        motorOscilador1,
+        motorOscilador2,
+        motorOscilador3,
+        motorLfo
+    ];
+
+    nodos.forEach(function(nodo) {
+        if (!nodo) return;
+        try {
+            nodo.stop(ahora + 0.14);
+        }
+        catch (error) {}
+    });
+
+    motorOscilador1 = null;
+    motorOscilador2 = null;
+    motorOscilador3 = null;
+    motorGanancia = null;
+    motorFiltro = null;
+    motorLfo = null;
+    motorLfoGanancia = null;
+}
+
+function sonidoAcierto() {
+    if (!sonidosActivos) return;
+    tocarNota(659.25, 0.10, 0.10, "sine", 0);
+    tocarNota(783.99, 0.14, 0.09, "sine", 0.08);
+    tocarNota(1046.50, 0.18, 0.08, "triangle", 0.16);
+}
+
+function sonidoError() {
+    if (!sonidosActivos) return;
+    tocarNota(220.00, 0.18, 0.08, "sawtooth", 0);
+    tocarNota(174.61, 0.22, 0.07, "sawtooth", 0.12);
+}
+
+function sonidoVictoria() {
+    if (!sonidosActivos) return;
+    tocarNota(523.25, 0.12, 0.09, "triangle", 0);
+    tocarNota(659.25, 0.12, 0.09, "triangle", 0.12);
+    tocarNota(783.99, 0.12, 0.09, "triangle", 0.24);
+    tocarNota(1046.50, 0.30, 0.10, "triangle", 0.36);
+}
+
+function sonidoGameOver() {
+    if (!sonidosActivos) return;
+    tocarNota(329.63, 0.16, 0.08, "square", 0);
+    tocarNota(293.66, 0.16, 0.07, "square", 0.15);
+    tocarNota(246.94, 0.28, 0.07, "square", 0.30);
+}
+
+function alternarMusica() {
+    musicaActiva = !musicaActiva;
+    guardarPreferenciasAudio();
+    actualizarBotonesAudio();
+
+    if (!musicaActiva) {
+        detenerMusica();
+        return;
+    }
+
+    audioDesbloqueado = true;
+    obtenerAudioContexto();
+
+    if (jugando) {
+        iniciarMusica();
+    }
+    else {
+        iniciarMusicaMenu();
+    }
+}
+
+function alternarSonidos() {
+    sonidosActivos = !sonidosActivos;
+    guardarPreferenciasAudio();
+    actualizarBotonesAudio();
+
+    if (sonidosActivos) {
+        tocarNota(659.25, 0.08, 0.07, "sine", 0);
+
+        if (jugando) {
+            iniciarMotor();
+        }
+    }
+    else {
+        detenerMotor();
+    }
+}
+
+/* =====================================================
+   VELOCIDAD
+===================================================== */
+
+function obtenerVelocidadBase() {
+
+    if (nivel === 1) return 1.8;
+    if (nivel === 2) return 2.1;
+
+    return 2.4;
+}
+
+function actualizarVelocimetro() {
+
+    const kmh = Math.round(
+        velocidadActual * 50
+    );
+
+    const porcentaje = Math.max(
+        0,
+        Math.min(
+            100,
+            (kmh / 120) * 100
+        )
+    );
+
+    const angulo =
+        -120 + (porcentaje * 240 / 100);
+
+    velocimetroValor.textContent = kmh;
+
+    if (velocimetroValorMini) {
+        velocimetroValorMini.textContent = kmh;
+    }
+
+    if (agujaVelocimetro) {
+        agujaVelocimetro.style.transform =
+            "rotate(" + angulo + "deg)";
+    }
+
+    velocimetro.style.setProperty(
+        "--velocimetro-porcentaje",
+        porcentaje + "%"
+    );
+}
+
+function recalcularVelocidad() {
+
+    velocidadBase = obtenerVelocidadBase();
+
+    if (frenando) {
+        velocidadActual = Math.max(
+            0.9,
+            velocidadBase * 0.55
+        );
+    }
+
+    else {
+        velocidadActual = velocidadBase;
+    }
+
+    actualizarVelocimetro();
+    actualizarSonidoMotor(false);
+}
+
+function empezarFrenar() {
+    if (!jugando) return;
+
+    frenando = true;
+    recalcularVelocidad();
+}
+
+function dejarFrenar() {
+    frenando = false;
+    recalcularVelocidad();
+}
+
+/* =====================================================
+   NÚMERO ALEATORIO
+===================================================== */
+
+function numeroAleatorio(min, max) {
+
+    return Math.floor(
+        Math.random() *
+        (max - min + 1)
+    ) + min;
+
+}
+
+
+/* =====================================================
+   NUEVA PREGUNTA
+===================================================== */
+
+function nuevaPregunta() {
+
+    let a;
+    let b;
+    let resultado;
+    let operador;
+
+
+    if (nivel === 1) {
+
+        a =
+            numeroAleatorio(2, 10);
+
+        b =
+            numeroAleatorio(2, 10);
+
+        resultado =
+            a * b;
+
+        operador =
+            "×";
+
+    }
+
+    else if (nivel === 2) {
+
+        a =
+            numeroAleatorio(-10, 10);
+
+        b =
+            numeroAleatorio(-10, 10);
+
+
+        if (
+            Math.random() < 0.5
+        ) {
+
+            resultado =
+                a + b;
+
+            operador =
+                "+";
+
+        }
+
+        else {
+
+            resultado =
+                a - b;
+
+            operador =
+                "−";
+
+        }
+
+    }
+
+    else {
+
+        a =
+            numeroAleatorio(-10, 10);
+
+        b =
+            numeroAleatorio(-10, 10);
+
+        resultado =
+            a * b;
+
+        operador =
+            "×";
+
+    }
+
+
+    respuestaCorrecta =
+        resultado;
+
+
+    pregunta.textContent =
+        a +
+        " " +
+        operador +
+        " " +
+        b +
+        " = ?";
+
+
+    let incorrecta1;
+
+    let incorrecta2;
+
+
+    do {
+
+        incorrecta1 =
+            resultado +
+            numeroAleatorio(-10, 10);
+
+    }
+
+    while (
+        incorrecta1 === resultado
+    );
+
+
+    do {
+
+        incorrecta2 =
+            resultado +
+            numeroAleatorio(-10, 10);
+
+    }
+
+    while (
+        incorrecta2 === resultado ||
+        incorrecta2 === incorrecta1
+    );
+
+
+    respuestas = [
+
+        resultado,
+
+        incorrecta1,
+
+        incorrecta2
+
+    ];
+
+
+    for (
+        let i = respuestas.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            respuestas[i],
+            respuestas[j]
+
+        ] =
+        [
+            respuestas[j],
+            respuestas[i]
+        ];
+
+    }
+
+
+    document.getElementById(
+        "respuesta1"
+    ).textContent =
+        respuestas[0];
+
+
+    document.getElementById(
+        "respuesta2"
+    ).textContent =
+        respuestas[1];
+
+
+    document.getElementById(
+        "respuesta3"
+    ).textContent =
+        respuestas[2];
+
+}
+
+
+/* =====================================================
+   POSICIÓN INICIAL
+===================================================== */
+
+function obtenerPosicionInicial() {
+
+    const carretera =
+        document.getElementById(
+            "carretera"
+        );
+
+
+    if (!carretera) {
+
+        posicionY = 300;
+
+        return;
+
+    }
+
+
+    const altura =
+        carretera.clientHeight;
+
+
+    posicionY =
+        Math.max(
+            130,
+            altura - 135
+        );
+
+}
+
+
+/* =====================================================
+   MOVER AUTO
+===================================================== */
+
+function moverAuto() {
+
+    auto.style.left =
+        carriles[posicion] + "%";
+
+
+    auto.style.top =
+        posicionY + "px";
+
+}
+
+
+/* =====================================================
+   IZQUIERDA
+===================================================== */
+
+function moverIzquierda() {
+
+    if (!jugando) return;
+
+
+    if (posicion > 1) {
+
+        posicion--;
+
+        moverAuto();
+
+    }
+
+}
+
+
+/* =====================================================
+   DERECHA
+===================================================== */
+
+function moverDerecha() {
+
+    if (!jugando) return;
+
+
+    if (posicion < 3) {
+
+        posicion++;
+
+        moverAuto();
+
+    }
+
+}
+
+
+/* =====================================================
+   TECLADO
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (!jugando) return;
+
+
+        if (
+            event.key === "ArrowLeft"
+        ) {
+
+            event.preventDefault();
+
+            moverIzquierda();
+
+        }
+
+
+        if (
+            event.key === "ArrowRight"
+        ) {
+
+            event.preventDefault();
+
+            moverDerecha();
+
+        }
+
+        if (
+            event.key === "ArrowDown"
+        ) {
+
+            event.preventDefault();
+
+            empezarFrenar();
+
+        }
+
+    }
+);
+
+document.addEventListener(
+    "keyup",
+    function(event) {
+
+        if (
+            event.key === "ArrowDown"
+        ) {
+
+            event.preventDefault();
+
+            dejarFrenar();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   INFORMACIÓN
+===================================================== */
+
+function actualizarInfo() {
+
+    puntosTexto.textContent =
+        puntos;
+
+    vidasTexto.textContent =
+        vidas;
+
+    nivelTexto.textContent =
+        nivel;
+
+}
+
+
+/* =====================================================
+   COMPROBAR RESPUESTA
+===================================================== */
+
+function comprobarRespuesta() {
+
+    const respuestaElegida =
+        respuestas[posicion - 1];
+
+
+    if (
+        respuestaElegida ===
+        respuestaCorrecta
+    ) {
+
+        puntos += 10;
+        sonidoAcierto();
+
+    }
+
+    else {
+
+        vidas--;
+        sonidoError();
+
+    }
+
+
+    actualizarInfo();
+
+
+    if (
+        vidas <= 0
+    ) {
+
+        terminar(false);
+
+        return;
+
+    }
+
+
+    if (
+        puntos >= 150
+    ) {
+
+        terminar(true);
+
+        return;
+
+    }
+
+
+    nuevaPregunta();
+
+}
+
+
+/* =====================================================
+   ANIMACIÓN
+===================================================== */
+
+function animar() {
+
+    if (!jugando) return;
+
+
+    posicionY -= velocidadActual;
+
+    moverAuto();
+
+
+    if (
+        posicionY <= 15
+    ) {
+
+        comprobarRespuesta();
+
+
+        if (!jugando) return;
+
+
+        obtenerPosicionInicial();
+
+        moverAuto();
+
+    }
+
+
+    animacion =
+        requestAnimationFrame(
+            animar
+        );
+
+}
+
+
+/* =====================================================
+   COMENZAR JUEGO
+===================================================== */
+
+function esMovil() {
+    return window.innerWidth <= 700;
+}
+
+async function intentarPantallaHorizontal() {
+    try {
+        const docEl = document.documentElement;
+
+        if (docEl.requestFullscreen && !document.fullscreenElement) {
+            await docEl.requestFullscreen();
+        }
+
+        if (
+            screen.orientation &&
+            screen.orientation.lock
+        ) {
+            await screen.orientation.lock("landscape");
+        }
+    } catch (error) {
+        // Algunos navegadores, especialmente Safari, no permiten bloquear orientación.
+    }
+}
+
+function activarJuegoHorizontalMovil() {
+    if (esMovil()) {
+        document.body.classList.add("juego-horizontal-movil");
+        intentarPantallaHorizontal();
+    }
+}
+
+function desactivarJuegoHorizontalMovil() {
+    document.body.classList.remove("juego-horizontal-movil");
+}
+
+function comenzarJuego() {
+
+    const nombreEscrito =
+        nombre.value.trim();
+
+
+    if (
+        nombreEscrito === ""
+    ) {
+
+        alert(
+            "✏️ Primero escribí tu nombre."
+        );
+
+        nombre.focus();
+
+        return;
+
+    }
+
+
+    nombreJugador =
+        nombreEscrito;
+
+
+    puntos = 0;
+
+    vidas = 3;
+
+    posicion = 2;
+
+    jugando = true;
+
+    frenando = false;
+    recalcularVelocidad();
+
+    if (
+        animacion !== null
+    ) {
+
+        cancelAnimationFrame(
+            animacion
+        );
+
+        animacion = null;
+
+    }
+
+
+    menu.style.display =
+        "none";
+
+    final.style.display =
+        "none";
+
+    configuracion.style.display =
+        "none";
+
+    juego.style.display =
+        "block";
+
+    activarJuegoHorizontalMovil();
+    iniciarMusica();
+    iniciarMotor();
+
+    actualizarInfo();
+
+    obtenerPosicionInicial();
+
+    nuevaPregunta();
+
+    moverAuto();
+
+    animar();
+
+}
+
+
+/* =====================================================
+   TERMINAR
+===================================================== */
+
+function terminar(gano) {
+
+    jugando = false;
+
+    dejarFrenar();
+    detenerMusica();
+    detenerMotor();
+
+
+    if (
+        animacion !== null
+    ) {
+
+        cancelAnimationFrame(
+            animacion
+        );
+
+        animacion = null;
+
+    }
+
+
+    if (gano) {
+
+        resultadoTitulo.textContent =
+            "🏆 ¡GANASTE!";
+
+        sonidoVictoria();
+
+    }
+
+    else {
+
+        resultadoTitulo.textContent =
+            "💥 GAME OVER";
+
+        sonidoGameOver();
+
+    }
+
+
+    resultadoTexto.textContent =
+        "Jugador: " +
+        nombreJugador +
+        " | Nivel: " +
+        nivel;
+
+
+    puntosFinales.textContent =
+        puntos;
+
+
+    guardarPuntaje();
+
+
+    final.style.display =
+        "flex";
+
+}
+
+
+/* =====================================================
+   OBTENER RANKING
+===================================================== */
+
+function obtenerRanking() {
+
+    try {
+
+        const datos =
+            localStorage.getItem(
+                "carreraRanking"
+            );
+
+
+        if (!datos) {
+
+            return [];
+
+        }
+
+
+        const ranking =
+            JSON.parse(datos);
+
+
+        if (
+            !Array.isArray(ranking)
+        ) {
+
+            return [];
+
+        }
+
+
+        return ranking;
+
+    }
+
+    catch (error) {
+
+        return [];
+
+    }
+
+}
+
+
+/* =====================================================
+   GUARDAR PUNTAJE
+===================================================== */
+
+function guardarPuntaje() {
+
+    let ranking =
+        obtenerRanking();
+
+
+    ranking.push({
+
+        nombre:
+            nombreJugador,
+
+        puntos:
+            puntos,
+
+        nivel:
+            nivel
+
+    });
+
+
+    ranking.sort(
+        function(a, b) {
+
+            return b.puntos -
+                   a.puntos;
+
+        }
+    );
+
+
+    /*
+       Se conservan los 30 mejores
+       resultados en total.
+    */
+
+    ranking =
+        ranking.slice(0, 30);
+
+
+    try {
+
+        localStorage.setItem(
+            "carreraRanking",
+            JSON.stringify(ranking)
+        );
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "No se pudo guardar el ranking."
+        );
+
+    }
+
+
+    mostrarRanking();
+
+}
+
+
+/* =====================================================
+   MOSTRAR RANKINGS
+===================================================== */
+
+function mostrarRanking() {
+
+    const ranking =
+        obtenerRanking();
+
+
+    ranking1.innerHTML = "";
+
+    ranking2.innerHTML = "";
+
+    ranking3.innerHTML = "";
+
+
+    mostrarRankingNivel(
+        ranking,
+        1,
+        ranking1
+    );
+
+
+    mostrarRankingNivel(
+        ranking,
+        2,
+        ranking2
+    );
+
+
+    mostrarRankingNivel(
+        ranking,
+        3,
+        ranking3
+    );
+
+}
+
+
+/* =====================================================
+   MOSTRAR UN RANKING
+===================================================== */
+
+function mostrarRankingNivel(
+    ranking,
+    nivelSeleccionado,
+    lista
+) {
+
+    const jugadores =
+        ranking
+        .filter(
+            function(jugador) {
+
+                return Number(
+                    jugador.nivel
+                ) ===
+                nivelSeleccionado;
+
+            }
+        )
+        .sort(
+            function(a, b) {
+
+                return b.puntos -
+                       a.puntos;
+
+            }
+        )
+        .slice(0, 10);
+
+
+    if (
+        jugadores.length === 0
+    ) {
+
+        const li =
+            document.createElement(
+                "li"
+            );
+
+
+        li.textContent =
+            "Todavía no hay jugadores.";
+
+
+        lista.appendChild(li);
+
+        return;
+
+    }
+
+
+    jugadores.forEach(
+        function(jugador) {
+
+            const li =
+                document.createElement(
+                    "li"
+                );
+
+
+            li.textContent =
+                jugador.nombre +
+                " — " +
+                jugador.puntos +
+                " pts";
+
+
+            lista.appendChild(li);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   VOLVER AL MENÚ
+===================================================== */
+
+function volverMenuPrincipal() {
+
+    jugando = false;
+
+    dejarFrenar();
+    detenerMusica();
+    detenerMotor();
+
+
+    if (
+        animacion !== null
+    ) {
+
+        cancelAnimationFrame(
+            animacion
+        );
+
+        animacion = null;
+
+    }
+
+
+    dejarFrenar();
+
+    juego.style.display =
+        "none";
+
+    final.style.display =
+        "none";
+
+    configuracion.style.display =
+        "none";
+
+    rankingModal.style.display =
+        "none";
+
+    menu.style.display =
+        "flex";
+
+    desactivarJuegoHorizontalMovil();
+
+    iniciarMusicaMenu();
+    mostrarRanking();
+
+}
+
+
+/* =====================================================
+   OTRO JUGADOR
+===================================================== */
+
+function otroJugador() {
+
+    volverMenuPrincipal();
+
+
+    nombre.value = "";
+
+
+    setTimeout(
+        function() {
+
+            nombre.focus();
+
+        },
+        150
+    );
+
+}
+
+
+/* =====================================================
+   BOTONES: MÉTODO DIRECTO Y COMPATIBLE
+===================================================== */
+
+function seleccionarNivel(nuevoNivel, boton) {
+    nivel = Number(nuevoNivel);
+
+    var botones = document.getElementsByClassName("nivel");
+    for (var i = 0; i < botones.length; i++) {
+        botones[i].classList.remove("activo");
+    }
+
+    if (boton) {
+        boton.classList.add("activo");
+    }
+
+    nivelTexto.textContent = nivel;
+}
+
+function actualizarAutoSeleccionado() {
+    const rutaAuto = autosDisponibles[autoSeleccionado];
+
+    autoSprite.src = rutaAuto;
+    autoPreviewSprite.src = rutaAuto;
+}
+
+function seleccionarAuto(nuevoAuto, boton) {
+    autoSeleccionado = nuevoAuto;
+
+    const botones = document.querySelectorAll("#opcionesAutos .botonAutoReal");
+    botones.forEach(function(item) {
+        item.classList.remove("activo");
+    });
+
+    if (boton) {
+        boton.classList.add("activo");
+    }
+
+    actualizarAutoSeleccionado();
+}
+
+function abrirConfiguracion() {
+    obtenerAudioContexto();
+    menu.style.display = "none";
+    configuracion.style.display = "flex";
+    actualizarAutoSeleccionado();
+    actualizarBotonesAudio();
+}
+
+function cerrarConfiguracion() {
+    configuracion.style.display = "none";
+    menu.style.display = "flex";
+    iniciarMusicaMenu();
+}
+
+function abrirRanking() {
+    rankingModal.style.display = "flex";
+}
+
+function cerrarRanking() {
+    rankingModal.style.display = "none";
+}
+
+/* =====================================================
+   ENTER EN NOMBRE
+===================================================== */
+
+nombre.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            event.preventDefault();
+
+            comenzarJuego();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   RECALCULAR AL GIRAR
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    function() {
+
+        if (jugando) {
+
+            obtenerPosicionInicial();
+
+            moverAuto();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   DESBLOQUEAR AUDIO DEL MENÚ
+   Los navegadores móviles exigen una primera interacción.
+===================================================== */
+
+function desbloquearAudioMenu() {
+    if (audioDesbloqueado) return;
+
+    audioDesbloqueado = true;
+    obtenerAudioContexto();
+
+    if (musicaActiva && !jugando) {
+        iniciarMusicaMenu();
+    }
+}
+
+document.addEventListener("pointerdown", desbloquearAudioMenu, { once: true });
+document.addEventListener("keydown", desbloquearAudioMenu, { once: true });
+
+/* =====================================================
+   INICIAR
+===================================================== */
+
+cargarPreferenciasAudio();
+document.body.classList.remove("menu-horizontal-movil");
+actualizarAutoSeleccionado();
+recalcularVelocidad();
+mostrarRanking();
+
+</script>
+
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+        navigator.serviceWorker.register("./service-worker.js")
+            .catch(function(error) {
+                console.log("No se pudo registrar el modo offline:", error);
+            });
+    });
+}
+</script>
+
+</body>
+
+</html>
