@@ -133,6 +133,16 @@
       height:30px;
     }
 
+
+    .range-labels{
+      display:flex;
+      justify-content:space-between;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:400;
+    }
+
     button{
       min-height:44px;
       border:1px solid #cbd5e1;
@@ -232,7 +242,17 @@
         font-size:18px;
       }
 
-      button{
+  
+    .range-labels{
+      display:flex;
+      justify-content:space-between;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:400;
+    }
+
+    button{
         width:100%;
       }
 
@@ -256,7 +276,7 @@
         <div class="graph-head">
           <div>
             <div class="section-title">Representación gráfica</div>
-            <div class="small">Observá qué sucede al modificar los coeficientes.</div>
+            <div class="small">Observá qué sucede al modificar los coeficientes. Los ejes ahora muestran un rango más amplio.</div>
           </div>
           <button id="resetBtn" type="button">Restablecer</button>
         </div>
@@ -272,15 +292,17 @@
           <div id="eq1" class="eq"></div>
 
           <label>a₁ = <span id="a1Val"></span>
-            <input id="a1" type="range" min="-6" max="6" step="1" value="2">
+            <input id="a1" type="range" min="-20" max="20" step="1" value="2">
+            <span class="range-labels"><span>-20</span><span>0</span><span>20</span></span>
           </label>
 
           <label>b₁ = <span id="b1Val"></span>
-            <input id="b1" type="range" min="-6" max="6" step="1" value="1">
+            <input id="b1" type="range" min="-20" max="20" step="1" value="1">
           </label>
 
           <label>c₁ = <span id="c1Val"></span>
-            <input id="c1" type="range" min="-10" max="10" step="1" value="4">
+            <input id="c1" type="range" min="-20" max="20" step="1" value="4">
+            <span class="range-labels"><span>-20</span><span>0</span><span>20</span></span>
           </label>
         </section>
 
@@ -289,15 +311,17 @@
           <div id="eq2" class="eq"></div>
 
           <label>a₂ = <span id="a2Val"></span>
-            <input id="a2" type="range" min="-6" max="6" step="1" value="-1">
+            <input id="a2" type="range" min="-20" max="20" step="1" value="-1">
+            <span class="range-labels"><span>-20</span><span>0</span><span>20</span></span>
           </label>
 
           <label>b₂ = <span id="b2Val"></span>
-            <input id="b2" type="range" min="-6" max="6" step="1" value="1">
+            <input id="b2" type="range" min="-20" max="20" step="1" value="1">
           </label>
 
           <label>c₂ = <span id="c2Val"></span>
-            <input id="c2" type="range" min="-10" max="10" step="1" value="1">
+            <input id="c2" type="range" min="-20" max="20" step="1" value="1">
+            <span class="range-labels"><span>-20</span><span>0</span><span>20</span></span>
           </label>
         </section>
 
@@ -319,7 +343,7 @@
       const el = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
       const svg = document.getElementById("graph");
       const NS = "http://www.w3.org/2000/svg";
-      const W = 520, min = -10, max = 10;
+      const W = 520, min = -20, max = 20;
       const sx = x => (x-min)/(max-min)*W;
       const sy = y => W-(y-min)/(max-min)*W;
       const fmt = n => Number(n.toFixed(2)).toString();
@@ -336,7 +360,7 @@
       function drawGrid(){
         svg.innerHTML = "";
 
-        for(let i=-10;i<=10;i++){
+        for(let i=-20;i<=20;i++){
           add("line",{
             x1:sx(i), y1:0, x2:sx(i), y2:W,
             stroke:i===0 ? "#94a3b8" : "#e2e8f0",
@@ -349,7 +373,7 @@
           });
         }
 
-        for(let i=-8;i<=8;i+=2){
+        for(let i=-20;i<=20;i+=5){
           if(i===0) continue;
 
           const tx = add("text",{
@@ -532,3 +556,4 @@
   </script>
 </body>
 </html>
+
