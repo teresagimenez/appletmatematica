@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Posición relativa entre dos rectas</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --border:#dbe3ef;
+      --text:#1f2937;
+      --muted:#64748b;
+      --primary:#2563eb;
+      --line1:#0f766e;
+      --line2:#c2410c;
+      --point:#7c3aed;
+      --ok:#15803d;
+      --soft:#f8fafc;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+      overflow-x:hidden;
+    }
+
+    body{
+      min-height:100%;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:1180px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(24px,4vw,32px);
+      line-height:1.15;
+    }
+
+    .intro{
+      margin:0 0 20px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.5;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);
+      gap:18px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 3px 12px rgba(15,23,42,.05);
+      min-width:0;
+    }
+
+    .graph-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .section-title{
+      font-weight:700;
+      font-size:17px;
+    }
+
+    .small{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .graph-wrap{
+      width:100%;
+      aspect-ratio:1/1;
+      min-height:280px;
+    }
+
+    svg{
+      width:100%;
+      height:100%;
+      display:block;
+      background:#fbfdff;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      touch-action:manipulation;
+    }
+
+    .side{
+      display:grid;
+      gap:14px;
+      min-width:0;
+    }
+
+    .eq{
+      font-size:clamp(18px,3.8vw,22px);
+      font-weight:700;
+      margin:6px 0 14px;
+      overflow-wrap:anywhere;
+    }
+
+    label{
+      display:block;
+      margin:12px 0;
+      font-size:15px;
+      font-weight:600;
+    }
+
+    input[type="range"]{
+      width:100%;
+      margin-top:8px;
+      accent-color:var(--primary);
+      height:30px;
+    }
+
+    button{
+      min-height:44px;
+      border:1px solid #cbd5e1;
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:15px;
+      touch-action:manipulation;
+    }
+
+    button.primary{
+      width:100%;
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    button.secondary{
+      width:100%;
+      margin-top:8px;
+    }
+
+    button:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .result{
+      background:var(--soft);
+      border-radius:12px;
+      padding:12px;
+    }
+
+    .result strong{
+      display:block;
+      font-size:20px;
+      margin-top:4px;
+    }
+
+    @media (max-width: 820px){
+      .wrap{
+        padding:14px;
+      }
+
+      .layout{
+        grid-template-columns:1fr;
+      }
+
+      .graph-card{
+        order:1;
+      }
+
+      .side{
+        order:2;
+      }
+
+      .card{
+        border-radius:14px;
+        padding:14px;
+      }
+
+      .graph-wrap{
+        min-height:0;
+      }
+    }
+
+    @media (max-width: 520px){
+      .wrap{
+        padding:10px;
+      }
+
+      h1{
+        font-size:24px;
+      }
+
+      .intro{
+        font-size:14px;
+        margin-bottom:14px;
+      }
+
+      .card{
+        padding:12px;
+      }
+
+      .graph-head{
+        align-items:flex-start;
+      }
+
+      .graph-head button{
+        width:100%;
+      }
+
+      .eq{
+        font-size:18px;
+      }
+
+      button{
+        width:100%;
+      }
+
+      input[type="range"]{
+        height:36px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <h1>Posición relativa entre dos rectas</h1>
+    <p class="intro">
+      Modificá los coeficientes de las rectas escritas en la forma
+      <strong>ax + by = c</strong> y observá cómo cambia su posición relativa.
+    </p>
+
+    <div class="layout">
+      <section class="card graph-card">
+        <div class="graph-head">
+          <div>
+            <div class="section-title">Representación gráfica</div>
+            <div class="small">Observá qué sucede al modificar los coeficientes.</div>
+          </div>
+          <button id="resetBtn" type="button">Restablecer</button>
+        </div>
+
+        <div class="graph-wrap">
+          <svg id="graph" viewBox="0 0 520 520" aria-label="Gráfico de dos rectas"></svg>
+        </div>
+      </section>
+
+      <div class="side">
+        <section class="card">
+          <div class="section-title">Recta r</div>
+          <div id="eq1" class="eq"></div>
+
+          <label>a₁ = <span id="a1Val"></span>
+            <input id="a1" type="range" min="-6" max="6" step="1" value="2">
+          </label>
+
+          <label>b₁ = <span id="b1Val"></span>
+            <input id="b1" type="range" min="-6" max="6" step="1" value="1">
+          </label>
+
+          <label>c₁ = <span id="c1Val"></span>
+            <input id="c1" type="range" min="-10" max="10" step="1" value="4">
+          </label>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Recta s</div>
+          <div id="eq2" class="eq"></div>
+
+          <label>a₂ = <span id="a2Val"></span>
+            <input id="a2" type="range" min="-6" max="6" step="1" value="-1">
+          </label>
+
+          <label>b₂ = <span id="b2Val"></span>
+            <input id="b2" type="range" min="-6" max="6" step="1" value="1">
+          </label>
+
+          <label>c₂ = <span id="c2Val"></span>
+            <input id="c2" type="range" min="-10" max="10" step="1" value="1">
+          </label>
+        </section>
+
+        <section class="card">
+          <div class="small">Posición relativa</div>
+          <div class="result">
+            <strong id="classification"></strong>
+            <div id="pointInfo" class="small" style="margin-top:6px"></div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const ids = ["a1","b1","c1","a2","b2","c2"];
+      const el = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+      const svg = document.getElementById("graph");
+      const NS = "http://www.w3.org/2000/svg";
+      const W = 520, min = -10, max = 10;
+      const sx = x => (x-min)/(max-min)*W;
+      const sy = y => W-(y-min)/(max-min)*W;
+      const fmt = n => Number(n.toFixed(2)).toString();
+
+      let currentType = "secant";
+
+      function add(tag, attrs={}){
+        const node = document.createElementNS(NS,tag);
+        Object.entries(attrs).forEach(([k,v]) => node.setAttribute(k,v));
+        svg.appendChild(node);
+        return node;
+      }
+
+      function drawGrid(){
+        svg.innerHTML = "";
+
+        for(let i=-10;i<=10;i++){
+          add("line",{
+            x1:sx(i), y1:0, x2:sx(i), y2:W,
+            stroke:i===0 ? "#94a3b8" : "#e2e8f0",
+            "stroke-width":i===0 ? 2 : 1
+          });
+          add("line",{
+            x1:0, y1:sy(i), x2:W, y2:sy(i),
+            stroke:i===0 ? "#94a3b8" : "#e2e8f0",
+            "stroke-width":i===0 ? 2 : 1
+          });
+        }
+
+        for(let i=-8;i<=8;i+=2){
+          if(i===0) continue;
+
+          const tx = add("text",{
+            x:sx(i)+4, y:sy(0)-6,
+            fill:"#64748b", "font-size":"11"
+          });
+          tx.textContent = i;
+
+          const ty = add("text",{
+            x:sx(0)+6, y:sy(i)-4,
+            fill:"#64748b", "font-size":"11"
+          });
+          ty.textContent = i;
+        }
+      }
+
+      function equation(a,b,c){
+        let left = "";
+
+        if(a !== 0){
+          left += a===1 ? "x" : a===-1 ? "-x" : a+"x";
+        }
+
+        if(b !== 0){
+          const abs = Math.abs(b);
+          const term = abs===1 ? "y" : abs+"y";
+
+          if(left){
+            left += b>0 ? " + "+term : " - "+term;
+          }else{
+            left += b>0 ? term : "-"+term;
+          }
+        }
+
+        if(!left) left="0";
+        return left+" = "+c;
+      }
+
+      function linePoints(a,b,c){
+        if(a===0 && b===0) return [];
+
+        const pts=[];
+
+        if(b!==0){
+          let y=(c-a*min)/b;
+          if(y>=min && y<=max) pts.push([min,y]);
+
+          y=(c-a*max)/b;
+          if(y>=min && y<=max) pts.push([max,y]);
+        }
+
+        if(a!==0){
+          let x=(c-b*min)/a;
+          if(x>=min && x<=max) pts.push([x,min]);
+
+          x=(c-b*max)/a;
+          if(x>=min && x<=max) pts.push([x,max]);
+        }
+
+        const unique=[];
+        pts.forEach(p=>{
+          if(!unique.some(q =>
+            Math.abs(p[0]-q[0])<1e-7 &&
+            Math.abs(p[1]-q[1])<1e-7
+          )) unique.push(p);
+        });
+
+        return unique.slice(0,2);
+      }
+
+      function drawLine(a,b,c,color,width=4,dash=""){
+        const pts=linePoints(a,b,c);
+        if(pts.length<2) return;
+
+        const attrs={
+          x1:sx(pts[0][0]),
+          y1:sy(pts[0][1]),
+          x2:sx(pts[1][0]),
+          y2:sy(pts[1][1]),
+          stroke:color,
+          "stroke-width":width,
+          "stroke-linecap":"round"
+        };
+
+        if(dash) attrs["stroke-dasharray"]=dash;
+        add("line",attrs);
+      }
+
+      function classify(a1,b1,c1,a2,b2,c2){
+        if((a1===0 && b1===0)||(a2===0 && b2===0)) return "invalid";
+
+        const d=a1*b2-a2*b1;
+
+        if(d!==0) return "secant";
+
+        if(
+          a1*c2-a2*c1===0 &&
+          b1*c2-b2*c1===0
+        ) return "coincident";
+
+        return "parallel";
+      }
+
+      function update(){
+        const v={
+          a1:parseInt(el.a1.value),
+          b1:parseInt(el.b1.value),
+          c1:parseInt(el.c1.value),
+          a2:parseInt(el.a2.value),
+          b2:parseInt(el.b2.value),
+          c2:parseInt(el.c2.value)
+        };
+
+        Object.keys(v).forEach(k=>{
+          document.getElementById(k+"Val").textContent=v[k];
+        });
+
+        document.getElementById("eq1").textContent="r: "+equation(v.a1,v.b1,v.c1);
+        document.getElementById("eq2").textContent="s: "+equation(v.a2,v.b2,v.c2);
+
+        drawGrid();
+
+        currentType=classify(v.a1,v.b1,v.c1,v.a2,v.b2,v.c2);
+
+        if(currentType==="coincident"){
+          drawLine(v.a1,v.b1,v.c1,"#0f766e",6);
+          drawLine(v.a2,v.b2,v.c2,"#c2410c",3,"9 7");
+        }else if(currentType!=="invalid"){
+          drawLine(v.a1,v.b1,v.c1,"#0f766e");
+          drawLine(v.a2,v.b2,v.c2,"#c2410c");
+        }
+
+        const classification=document.getElementById("classification");
+        const pointInfo=document.getElementById("pointInfo");
+
+        if(currentType==="secant"){
+          classification.textContent="SECANTES";
+
+          const D=v.a1*v.b2-v.a2*v.b1;
+          const x=(v.c1*v.b2-v.c2*v.b1)/D;
+          const y=(v.a1*v.c2-v.a2*v.c1)/D;
+
+          pointInfo.textContent="Se cortan en un único punto: ("+fmt(x)+", "+fmt(y)+").";
+
+          if(x>=min && x<=max && y>=min && y<=max){
+            add("circle",{
+              cx:sx(x), cy:sy(y), r:7,
+              fill:"#7c3aed",
+              stroke:"#ffffff",
+              "stroke-width":2
+            });
+          }
+        }else if(currentType==="parallel"){
+          classification.textContent="PARALELAS";
+          pointInfo.textContent="No tienen puntos en común.";
+        }else if(currentType==="coincident"){
+          classification.textContent="COINCIDENTES";
+          pointInfo.textContent="Tienen infinitos puntos en común.";
+        }else{
+          classification.textContent="ECUACIÓN NO VÁLIDA";
+          pointInfo.textContent="En una recta, a y b no pueden valer 0 simultáneamente.";
+        }
+
+      }
+
+      ids.forEach(id=>el[id].addEventListener("input",update));
+
+      document.getElementById("resetBtn").addEventListener("click",()=>{
+        el.a1.value=2;
+        el.b1.value=1;
+        el.c1.value=4;
+        el.a2.value=-1;
+        el.b2.value=1;
+        el.c2.value=1;
+        update();
+      });
+
+      update();
+    })();
+  </script>
+</body>
+</html>
